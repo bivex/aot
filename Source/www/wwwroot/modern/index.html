@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AOT Modern Interface | Automatic Optical Text processing</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo-wrapper">
+                <img src="images/logo.png" alt="AOT Analytics" style="width: 100%; max-width: 180px; margin-bottom: 1rem;">
+            </div>
+            <nav>
+                <ul class="nav-links">
+                    <li class="nav-item">
+                        <a href="#morphology" class="nav-link active" data-section="morphology">
+                            <i class="fas fa-microscope"></i>
+                            Morphology
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#syntax" class="nav-link" data-section="syntax">
+                            <i class="fas fa-project-diagram"></i>
+                            Syntax
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#about" class="nav-link" data-section="about">
+                            <i class="fas fa-info-circle"></i>
+                            About
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <div style="margin-top: auto; font-size: 0.75rem; color: var(--text-muted);">
+                &copy; 2026 AOT Project<br>
+                Premium Linguistics Stack
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Morphology Section -->
+            <section id="morphology" class="content-section active">
+                <header>
+                    <h1>Morphological Analysis</h1>
+                    <p class="subtitle">Extract lemmas, grammems, and paradigms from text.</p>
+                </header>
+
+                <div class="input-group">
+                    <textarea id="morphInput" placeholder="Enter text to analyze... (e.g., 'мама мыла раму')"></textarea>
+                    <div class="controls">
+                        <div class="options">
+                            <label class="option-item">
+                                <input type="radio" name="morphLangua" value="Russian" checked>
+                                Russian
+                            </label>
+                            <label class="option-item">
+                                <input type="radio" name="morphLangua" value="English">
+                                English
+                            </label>
+                            <label class="option-item">
+                                <input type="radio" name="morphLangua" value="German">
+                                German
+                            </label>
+                            <label class="option-item">
+                                <input type="checkbox" id="withParadigms">
+                                With Paradigms
+                            </label>
+                        </div>
+                        <button id="morphSubmitBtn">
+                            <span class="btn-text">Analyze</span>
+                            <div class="spinner"></div>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="morphResults" class="results-container">
+                    <!-- Results will be injected here -->
+                </div>
+            </section>
+
+            <!-- Syntax Section -->
+            <section id="syntax" class="content-section">
+                <header>
+                    <h1>Syntactic Analysis</h1>
+                    <p class="subtitle">Visualize the dependency structure of sentences.</p>
+                </header>
+
+                <div class="input-group">
+                    <textarea id="syntaxInput" placeholder="Enter a sentence to visualize..."></textarea>
+                    <div class="controls">
+                        <div class="options">
+                            <select id="syntaxLangua" style="background: var(--bg-sidebar); color: white; border: 1px solid var(--border-color); padding: 0.5rem; border-radius: 0.4rem;">
+                                <option value="Russian" selected>Russian</option>
+                                <option value="German">German</option>
+                                <option value="Ukrainian">Ukrainian</option>
+                            </select>
+                        </div>
+                        <button id="syntaxSubmitBtn">
+                            <span class="btn-text">Visualize</span>
+                            <div class="spinner"></div>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="syntaxCanvasWrapper">
+                    <canvas id="synanCanvas"></canvas>
+                </div>
+            </section>
+
+            <!-- About Section -->
+            <section id="about" class="content-section">
+                <header>
+                    <h1>About AOT</h1>
+                </header>
+                <div class="card">
+                    <p>The Automatic Optical Text (AOT) project is a comprehensive toolkit for natural language processing, focusing on Russian, English, German, and Ukrainian languages.</p>
+                    <p style="margin-top: 1rem;">This modern interface provides a streamlined way to interact with the AOT backend services (SynanDaemon).</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>

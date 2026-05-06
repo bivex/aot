@@ -58,6 +58,15 @@ The interface will then be available at:
 - Morphology Demo: `http://localhost:8080/demo/morph.html`
 - Syntax Demo (Visualizer): `http://localhost:8080/demo/synt.html`
 
+### Modern Interface (Recommended)
+A completely redesigned, premium interface is available at:
+- `http://localhost:8080/modern/index.html`
+
+This version features:
+- **Unified SPA**: Switch between Morphology and Syntax seamlessly.
+- **Premium Design**: Dark mode with modern typography and animations.
+- **Enhanced Visualizer**: Re-implemented syntax tree with better clarity.
+
 ---
 
 ## 3. Production Deployment (Nginx)
