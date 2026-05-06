@@ -60,24 +60,45 @@ p {
   text-indent: 0;
 }
 
-/* Links with excellent tap targets and hover states */
+/* Links with excellent visual distinction */
 a {
   color: var(--color-text-primary);
   text-decoration: underline;
   text-decoration-thickness: 1px;
-  text-underline-offset: 2px;
+  text-underline-offset: 3px;
   transition: color 0.2s ease, text-decoration-color 0.2s ease;
+  text-decoration-color: rgba(0, 0, 0, 0.4);
 }
 
 a:hover {
   color: #0066cc;
   text-decoration-color: #0066cc;
+  text-decoration-thickness: 2px;
 }
 
 a:focus-visible {
-  outline: 2px solid #0066cc;
+  outline: 3px solid #0066cc;
   outline-offset: 2px;
   border-radius: 2px;
+}
+
+/* Ensure links are always visually distinct regardless of color */
+.main-nav a,
+.footer-text a,
+.titleblack a,
+.titlewhite a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+}
+
+.main-nav a {
+  text-decoration-color: rgba(255, 255, 255, 0.7);
+}
+
+.main-nav a:hover {
+  text-decoration-color: #60a5fa;
+  text-decoration-thickness: 2px;
 }
 
 /* Better list styling */

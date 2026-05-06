@@ -5,8 +5,132 @@
 	<title>АОТ :: Онлайн демо :: Синтаксис</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link href="../aot.css" rel="stylesheet" type="text/css">
-	<link rel="stylesheet" type="text/css" href="/demo/synan.css" />
+	
+	<!-- Preconnect to Google Fonts (if used) -->
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	
+	<!-- Critical CSS inline for above-the-fold content -->
+	<style>
+		/* Critical above-the-fold styles */
+		* { box-sizing: border-box; }
+		html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+		body { 
+			margin: 0; 
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+			line-height: 1.6;
+			color: #1a1a1a;
+			background: #F3F3F3;
+		}
+		.container {
+			max-width: 760px;
+			margin: 2rem auto;
+			background: #fff;
+			box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+			border-radius: 8px;
+			overflow: hidden;
+		}
+		.site-header {
+			background: linear-gradient(135deg, #1a1a1a 0%, #333 100%);
+			color: #fff;
+			padding: 2rem;
+			text-align: center;
+		}
+		.brand {
+			font-size: 3.5rem;
+			font-weight: 700;
+			margin: 0;
+			letter-spacing: -0.03em;
+			line-height: 1;
+			color: #fff;
+		}
+		.tagline {
+			font-size: 1.125rem;
+			margin: 0.75rem 0 0;
+			opacity: 0.9;
+		}
+		.main-nav {
+			background: #000;
+			padding: 0.75rem 2rem;
+			border-top: 1px solid #444;
+			border-bottom: 1px solid #444;
+		}
+		.main-nav ul {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: center;
+			gap: 2rem;
+			list-style: none;
+			margin: 0;
+			padding: 0;
+		}
+		.main-nav a {
+			color: #fff;
+			text-decoration: underline;
+			text-underline-offset: 2px;
+			font-size: 0.9rem;
+		}
+		.demo-section { padding: 2rem; }
+		.section-title {
+			background: #e5e7eb;
+			padding: 0.75rem 1rem;
+			margin: 0 0 1.5rem 0;
+			font-size: 1.25rem;
+			font-weight: 600;
+			border-left: 4px solid #6366f1;
+		}
+		textarea {
+			width: 100%;
+			max-width: 720px;
+			padding: 1rem;
+			font-size: 1rem;
+			line-height: 1.6;
+			border: 2px solid #d1d5db;
+			border-radius: 8px;
+			min-height: 200px;
+			resize: vertical;
+		}
+		.submit-btn {
+			padding: 0.75rem 2rem;
+			font-size: 1rem;
+			font-weight: 600;
+			color: #fff;
+			background: linear-gradient(135deg, #6366f1, #4f46e5);
+			border: none;
+			border-radius: 8px;
+			cursor: pointer;
+		}
+		.canvas-wrapper {
+			background: #f8fafc;
+			border: 2px solid #e5e7eb;
+			border-radius: 8px;
+			padding: 1.5rem;
+			margin-top: 1rem;
+			display: flex;
+			justify-content: center;
+			min-height: 400px;
+		}
+		#synanCanvas { max-width: 100%; }
+		.info-section { padding: 2rem; background: #f9fafb; }
+		.site-footer {
+			background: #1a1a1a;
+			color: #9ca3af;
+			padding: 1.5rem 2rem;
+			text-align: center;
+			font-size: 0.875rem;
+		}
+		@media (max-width: 768px) {
+			.container { margin: 1rem; border-radius: 0; }
+			.brand { font-size: 2.5rem; }
+			.main-nav ul { gap: 0.75rem 1rem; }
+		}
+	</style>
+	
+	<!-- Non-critical CSS loaded asynchronously -->
+	<link href="../aot.css" rel="stylesheet" type="text/css" media="print" onload="this.media='all'">
+	<noscript><link href="../aot.css" rel="stylesheet" type="text/css"></noscript>
+	<link rel="stylesheet" type="text/css" href="/demo/synan.css" media="print" onload="this.media='all'">
+	<noscript><link rel="stylesheet" type="text/css" href="/demo/synan.css"></noscript>
 </head>
 
 
