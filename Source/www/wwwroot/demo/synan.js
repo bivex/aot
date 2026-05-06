@@ -2,192 +2,187 @@ import { SynanDaemonUrl } from './common.js';
 
 console.log('[synan.js] loaded - version with full-width canvas fix');
 
-/**
- * Configuration constants for rendering
- */
-const CONFIG = {
-    FONT_COLOR: 'black',
-    BG_COLOR: 'white',
-    GROUP_ARC_COLOR: 'blue',
-    NONGROUP_ARC_COLOR: 'red',
-    FONT: 'Arial',
-    ARC_FONT: 'Arial',
-    FONT_SIZE: 20,
-    ARC_FONT_SIZE: 14,
-    SPACE_SIZE: 10,
-    LEFT_SPACE: 2,
-    TOP_SPACE: 30,
-    ARC_HEIGHT: 40
-};
+var TopClauses = [];
+var cursor;
 
-/**
- * State management
- */
-let TopClauses = [];
-let cursor = 0;
+var FONT_COLOR = 'black',
+    BG_COLOR = 'white',
+    GROUP_ARC_COLOR = 'blue',
+    NONGROUP_ARC_COLOR = 'red',
+    FONT = 'Arial',
+    ARC_FONT = 'Arial',
+    FONT_SIZE = 20,
+    ARC_FONT_SIZE = 14,
+    SPACE_SIZE = 10,
+    LEFT_SPACE = 2,
+    TOP_SPACE = 30,
+    ARC_HEIGHT = 40;
 
-/**
- * Canvas setup
- */
-const mainCanvas = document.getElementById("synanCanvas");
-const longCanvas = document.createElement('canvas');
-const ctx = longCanvas.getContext("2d");
-const ctxMain = mainCanvas.getContext("2d");
+var mainCanvas = document.getElementById("synanCanvas"),
+    longCanvas = document.createElement('canvas'),
+    ctx = longCanvas.getContext("2d"),
+    ctxMain = mainCanvas.getContext("2d");
 
-/**
- * Morphological variant class - represents a grammatical interpretation
- */
 class CMorphVariant {
     constructor(synUnits, arcs, subjArcs) {
         this.synUnits = synUnits;
         this.arcs = arcs;
         this.subjArcs = subjArcs;
-    }
+        this.compareTo = function(var2){
+            for (var i = 0; i < var2.synUnits.length; i++) {
+                if (this.synUnits[i].homonymNo < var2.synUnits[i].homonymNo)
+                    return -1;
+                if (this.synUnits[i].homonymNo > var2.synUnits[i].homonymNo)
+                    return 1;
+            }
+            return 0;
+        };
 
-    compareTo(var2) {
-        for (let i = 0; i < var2.synUnits.length; i++) {
-            if (this.synUnits[i].homonymNo < var2.synUnits[i].homonymNo) return -1;
-            if (this.synUnits[i].homonymNo > var2.synUnits[i].homonymNo) return 1;
-        }
-        return 0;
-    }
-
-    equals(Var) {
-        return this.compareTo(Var) === 0;
-    }
+        this.equals = function(Var) {
+            return (this.compareTo(Var) == 0);
+        };
+    };
 }
 
-/**
- * Word arc class - represents syntactic relationships
- */
 class WordArc {
     constructor(group) {
         this.childArcs = [];
-        this.groupArc = group.isGroup;
-        this.isSubj = group.isSubj;
+        this.firstWord = 0;
+        this.lastWord = 0;
+        this.height = 0;
+        this.groupArc = true;
+        this.isSubj = false;
+        this.parentGroupLeg = {};
         this.firstWord = group.start;
         this.lastWord = group.last;
         this.strName = group.descr;
-        this.parentGroupLeg = {};
-    }
-
-    getHeight() {
-        if (this.height === 0) this.height = this.calculateHeight();
-        return this.height;
-    }
-
-    calculateHeight() {
-        let height = 0;
-        for (const childArc of this.childArcs) {
-            const childHeight = childArc.calculateHeight();
-            if (childHeight > height) height = childHeight;
-        }
-        return height + CONFIG.ARC_HEIGHT;
-    }
-
-    drawOneLineArc(Clause, leftPoint, rightPoint) {
-        const WordPannelLeft = Clause.WordPanels[this.firstWord];
-        ctx.beginPath();
-        ctx.moveTo(leftPoint.x, leftPoint.y);
-        ctx.lineTo(leftPoint.x, WordPannelLeft.y - this.height);
-        ctx.lineTo(rightPoint.x, WordPannelLeft.y - this.height);
-        ctx.lineTo(rightPoint.x, rightPoint.y);
-        ctx.stroke();
-        this.parentGroupLeg = {
-            x: leftPoint.x + (rightPoint.x - leftPoint.x) / 2,
-            y: WordPannelLeft.y - this.height
+        this.groupArc = group.isGroup;
+        this.isSubj = group.isSubj;
+        this.getHeight = function() {
+            if(this.height == 0)
+                this.height = this.calculateHeight();
+            return this.height;
         };
-    }
 
-    draw(Clause) {
-        for (const childArc of this.childArcs) childArc.draw(Clause);
-        this.height = this.getHeight();
-        const leftPoint = this.getLeftLegPoint(Clause);
-        const rightPoint = this.getRightLegPoint(Clause);
-        
-        ctx.strokeStyle = this.groupArc ? CONFIG.GROUP_ARC_COLOR : CONFIG.NONGROUP_ARC_COLOR;
-        this.drawOneLineArc(Clause, leftPoint, rightPoint);
-        
-        ctx.font = `${CONFIG.ARC_FONT_SIZE}px ${CONFIG.ARC_FONT}`;
-        ctx.fillText(this.strName, this.parentGroupLeg.x - ctx.measureText(this.strName).width / 2, this.parentGroupLeg.y - CONFIG.ARC_FONT_SIZE * 0.3);
-    }
-
-    getLeftLegPoint(Clause) {
-        const WordPannelLeft = Clause.WordPanels[this.firstWord];
-        let leftPoint = {};
-        let bSet = false;
-        
-        if (this.childArcs.length > 0) {
-            const wordArcLeft = this.childArcs[0];
-            if ((wordArcLeft.firstWord === this.firstWord) && 
-                ((wordArcLeft.groupArc && this.groupArc) ||
-                 (!wordArcLeft.groupArc && !this.groupArc) ||
-                 (!wordArcLeft.groupArc && this.groupArc))) {
-                leftPoint = wordArcLeft.parentGroupLeg;
-                bSet = true;
+        this.calculateHeight = function() {
+            var height = 0;
+            for(var i in this.childArcs) {
+                var ii = this.childArcs[i].calculateHeight();
+                if(ii > height)
+                    height = ii;
             }
-        }
-        
-        if (!bSet) {
-            leftPoint = {
-                x: this.groupArc ? WordPannelLeft.x + WordPannelLeft.width / 2 : WordPannelLeft.x,
-                y: WordPannelLeft.y
-            };
-        }
-        return leftPoint;
-    }
+            return height + ARC_HEIGHT;
+        };
 
-    getRightLegPoint(Clause) {
-        const WordPannelRight = Clause.WordPanels[this.lastWord];
-        let rightPoint = {};
-        let bSet = false;
-        
-        if (this.childArcs.length >= 1) {
-            const wordArcRight = this.childArcs[this.childArcs.length - 1];
-            if ((wordArcRight.lastWord === this.lastWord) &&
-                ((wordArcRight.groupArc && this.groupArc) ||
-                 (!wordArcRight.groupArc && !this.groupArc) ||
-                 (!wordArcRight.groupArc && this.groupArc))) {
-                rightPoint = wordArcRight.parentGroupLeg;
-                bSet = true;
+        this.drawOneLineArc = function(Clause, leftPoint, rightPoint) {
+            var WordPannelLeft = Clause.WordPanels[this.firstWord];
+            ctx.beginPath();
+            ctx.moveTo(leftPoint.x, leftPoint.y);
+            ctx.lineTo(leftPoint.x, WordPannelLeft.y - this.height);
+            ctx.lineTo(rightPoint.x, WordPannelLeft.y - this.height);
+            ctx.lineTo(rightPoint.x, rightPoint.y);
+            ctx.stroke();
+            this.parentGroupLeg.x = leftPoint.x + (rightPoint.x - leftPoint.x)/2;
+            this.parentGroupLeg.y = WordPannelLeft.y - this.height;
+        };
+
+        this.draw = function(Clause) {
+            for (var i in this.childArcs)
+                this.childArcs[i].draw(Clause);
+
+            this.height = this.getHeight();
+            var leftPoint = this.getLeftLegPoint(Clause);
+            var rightPoint = this.getRightLegPoint(Clause);
+
+            if(this.groupArc)
+                ctx.strokeStyle = GROUP_ARC_COLOR;
+            else
+                ctx.strokeStyle = NONGROUP_ARC_COLOR;
+
+            this.drawOneLineArc(Clause, leftPoint, rightPoint);
+
+            ctx.font = ARC_FONT_SIZE + 'px ' + ARC_FONT;
+            ctx.fillText(this.strName, this.parentGroupLeg.x - ctx.measureText(this.strName).width / 2, this.parentGroupLeg.y - ARC_FONT_SIZE*0.3);
+        };
+
+        this.getLeftLegPoint = function(Clause) {
+            var WordPannelLeft = Clause.WordPanels[this.firstWord];
+
+            var leftPoint = {};
+            var bSet = false;
+            if(this.childArcs.length > 0) {
+                var wordArcLeft = this.childArcs[0];
+                //���������� �����-�� �������
+                if ( (wordArcLeft.firstWord == this.firstWord) &&
+                    ((wordArcLeft.groupArc && this.groupArc) ||
+                    (!wordArcLeft.groupArc && !this.groupArc)||
+                    (!wordArcLeft.groupArc && this.groupArc)))
+                {
+                    leftPoint = wordArcLeft.parentGroupLeg;
+                    bSet = true;
+                }
             }
-        }
-        
-        if (!bSet) {
-            rightPoint = {
-                x: this.groupArc ? WordPannelRight.x + WordPannelRight.width / 2 : WordPannelRight.x + WordPannelRight.width,
-                y: WordPannelRight.y
-            };
-        }
-        return rightPoint;
-    }
-}
 
-/**
- * Syntactic unit class
- */
+            if (!bSet) {
+                if(this.groupArc) {
+                    leftPoint.x = WordPannelLeft.x + WordPannelLeft.width/2;
+                    leftPoint.y = WordPannelLeft.y;
+                } else {
+                    leftPoint.x = WordPannelLeft.x;
+                    leftPoint.y = WordPannelLeft.y;
+                }
+            }
+            return leftPoint;
+        };
+
+        this.getRightLegPoint = function(Clause) {
+            var rightPoint = {};
+
+            var WordPannelRight = Clause.WordPanels[this.lastWord];
+
+            var bSet = false;
+            if(this.childArcs.length >= 1) {
+                var wordArcRight = this.childArcs[this.childArcs.length - 1];
+                if ( (wordArcRight.lastWord == this.lastWord) &&
+                    ((wordArcRight.groupArc && this.groupArc) ||
+                    (!wordArcRight.groupArc && !this.groupArc)||
+                    ( !wordArcRight.groupArc && this.groupArc)))
+                {
+                    rightPoint = wordArcRight.parentGroupLeg;
+                    bSet = true;
+                }
+            }
+
+            if(!bSet) {
+                if(this.groupArc) {
+                    rightPoint.x = WordPannelRight.x + WordPannelRight.width/2;
+                    rightPoint.y = WordPannelRight.y;
+                } else {
+                    rightPoint.x = WordPannelRight.x + WordPannelRight.width;
+                    rightPoint.y = WordPannelRight.y;
+                }
+            }
+            return rightPoint;
+        }
+    };
+};
+
 class CSynUnit {
-    constructor(str) {
-        if (str !== 'empty') {
+    constructor (str) {
+        if (str != 'emtpy'){
             this.homonymNo = str.homNo;
             this.strGram = str.grm;
         }
-    }
+    };
 }
 
-/**
- * Homonym class
- */
 class Homonym {
     constructor(str) {
         this.lemma = str;
         this.strCurrentGram = '';
-    }
-}
+    };
+};
 
-/**
- * Word panel class - represents a word in the visualization
- */
 class WordPanel {
     constructor(word) {
         this.x = 0;
@@ -195,13 +190,13 @@ class WordPanel {
         this.width = 0;
         this.activeHomonym = 0;
         this.word = word.str;
-        this.homonyms = word.homonyms.map(h => new Homonym(h));
-    }
-}
+        this.homonyms = [];
+        for (var i in word.homonyms) {
+            this.homonyms.push(new Homonym(word.homonyms[i]));
+        }
+    };
+}  
 
-/**
- * Top clause class - main syntactic structure
- */
 class TopClause {
     constructor(Info) {
         this.currentMorphVariant = 0;
@@ -209,365 +204,351 @@ class TopClause {
         this.MorphVariants = [];
         this.parseWords(Info.words);
         this.parseVariants(Info.variants);
-    }
 
-    parseWords(words) {
-        for (const word of words) {
-            this.WordPanels.push(new WordPanel(word));
-        }
-    }
-
-    parseVariants(variants) {
-        for (const variant of variants) {
-            this.parseOneVariant(variant);
-        }
-        if (this.MorphVariants.length > 0) {
-            this.setActiveHomonyms(0);
-        }
-    }
-
-    getCurArcs() {
-        const CurrVar = this.getActiveHomonymNumbers();
-        for (let i = 0; i < this.MorphVariants.length; i++) {
-            const Var = this.MorphVariants[i];
-            if (Var.equals(CurrVar)) {
-                this.currentMorphVariant = i;
-                this.setActiveHomonyms(i);
-                return Var.arcs;
-            }
-        }
-        this.currentMorphVariant = -1;
-        return [];
-    }
-
-    getActiveHomonymNumbers() {
-        return this.WordPanels.map(panel => {
-            const u = new CSynUnit('empty');
-            u.homonymNo = panel.activeHomonym;
-            return u;
-        });
-    }
-
-    drawWordPanels(height) {
-        ctx.fillStyle = CONFIG.FONT_COLOR;
-        for (const panel of this.WordPanels) {
-            ctx.font = (panel.homonyms.length > 1 ? 'bold ' : '') + `${CONFIG.FONT_SIZE}px ${CONFIG.FONT}`;
-            panel.width = ctx.measureText(panel.word).width;
-            
-            const prevLineNo = Math.floor(cursor / ctxMain.canvas.width);
-            const lineNo = Math.floor((panel.width + cursor) / ctxMain.canvas.width);
-            
-            if (lineNo > prevLineNo) {
-                cursor = ctxMain.canvas.width * lineNo + CONFIG.LEFT_SPACE;
-            }
-            
-            panel.x = cursor;
-            panel.y = height;
-            panel.outerX = cursor - ctxMain.canvas.width * lineNo;
-            panel.outerY = height + ctx.canvas.height * lineNo;
-            
-            ctx.fillText(panel.word, panel.x, panel.y + CONFIG.FONT_SIZE);
-            cursor += panel.width + CONFIG.SPACE_SIZE;
-        }
-    }
-
-    drawSubjPredic() {
-        if (this.currentMorphVariant < 0) return;
-        const homs = this.MorphVariants[this.currentMorphVariant];
-        ctx.strokeStyle = CONFIG.FONT_COLOR;
-        
-        for (const arc of homs.subjArcs) {
-            const panel1 = this.WordPanels[arc.firstWord];
-            const panel2 = this.WordPanels[arc.lastWord];
-            this.drawSubj(panel1);
-            this.drawPredic(panel2);
-        }
-    }
-
-    drawSubj(panel) {
-        ctx.beginPath();
-        ctx.moveTo(panel.x, panel.y + CONFIG.FONT_SIZE * 1.2);
-        ctx.lineTo(panel.x + panel.width, panel.y + CONFIG.FONT_SIZE * 1.2);
-        ctx.stroke();
-    }
-
-    drawPredic(panel) {
-        ctx.beginPath();
-        ctx.moveTo(panel.x, panel.y + CONFIG.FONT_SIZE * 1.2);
-        ctx.lineTo(panel.x + panel.width, panel.y + CONFIG.FONT_SIZE * 1.2);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(panel.x, panel.y + CONFIG.FONT_SIZE * 1.4);
-        ctx.lineTo(panel.x + panel.width, panel.y + CONFIG.FONT_SIZE * 1.4);
-        ctx.stroke();
-    }
-
-    drawArcs() {
-        const arcs = this.getCurArcs();
-        for (const arc of arcs) {
-            arc.draw(this);
-        }
-    }
-
-    addPopups() {
-        for (let i = 0; i < this.WordPanels.length; i++) {
-            const panel = this.WordPanels[i];
-            const popDiv = document.createElement("div");
-            
-            popDiv.style.position = 'absolute';
-            popDiv.style.top = panel.outerY + 'px';
-            popDiv.style.left = panel.outerX + 'px';
-            popDiv.style.height = CONFIG.FONT_SIZE * 1.2 + 'px';
-            popDiv.style.width = panel.width + 'px';
-            popDiv.title = panel.homonyms[panel.activeHomonym].lemma + ' ' + panel.homonyms[panel.activeHomonym].strCurrentGram;
-            popDiv.className = 'synanWordPanel';
-            
-            if (panel.homonyms.length > 1) {
-                const menuDiv = document.createElement("div");
-                menuDiv.className = 'synanDropdownContent';
-                
-                for (let j = 0; j < panel.homonyms.length; j++) {
-                    const menuEl = document.createElement("a");
-                    menuEl.innerHTML = panel.homonyms[j].lemma;
-                    menuEl.setAttribute('ActionCommand', j);
-                    menuEl.setAttribute('wordPanelNo', i);
-                    
-                    menuEl.addEventListener("click", function() {
-                        const homNum = this.getAttribute('ActionCommand');
-                        const panelNo = this.getAttribute('wordPanelNo');
-                        TopClauses[Math.floor(panelNo / TopClauses[0].WordPanels.length)].WordPanels[panelNo % TopClauses[0].WordPanels.length].activeHomonym = homNum;
-                        drawAll();
-                    });
-                    menuDiv.appendChild(menuEl);
+        this.getCurArcs = function() {
+            var CurrVar = this.getActiveHomonymNumbers();
+            for(var i = 0; i < this.MorphVariants.length; i++) {
+                var Var = this.MorphVariants[i];
+                if( Var.equals(CurrVar) ) {
+                    this.currentMorphVariant = i;
+                    this.setActiveHomonyms(i);
+                    return Var.arcs;
                 }
-                
-                popDiv.appendChild(menuDiv);
-                popDiv.style.cursor = 'pointer';
-                popDiv.addEventListener("click", function() {
-                    const dropdown = this.getElementsByClassName('synanDropdownContent')[0];
-                    dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-                });
-                popDiv.classList.add('panelDroppable');
             }
-            
-            document.getElementById('canvasWrapper').appendChild(popDiv);
-        }
-    }
+            this.currentMorphVariant = -1;
+            return [];
+        };
 
-    setActiveHomonyms(VarNo) {
-        const hom = this.MorphVariants[VarNo];
-        for (let i = 0; i < hom.synUnits.length; i++) {
-            const panel = this.WordPanels[i];
-            panel.activeHomonym = hom.synUnits[i].homonymNo;
-            panel.homonyms[panel.activeHomonym].strCurrentGram = hom.synUnits[i].strGram;
-        }
-    }
+        this.getActiveHomonymNumbers = function() {
+            var WordsCount = this.WordPanels.length;
+            var arr = [];
+            for (var i = 0; i < WordsCount; i++) {
+                var Panel = this.WordPanels[i];
+                var U = new CSynUnit('empty');
+                U.homonymNo = Panel.activeHomonym;
+                arr.push(U);
+            }
+            return new CMorphVariant(arr, [], []);
+        };
+
+        this.drawWordPanels = function(height) {
+            ctx.fillStyle = FONT_COLOR;
+            for (var i in this.WordPanels) {
+                var panel = this.WordPanels[i];
+                if (panel.homonyms.length > 1)  ctx.font = 'bold ' + FONT_SIZE + 'px ' + FONT;
+                else                            ctx.font = FONT_SIZE + 'px ' + FONT;
+                panel.width = ctx.measureText(panel.word).width;
+                var prevLineNo = Math.floor(cursor / ctxMain.canvas.width);
+                var lineNo = Math.floor((panel.width + cursor) / ctxMain.canvas.width);
+                if (lineNo > prevLineNo) {
+                    cursor = ctxMain.canvas.width * lineNo + LEFT_SPACE;
+                }
+                panel.x = cursor;
+                panel.y = height;
+                panel.outerX = cursor - ctxMain.canvas.width * lineNo;
+                panel.outerY = height + ctx.canvas.height * lineNo;
+                ctx.fillText(panel.word, panel.x, panel.y + FONT_SIZE);
+                cursor += panel.width + SPACE_SIZE;
+            }
+        };
+
+        this.drawSubjPredic = function () {
+            if (this.currentMorphVariant < 0) return;
+            var homs = this.MorphVariants[this.currentMorphVariant];
+            ctx.strokeStyle = FONT_COLOR;
+            for(var i = 0; i < homs.subjArcs.length; i++) {
+                var arc = homs.subjArcs[i];
+                var panel1 = this.WordPanels[arc.firstWord];
+                var panel2 = this.WordPanels[arc.lastWord];
+                this.drawSubj(panel1);
+                this.drawPredic(panel2);
+            }
+        };
+
+        this.drawSubj = function(panel) {
+            ctx.beginPath();
+            ctx.moveTo(panel.x, panel.y + FONT_SIZE*1.2);
+            ctx.lineTo(panel.x + panel.width, panel.y + FONT_SIZE*1.2);
+            ctx.stroke();
+        };
+
+        this.drawPredic = function(panel) {
+            ctx.beginPath();
+            ctx.moveTo(panel.x, panel.y + FONT_SIZE*1.2);
+            ctx.lineTo(panel.x + panel.width, panel.y + FONT_SIZE*1.2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(panel.x, panel.y + FONT_SIZE*1.4);
+            ctx.lineTo(panel.x + panel.width, panel.y + FONT_SIZE*1.4);
+            ctx.stroke();
+        };
+
+        this.drawArcs = function() {
+            var arcs = this.getCurArcs();
+            for (var i in arcs) {
+                arcs[i].draw(this);
+            }
+        };
+
+        this.addPopups = function() {
+            for (var i in this.WordPanels) {
+                var panel = this.WordPanels[i];
+                var popDiv = document.createElement("div");
+                popDiv.style.position = 'absolute';
+                popDiv.style.top = panel.outerY;
+                popDiv.style.left = panel.outerX;
+                popDiv.style.height = FONT_SIZE*1.2 + 'px';
+                popDiv.style.width = panel.width + 'px';
+                popDiv.title = panel.homonyms[panel.activeHomonym].lemma + ' ' + panel.homonyms[panel.activeHomonym].strCurrentGram;
+                popDiv.className = 'synanWordPanel';
+                if (panel.homonyms.length > 1) {
+                    var menuDiv = document.createElement("div");
+                    menuDiv.className = 'synanDropdownContent';
+                    for (var j in panel.homonyms) {
+                        var menuEl = document.createElement("a");
+                        menuEl.innerHTML = panel.homonyms[j].lemma;
+                        menuEl.setAttribute('ActionCommand', j);
+                        menuEl.setAttribute('wordPanelNo', i);
+                        var Clause = this;
+                        menuEl.addEventListener("click", function(){
+                            var homNum = this.getAttribute('ActionCommand');
+                            var panelNo = this.getAttribute('wordPanelNo');
+                            Clause.WordPanels[panelNo].activeHomonym = homNum;
+                            drawAll();
+                        });
+                        menuDiv.appendChild(menuEl);
+                    }
+                    popDiv.appendChild(menuDiv);
+                    popDiv.style.cursor = 'pointer';
+                    popDiv.addEventListener("click", function(){
+                        this.getElementsByClassName('synanDropdownContent')[0].style.display = 'block';
+                    });
+                    popDiv.className += ' panelDroppable';
+                }
+                var canWrap = document.getElementById('canvasWrapper');
+                canWrap.appendChild(popDiv);
+            }
+        };
+    };
 }
 
-/**
- * Parse one variant into morphological variant
- */
-function parseOneVariant(variant, WordPanelsCount) {
-    const homs = readUnits(variant.units, WordPanelsCount);
-    const arcs = [];
-    const subjArcs = [];
-    
-    for (const group of variant.groups) {
-        const arc = new WordArc({
-            start: group.start,
-            last: group.last,
-            isGroup: group.isGroup,
-            isSubj: group.isSubj,
-            descr: group.descr
-        });
+var protoClause = TopClause.prototype;
+
+protoClause.parseWords = function(words) {
+    for (var i in words) {
+        this.WordPanels.push(new WordPanel(words[i]));
+    }
+};
+
+protoClause.parseVariants = function(variants) {
+    for (var i in variants) {
+        this.parseOneVariant(variants[i]);
+    }
+    if( this.MorphVariants.length > 0 )
+        this.setActiveHomonyms(0);
+};
+
+protoClause.setActiveHomonyms = function(VarNo) {
+    var hom = this.MorphVariants[VarNo];
+    for(var i = 0 ; i < hom.synUnits.length ; i++ )
+    {
+        var panel = this.WordPanels[i];
+        panel.activeHomonym = hom.synUnits[i].homonymNo;
+        panel.homonyms[panel.activeHomonym].strCurrentGram = hom.synUnits[i].strGram;
+    }
+};
+
+protoClause.parseOneVariant = function(variant) {
+    var homs = this.readUnits(variant.units),
+        arcs = [],
+        subjArcs = [];
+    for (var i in variant.groups) {
+        var arc = new WordArc(variant.groups[i]);
         if (arc.isSubj) {
             subjArcs.push(arc);
         } else {
             arcs.push(arc);
         }
     }
-    
-    return new CMorphVariant(homs, orderArcs(arcs), subjArcs);
-}
+    arcs = this.orderArcs(arcs);
+    this.MorphVariants.push(new CMorphVariant(homs, arcs, subjArcs));
+};
 
-function readUnits(str, wordsCount) {
-    const arr = [];
-    let ii = 0;
+protoClause.readUnits = function(str) {
+    var wordsCount = this.WordPanels.length,
+        ii = 0,
+        arr = [];
     while ((ii < wordsCount) && (str[ii])) {
         arr.push(new CSynUnit(str[ii]));
         ii++;
     }
     return arr;
-}
+};
 
-function orderArcsRec(arcs, parentArc, iCur) {
-    for (let i = iCur; i < arcs.length;) {
-        const arc = arcs[i];
-        if (+arc.firstWord > +parentArc.lastWord) return i;
-        i = orderArcsRec(arcs, arc, i + 1);
+protoClause.orderArcsRec = function(arcs, parentArc, iCur) {
+    for(var i = iCur; i < arcs.length;) {
+        var arc = arcs[i];
+        if(+arc.firstWord > +parentArc.lastWord)
+            return i;
+        i = this.orderArcsRec(arcs, arc, i + 1);
         parentArc.childArcs.push(arc);
     }
     return arcs.length;
-}
+};
 
-function orderArcs(arcs) {
-    const ordered = [];
-    for (let i = 0; i < arcs.length;) {
-        const arc = arcs[i];
-        i = orderArcsRec(arcs, arc, i + 1);
+protoClause.orderArcs = function(arcs) {
+    var ordered = [];
+    for(var i = 0; i < arcs.length;) {
+        var arc = arcs[i];
+        i = this.orderArcsRec(arcs, arc, i + 1);
         ordered.push(arc);
     }
     return ordered;
-}
-
-/* ========== Parsing and Drawing Functions ========== */
+};
 
 function parseSynanJson(synanJson) {
-    TopClauses = [];
-    for (const s in synanJson) {
-        for (const c in synanJson[s]) {
+    TopClauses = []
+    for (var s in synanJson) {
+        for (var c in synanJson[s]) {
             TopClauses.push(new TopClause(synanJson[s][c]));
         }
     }
 }
 
+
 function calcMaxArcHeight() {
-    let height = 0;
-    for (const Clause of TopClauses) {
-        const arcs = Clause.getCurArcs();
-        arcs.sort((a, b) => b.childArcs.length - a.childArcs.length);
-        for (const arc of arcs) {
-            const curHeight = arc.getHeight();
-            if (curHeight > height) height = curHeight;
+    var height = 0;
+    for (var ClauseNo in TopClauses) {
+        var arcs = TopClauses[ClauseNo].getCurArcs();
+        arcs = arcs.sort(function(a,b){return b.childArcs.length - a.childArcs.length});
+        for(var i in arcs) {
+            var curHeight = arcs[i].getHeight();
+            if(curHeight > height)
+                height = curHeight;
         }
     }
     return height;
-}
+};
 
 function calcWordsLength() {
-    let length = CONFIG.LEFT_SPACE;
-    for (const Clause of TopClauses) {
-        for (const panel of Clause.WordPanels) {
-            ctx.font = (panel.homonyms.length > 1 ? 'bold ' : '') + `${CONFIG.FONT_SIZE}px ${CONFIG.FONT}`;
-            const prevLineNo = Math.floor(length / ctxMain.canvas.width);
-            const lineNo = Math.floor((ctx.measureText(panel.word).width + length) / ctxMain.canvas.width);
+    var length = LEFT_SPACE;
+    for (var i in TopClauses) {
+        var Clause = TopClauses[i];
+        for (var j in Clause.WordPanels) {
+            if (Clause.WordPanels[j].homonyms.length > 1)  ctx.font = 'bold ' + FONT_SIZE + 'px ' + FONT;
+            else                                            ctx.font = FONT_SIZE + 'px ' + FONT;
+            var prevLineNo = Math.floor(length / ctxMain.canvas.width);
+            var lineNo = Math.floor((ctx.measureText(Clause.WordPanels[j].word).width + length) / ctxMain.canvas.width);
             if (lineNo > prevLineNo) {
-                length = ctxMain.canvas.width * lineNo + CONFIG.LEFT_SPACE;
+                length = ctxMain.canvas.width * lineNo + LEFT_SPACE;
             }
-            length += ctx.measureText(panel.word).width + CONFIG.SPACE_SIZE;
+            length += ctx.measureText(Clause.WordPanels[j].word).width + SPACE_SIZE;
         }
     }
     return length;
-}
+};
 
 function wrapAll() {
-    const linesNo = Math.ceil(ctx.canvas.width / ctxMain.canvas.width);
+    var linesNo = Math.ceil(ctx.canvas.width / ctxMain.canvas.width);
     ctxMain.canvas.height = linesNo * ctx.canvas.height;
-    ctxMain.clearRect(0, 0, ctxMain.canvas.width, ctxMain.canvas.height);
-    
-    for (let i = 0; i < linesNo; i++) {
-        ctxMain.drawImage(ctx.canvas, ctxMain.canvas.width * i, 0, ctxMain.canvas.width, ctx.canvas.height, 0, ctx.canvas.height * i, ctxMain.canvas.width, ctx.canvas.height);
+    ctxMain.clearRect(0,0,ctxMain.canvas.width,ctxMain.canvas.height);
+    for (var i = 0; i < linesNo; i++) {
+        ctxMain.drawImage(ctx.canvas, ctxMain.canvas.width*i, 0, ctxMain.canvas.width, ctx.canvas.height, 0, ctx.canvas.height * i, ctxMain.canvas.width, ctx.canvas.height);
     }
-}
+};
 
 function removePopups() {
-    const wrapper = document.getElementById('canvasWrapper');
-    const popDivs = wrapper.getElementsByClassName("synanWordPanel");
-    while (popDivs.length > 0) {
-        for (let i = 0; i < popDivs.length; i++) {
-            popDivs[i].parentNode.removeChild(popDivs[i]);
-        }
+    var wrapper = document.getElementById('canvasWrapper');
+    var popDiv = wrapper.getElementsByClassName("synanWordPanel");
+    while (popDiv.length > 0){                                      //������ ���, ����� �� ��������
+        for (var i = 0; i < popDiv.length; i++)
+            popDiv[i].parentNode.removeChild(popDiv[i]);
+        popDiv = wrapper.getElementsByClassName("synanWordPanel");
     }
-}
+};
 
 function addPopups() {
-    for (const Clause of TopClauses) {
-        Clause.addPopups();
-    }
-    
+    for (var i in TopClauses)
+        TopClauses[i].addPopups();
     window.onclick = function(event) {
         if (!event.target.matches('.panelDroppable')) {
-            const dropdowns = document.getElementsByClassName("synanDropdownContent");
-            for (const dropdown of dropdowns) {
-                dropdown.style.display = 'none';
-            }
+            var dropdowns = document.getElementsByClassName("synanDropdownContent");
+            for (var i = 0; i < dropdowns.length; i++)
+                dropdowns[i].style.display = 'none';
         }
-    };
-}
+    }
+};
 
 function drawAll() {
     console.log('[drawAll] called');
     removePopups();
     
-    const wrapper = document.getElementById('canvasWrapper');
+    // Get available width from container for full-width rendering
+    var wrapper = document.getElementById('canvasWrapper');
     if (wrapper) {
-        const style = getComputedStyle(wrapper);
-        const paddingX = (parseFloat(style.paddingLeft) || 0) + (parseFloat(style.paddingRight) || 0);
-        const availableWidth = wrapper.clientWidth - paddingX;
-        console.log(`[drawAll] wrapper w=${wrapper.clientWidth} padding=${paddingX} available=${availableWidth} canvasBefore=${ctxMain.canvas.width}`);
-        
+        var style = getComputedStyle(wrapper);
+        var paddingX = (parseFloat(style.paddingLeft) || 0) + (parseFloat(style.paddingRight) || 0);
+        var availableWidth = wrapper.clientWidth - paddingX;
+        console.log('[drawAll] wrapper w=' + wrapper.clientWidth + ' padding=' + paddingX + ' available=' + availableWidth + ' canvasBefore=' + ctxMain.canvas.width);
+        // Set the main canvas width to container width for full-width rendering
         if (availableWidth > 0 && availableWidth !== ctxMain.canvas.width) {
             ctxMain.canvas.width = availableWidth;
-            console.log(`[drawAll] SET ctxMain.canvas.width = ${availableWidth}`);
+            console.log('[drawAll] SET ctxMain.canvas.width =', availableWidth);
+        } else {
+            console.log('[drawAll] no change needed (available=' + availableWidth + ' current=' + ctxMain.canvas.width + ')');
         }
+    } else {
+        console.log('[drawAll] wrapper not found');
     }
     
-    const height = calcMaxArcHeight() + CONFIG.TOP_SPACE;
-    const width = calcWordsLength();
-    console.log(`[drawAll] total content width=${width} height=${height}`);
-    
-    ctx.canvas.height = height + CONFIG.FONT_SIZE * 1.6;
+    var height = calcMaxArcHeight() + TOP_SPACE;
+    var width = calcWordsLength();
+    console.log('[drawAll] total content width=' + width + ' height=' + height);
+    ctx.canvas.height = height + FONT_SIZE*1.6;
     ctx.canvas.width = width;
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    
-    cursor = CONFIG.LEFT_SPACE;
-    for (const Clause of TopClauses) {
-        Clause.drawWordPanels(height);
-        Clause.drawArcs();
-        Clause.drawSubjPredic();
+    ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
+    cursor = LEFT_SPACE;
+    for (var i in TopClauses) {
+        TopClauses[i].drawWordPanels(height);
+        TopClauses[i].drawArcs();
+        TopClauses[i].drawSubjPredic();
     }
-    
     wrapAll();
     addPopups();
     
-    console.log(`[drawAll] DONE: main canvas w=${ctxMain.canvas.width} h=${ctxMain.canvas.height}`);
+    console.log('[drawAll] DONE: main canvas w=' + ctxMain.canvas.width + ' h=' + ctxMain.canvas.height);
 }
 
-/* ========== API Request Functions ========== */
 
-async function syntax_request() {
-    const langua = document.getElementById("Language").value;
-    const query = document.getElementById("InputText").value.trim();
+
+function syntax_request() {
+    var langua = document.getElementById("Language").value;
+    var query = document.getElementById("InputText").value.trim();
     
     if (!query || query.length === 0) {
         alert('Please enter text to analyze');
         return;
     }
 
-    const submitBtn = document.querySelector('#syntax-form button[type="button"]');
-    const originalText = submitBtn.textContent;
-    submitBtn.textContent = 'Processing...';
-    submitBtn.disabled = true;
-    
-    try {
-        const url = `${SynanDaemonUrl}&action=syntax&langua=${encodeURIComponent(langua)}&query=${encodeURIComponent(query)}`;
-        
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`Server returned ${response.status}`);
-        }
-        
-        const synanJson = await response.json();
-        console.log(JSON.stringify(synanJson, null));
-        parseSynanJson(synanJson);
-        drawAll();
-    } catch (err) {
-        console.error('Syntax request failed:', err);
-        alert('Error: ' + err.message);
-    } finally {
-        submitBtn.textContent = originalText;
-        submitBtn.disabled = false;
-    }
+    var url = SynanDaemonUrl + "&action=syntax&langua=" + encodeURIComponent(langua);
+    url +=  "&query=" + encodeURIComponent(query);
+
+    fetch(url)
+        .then(function(response) {
+            if (!response.ok) {
+                throw new Error('Server returned ' + response.status);
+            }
+            return response.json();
+        })
+        .then(function(synanJson) {
+            console.log(JSON.stringify(synanJson, null));
+            parseSynanJson(synanJson);
+            drawAll();
+        })
+        .catch(function(err) {
+            console.error('Syntax request failed:', err);
+            alert('Error: ' + err.message);
+        });
 }
 
-window.syntax_request = syntax_request;
+window.syntax_request = syntax_request
