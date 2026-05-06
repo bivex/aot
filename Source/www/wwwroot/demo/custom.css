@@ -1,0 +1,172 @@
+/* Custom Professional AOT Styles */
+
+:root {
+    --primary-color: #2c3e50;
+    --primary-dark: #1a252f;
+    --accent-color: #3498db;
+    --accent-dark: #2980b9;
+    --text-color: #333;
+    --text-light: #7f8c8d;
+    --bg-color: #f4f7f6;
+    --card-bg: #ffffff;
+    --border-color: #dcdde1;
+    --success-color: #27ae60;
+    --warning-color: #f39c12;
+    --danger-color: #e74c3c;
+}
+
+/* Base Styles */
+body {
+    background-color: var(--bg-color) !important;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+    line-height: 1.6;
+    color: var(--text-color);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Layout Containers */
+.ui.container {
+    max-width: 1200px !important;
+}
+
+/* Refined Navigation */
+.ui.menu.aot-nav {
+    background: var(--card-bg) !important;
+    border: none !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+    padding: 0.75rem 0 !important;
+}
+
+.ui.menu.aot-nav .item {
+    font-weight: 600 !important;
+    text-transform: uppercase;
+    font-size: 0.85rem !important;
+    letter-spacing: 0.5px !important;
+    transition: color 0.3s ease !important;
+}
+
+.ui.menu.aot-nav .item:hover {
+    color: var(--accent-color) !important;
+}
+
+.ui.menu.aot-nav .item.active {
+    color: var(--accent-color) !important;
+    border-bottom: 2px solid var(--accent-color);
+}
+
+/* Professional Hero Section */
+.ui.hero.header {
+    background: linear-gradient(135deg, var(--card-bg) 0%, #fafbfc 100%) !important;
+    border-bottom: 1px solid var(--border-color);
+    padding: 4rem 0 3rem 0 !important;
+    margin-bottom: 3rem !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.ui.hero.header h1 {
+    font-size: 3.5rem !important;
+    font-weight: 800 !important;
+    color: var(--primary-color) !important;
+    margin-bottom: 0.5rem !important;
+    letter-spacing: -0.5px;
+}
+
+.ui.hero.header .subtitle {
+    font-size: 1.25rem !important;
+    color: var(--text-light) !important;
+    font-weight: 300 !important;
+}
+
+/* Card Styles */
+.ui.card.aot-card,
+.ui.cards.aot-cards > .card {
+    border-radius: 8px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+    border: 1px solid var(--border-color) !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ui.card.aot-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
+}
+
+.ui.card.aot-card .header {
+    color: var(--primary-color) !important;
+    font-weight: 600 !important;
+}
+
+/* Buttons */
+.ui.button.aot-primary {
+    background-color: var(--accent-color) !important;
+    color: #fff !important;
+}
+
+.ui.button.aot-primary:hover {
+    background-color: var(--accent-dark) !important;
+}
+
+/* Tables */
+.ui.table.aot-table {
+    border-radius: 8px !important;
+    overflow: hidden;
+}
+
+.ui.table.aot-table thead th {
+    background-color: var(--primary-color) !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+}
+
+/* Forms */
+.ui.form .field label {
+    font-weight: 600 !important;
+    color: var(--primary-color) !important;
+}
+
+.ui.input input,
+.ui.textarea textarea {
+    border-radius: 4px !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+.ui.input input:focus,
+.ui.textarea textarea:focus {
+    border-color: var(--accent-color) !important;
+}
+
+/* Status Labels */
+.ui.label.status-success {
+    background-color: var(--success-color) !important;
+}
+
+.ui.label.status-warning {
+    background-color: var(--warning-color) !important;
+}
+
+.ui.label.status-danger {
+    background-color: var(--danger-color) !important;
+}
+
+/* Responsive Adjustments */
+@media screen and (max-width: 768px) {
+    .ui.hero.header h1 {
+        font-size: 2.5rem !important;
+    }
+
+    .ui.hero.header {
+        padding: 2.5rem 0 2rem 0 !important;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .ui.hero.header h1 {
+        font-size: 2rem !important;
+    }
+
+    .ui.menu.aot-nav .item {
+        font-size: 0.75rem !important;
+    }
+}
