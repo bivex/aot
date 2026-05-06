@@ -21,8 +21,11 @@ CTestTestfile.cmake
 Bin/SemanDaemon
 Bin/SynanDaemon
 
-# Generated dictionary binary files (all .bin files in Dicts)
+# Generated dictionary binary files (all .bin files in Dicts and Thes)
 Dicts/**/*.bin
+Dicts/**/*.bin1
+Dicts/**/*.bin2
+Thes/**/*.bin
 Dicts/**/*.options
 Dicts/**/*.weight
 Dicts/**/*.annot
@@ -32,6 +35,18 @@ Dicts/**/*.npredict
 Dicts/**/*.wrd_idx
 Dicts/Bigrams/*.gz
 Dicts/Bigrams/unigrams.txt
+Dicts/Bigrams/*.bin1
+Dicts/Bigrams/*.bin2
+
+# Grammar files (generated)
+Dicts/**/*.automat
+Dicts/**/*.table
+Dicts/**/*.grammar_precompiled
+Dicts/**/*.grammar
+
+# Morphology grammar tables (generated)
+Dicts/Morph/**/*.json
+Dicts/Morph/**/*.gramtab
 
 # Generated source files (flex/bison)
 *_yacc.cpp
