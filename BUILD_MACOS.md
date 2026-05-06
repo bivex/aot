@@ -229,7 +229,144 @@ ERROR [TRMLHttpServer::OnHttpRequest@136] Error: cannot find action Request: /
 
 Это значит daemon работает, но endpoint '/' не реализован (нужны конкретные API вызовы).
 
-## 13. Структура Bin после сборки
+## 13. API запросы
+
+### 13.1 SynanDaemon (порт 8082)
+
+Синтаксический и морфологический анализатор. Поддерживает три действия:
+
+#### 13.1.1 Морфологический разбор (`action=morph`)
+Возвращает все возможные морфологические интерпретации слова.
+
+**Параметры:**
+- `langua` — язык: `Russian`, `German`, `English`
+- `query` — слово или словосочетание
+- `action=morph`
+
+**Пример:**
+```bash
+curl -G --data-urlencode "action=morph" \
+     --data-urlencode "langua=Russian" \
+     --data-urlencode "query=машина" \
+     http://127.0.0.1:8082/
+```
+
+**Ответ (JSON):**
+```json
+[
+  {
+    "found": true,
+    "commonGrammems": "но",
+    "wordForm": "МАШИНА",
+    "srcNorm": "НЕУБИВАЙМЕНЯ",
+    "morphInfo": "С ср,жр,мр,пр,тв,вн,дт,рд,им,ед,мн",
+    "wordWeight": 1484,
+    "homonymWeight": 0
+  }
+]
+```
+
+#### 13.1.2 Синтаксический разбор (`action=syntax`)
+Возвращает синтаксическую структуру предложения (только для русского и немецкого).
+
+**Параметры:**
+- `langua` — `Russian` или `German`
+- `query` — предложение
+- `action=syntax`
+
+**Пример:**
+```bash
+curl -G --data-urlencode "action=syntax" \
+     --data-urlencode "langua=Russian" \
+     --data-urlencode "query=Я иду домой" \
+     http://127.0.0.1:8082/
+```
+
+**Ответ (JSON):** массив объектов с полями `words`, `variants`, `groups`.
+
+#### 13.1.3 Связанные слова (биграмы) (`action=bigrams`)
+Находит слова, которые часто встречаются вместе с заданным.
+
+**Параметры:**
+- `langua` — `Russian`
+- `query` — слово
+- `minBigramsFreq` — минимальная частота (целое число, например 10)
+- `sortMode` — сортировка: `freq` (по частоте) или `mi` (по mutual information)
+- `action=bigrams`
+
+**Пример:**
+```bash
+curl -G --data-urlencode "action=bigrams" \
+     --data-urlencode "langua=Russian" \
+     --data-urlencode "query=слово" \
+     --data-urlencode "minBigramsFreq=10" \
+     --data-urlencode "sortMode=freq" \
+     http://127.0.0.1:8082/
+```
+
+### 13.2 SemanDaemon (порт 8081)
+
+Семантический анализатор и переводчик с русского на английский.
+
+#### 13.2.1 Перевод (`action=translate`)
+Переводит русское предложение на английский.
+
+**Параметры:**
+- `langua` — `Russian` (источник)
+- `query` — текст для перевода
+- `topic` — тема/домен (например: `common`, `science`, `law`). Влияет на выбор лексики.
+- `action=translate`
+
+**Пример:**
+```bash
+curl -G --data-urlencode "action=translate" \
+     --data-urlencode "langua=Russian" \
+     --data-urlencode "query=Мама мыла раму" \
+     --data-urlencode "topic=common" \
+     http://127.0.0.1:8081/
+```
+
+**Ответ:**
+```json
+{"translation": "Mam washed frame."}
+```
+
+#### 13.2.2 Семантический граф (`action=graph`)
+Строит семантический граф предложения с узлами и ребрами.
+
+**Параметры:**
+- `langua` — `Russian`
+- `query` — предложение (до ~150 символов, остальное обрезается)
+- `topic` — домен (например `common`)
+- `action=graph`
+
+**Пример:**
+```bash
+curl -G --data-urlencode "action=graph" \
+     --data-urlencode "langua=Russian" \
+     --data-urlencode "query=Мама мыла раму" \
+     --data-urlencode "topic=common" \
+     http://127.0.0.1:8081/
+```
+
+**Ответ (JSON):**
+```json
+{
+  "nodes": [
+    {"x":172,"y":140,"label":"МАМА","morph":"МАМА =   С од,жр,им,ед,\nSynWordNo = 0\nWordWeight = 1480"},
+    {"x":225,"y":80,"label":"МЫЛА","morph":"МЫТЬ =   Г дст,пе,нс,прш,жр,ед,\nSynWordNo = 1\nWordWeight = 173"},
+    {"x":277,"y":140,"label":"РАМУ","morph":"РАМА =   С но,жр,вн,ед,\nSynWordNo = 2\nWordWeight = 107"}
+  ],
+  "edges": [
+    {"source":1,"target":0,"label":"SUB"},
+    {"source":1,"target":2,"label":"OBJ"}
+  ]
+}
+```
+
+---
+
+## 14. Структура Bin после сборки
 
 ```
 Bin/
@@ -246,7 +383,7 @@ Bin/
 └── *.log                # Логи после запуска
 ```
 
-## 14. Clean и пересборка
+## 15. Clean и пересборка
 
 ```bash
 # Полная очистка
@@ -264,7 +401,7 @@ cp Source/www/SynanDaemon/SynanDaemon $RML/Bin/
 cp Source/www/SemanDaemon/SemanDaemon $RML/Bin/
 ```
 
-## 15. Ссылки и ресурсы
+## 16. Ссылки и ресурсы
 
 - Официальный сайт: www.aot.ru
 - Документация: `Docs/Morph_UNIX.txt`
