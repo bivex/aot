@@ -103,3 +103,5 @@ Docs/latex/
 *.layout
 SynanDaemon.lck
 SemanDaemon.lck
+/.playwright-mcp
+input.lem
