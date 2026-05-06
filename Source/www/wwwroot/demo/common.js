@@ -1,4 +1,4 @@
-﻿export var SynanDaemonUrl = 'http://localhost:17017?dummy=1';
+export var SynanDaemonUrl = 'http://localhost:8089?dummy=1';
 export var SemanDaemonUrl = 'http://localhost:17018?dummy=1';
 
 //export var SynanDaemonUrl = 'http://63.250.59.227:8080?dummy=1';
