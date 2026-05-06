@@ -15,6 +15,9 @@ CSyntaxOpt *NewOptions(MorphLanguageEnum langua) {
     if (langua == morphEnglish)
         return new CEngSyntaxOpt(langua);
 
+    if (langua == morphUkrainian)
+        return new CRusSyntaxOpt(morphUkrainian);
+
     return new CRusSyntaxOpt(morphRussian);
 }
 
@@ -118,7 +121,7 @@ bool CSentencesCollection::ProcessData(const CLemmatizedText *piPlmLine) {
 
 
 bool CSentencesCollection::ReadAndProcessSentences(const CLemmatizedText* text) {
-    if (!m_pSyntaxOptions->IsValid())
+    if (!m_pSyntaxOptions || !m_pSyntaxOptions->IsValid())
         return false;
 
     if (m_bEnableProgressBar)

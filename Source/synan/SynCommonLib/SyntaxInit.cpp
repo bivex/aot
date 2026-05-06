@@ -164,7 +164,9 @@ void CSyntaxOpt::InitializeOptions() {
     }
 
     if (!m_pOborDic->ReadOborots(m_piOborDictionaryWeak)) {
-        throw CExpc("Failed read oborots");
+        if (m_Language != morphUkrainian) {
+            throw CExpc("Failed read oborots");
+        }
     }
     m_pThesaurus.reset(NewThesaurus(this));
     m_piGramTab = GetMHolder(m_Language).m_pGramTab;

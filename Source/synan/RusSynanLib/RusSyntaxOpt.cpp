@@ -137,6 +137,9 @@ void CRusSyntaxOpt::LoadFromRoss(CDictionary *piRossDict) {
 const char g_strRegRossDicPath[] = "Software\\Dialing\\Ross\\DictPath";
 
 void CRusSyntaxOpt::InitOptionsLanguageSpecific() {
+    if (m_Language == morphUkrainian) {
+        return;
+    }
     //loading ross
     CDictionary piRossDict;
     std::string strPath = GetRegistryString(g_strRegRossDicPath);

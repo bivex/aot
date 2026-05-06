@@ -30,30 +30,42 @@ void CSyntaxHolder::ClearHolder() {
 
 void CSyntaxHolder::LoadSyntax()
 {
-	InitGraphan();
+	try {
+		InitGraphan();
 
-    assert (!m_pPostMorph);
+		assert(!m_pPostMorph);
 
-	if (m_Language == morphRussian)
-		m_pPostMorph = NewRussianPostMorph();
-	else
-		m_pPostMorph = NewGermanPostMorph();
-		
-	if (!m_pPostMorph)
-	{
-		throw CExpc("Cannot load postmorphology\n");				
-	}
+		if (m_Language == morphRussian)
+			m_pPostMorph = NewRussianPostMorph();
+		else if (m_Language == morphGerman)
+			m_pPostMorph = NewGermanPostMorph();
+		else
+			m_pPostMorph = nullptr;
 
-	m_Synan.CreateOptions(m_Language);
+		if (!m_pPostMorph && m_Language != morphUkrainian)
+		{
+			throw CExpc("Cannot load postmorphology\n");
+		}
 
-	if (m_Language == morphGerman)
-	{
+		m_Synan.CreateOptions(m_Language);
+
+		if (m_Language == morphGerman)
+		{
 			m_Synan.SetEnableAllThesauri(false);
-	}
+		}
 
-	m_Synan.SetOborDic(m_Graphan.GetOborDic());
-	m_Synan.SetLemmatizer(GetMHolder(m_Language).m_pLemmatizer);
-	m_Synan.InitializeProcesser();
+		m_Synan.SetOborDic(m_Graphan.GetOborDic());
+		m_Synan.SetLemmatizer(GetMHolder(m_Language).m_pLemmatizer);
+		m_Synan.InitializeProcesser();
+	}
+	catch (CExpc& e) {
+		LOGE << "LoadSyntax failed: " << e.what();
+		if (m_Language != morphUkrainian) throw;
+	}
+	catch (...) {
+		LOGE << "LoadSyntax failed with unknown error";
+		if (m_Language != morphUkrainian) throw;
+	}
 };
 
 
@@ -71,7 +83,9 @@ bool CSyntaxHolder::GetSentencesFromSynAn(std::string utf8str, bool bFile)
 			m_LemText.SaveToFile("before.lem");
         #endif
 
-		m_pPostMorph->ProcessData(m_LemText);
+		if (m_pPostMorph) {
+			m_pPostMorph->ProcessData(m_LemText);
+		}
 
 #ifdef _DEBUG
 		m_LemText.SaveToFile("after.lem");

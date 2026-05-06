@@ -6,7 +6,8 @@
 TSynanHttpServer::TSynanHttpServer() :
     TRMLHttpServer(),
     RussianSyntaxHolder(morphRussian),
-    GermanSyntaxHolder(morphGerman)
+    GermanSyntaxHolder(morphGerman),
+    UkrainianSyntaxHolder(morphUkrainian)
 {
 
 }
@@ -37,10 +38,18 @@ std::string TSynanHttpServer::ProcessMorphology(TDaemonParsedRequest &request) {
 
 
 std::string TSynanHttpServer::ProcessSyntax(TDaemonParsedRequest &request) {
-    if (request.Langua == morphEnglish) {
-        throw CExpc("unsupported language");
+    CSyntaxHolder *P = nullptr;
+    if (request.Langua == morphRussian) {
+        P = &RussianSyntaxHolder;
+    } else if (request.Langua == morphGerman) {
+        P = &GermanSyntaxHolder;
+    } else if (request.Langua == morphUkrainian) {
+        P = &UkrainianSyntaxHolder;
     }
-    CSyntaxHolder *P = (request.Langua == morphRussian) ? &RussianSyntaxHolder : &GermanSyntaxHolder;
+    
+    if (P == nullptr) {
+        return "[]";
+    }
     return BuildJson(P, request.Query);
 };
 
@@ -51,6 +60,9 @@ void TSynanHttpServer::LoadSynan(bool loadBigrams) {
 
     LOGI <<"Loading German Syntax";
     GermanSyntaxHolder.LoadSyntax();
+
+    LOGI <<"Loading Ukrainian Syntax";
+    UkrainianSyntaxHolder.LoadSyntax();
 
     LOGI <<"Loading English Morphology";
     EnglishMorphHolder.LoadMorphology(morphEnglish);
