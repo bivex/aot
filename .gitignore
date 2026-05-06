@@ -92,11 +92,12 @@ __pycache__/
 venv/
 .env
 
-# macOS
-.AppleDouble
-.LSOverride
-.Spotlight-V100
-.Trashes
+# Documentation build artifacts
+Docs/doxygen/
+Docs/html/
+Docs/latex/
 
-# Lock files
-*.lck
+# Generated documentation files
+*.tag
+*.md5
+*.layout
