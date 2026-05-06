@@ -2,3 +2,6 @@
 	path = Source/morph_dict
 	url = https://github.com/bivex/morph_dict
         update = merge 
+[submodule "Source/dict_uk"]
+	path = Source/dict_uk
+	url = https://github.com/brown-uk/dict_uk

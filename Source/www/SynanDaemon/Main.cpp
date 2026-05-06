@@ -23,6 +23,7 @@ int	main(int argc, const char **argv) {
         GlobalLoadMorphHolder(morphRussian);
         GlobalLoadMorphHolder(morphGerman);
         GlobalLoadMorphHolder(morphEnglish);
+        GlobalLoadMorphHolder(morphUkrainian);
 		DealWithLockFile("SynanDaemon.lck");
 		Server.Initialize(args.Retrieve("host"), atoi(args.Retrieve("port").c_str()));
 		Server.LoadSynan(!skipBigrams);
