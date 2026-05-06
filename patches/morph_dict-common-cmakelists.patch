@@ -1,0 +1,22 @@
+commit 5f66c4278b85d56dc755ffbba2279b320b4ca536
+Author: Kilo <209128140+bivex@users.noreply.github.com>
+Date:   Wed May 6 08:21:34 2026 +0300
+
+    Disable tests on macOS due to char32_t locale incompatibility
+
+diff --git a/common/CMakeLists.txt b/common/CMakeLists.txt
+index 2e2a693..322aba2 100644
+--- a/common/CMakeLists.txt
++++ b/common/CMakeLists.txt
+@@ -17,7 +17,10 @@ set(my_SOURCES
+ 
+ add_library(morphology_common  ${my_SOURCES})
+ 
+-add_subdirectory(tests)
++# Tests disabled on macOS due to char32_t locale incompatibility
++if(NOT APPLE)
++    add_subdirectory(tests)
++endif()
+ 
+ 
+ target_link_libraries(morphology_common
