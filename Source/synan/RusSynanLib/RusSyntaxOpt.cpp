@@ -138,6 +138,11 @@ const char g_strRegRossDicPath[] = "Software\\Dialing\\Ross\\DictPath";
 
 void CRusSyntaxOpt::InitOptionsLanguageSpecific() {
     if (m_Language == morphUkrainian) {
+        // Ukrainian uses the same syntax engine but doesn't have ROSS dictionary
+        // or Russian-specific data files. Initialize verb masks which are
+        // language-independent (based on grammems shared with Ukrainian).
+        m_VerbsThatCanSubdueInfinitive.set_poses( _QM(VERB) | _QM(INFINITIVE) | _QM(ADVERB_PARTICIPLE) | _QM(PARTICIPLE_SHORT) | _QM(PARTICIPLE));
+        m_pVerbsWithInstrObj.set_poses(_QM(VERB) | _QM(INFINITIVE) | _QM(ADVERB_PARTICIPLE) | _QM(PARTICIPLE_SHORT) | _QM(PARTICIPLE));
         return;
     }
     //loading ross

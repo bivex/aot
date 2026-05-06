@@ -86,12 +86,12 @@ def convert():
     current_forms = []
     
     count = 0
-    max_lines = 100000 
+    max_lines = 0  # 0 = no limit
     
     with open(input_file, 'r', encoding='utf-8') as f:
         for line in f:
             count += 1
-            if count > max_lines: break
+            if max_lines and count > max_lines: break
             
             parts = line.strip().split(' ')
             if len(parts) < 3: continue
@@ -135,11 +135,15 @@ def convert():
                     else:
                         p_id = paradigm_to_id[p_key]
                         
+                    # MorphoWizard expects the FULL lemma (stem + first flexia)
+                    # because get_base_string() strips the first flexia to get the stem
+                    first_flexia = paradigm[0]['flexia'] if paradigm else ''
+                    full_lemma = stem + first_flexia
                     lemmas_list.append({
-                        "l": stem,
+                        "l": full_lemma,
                         "f": p_id,
                         "a": 0,
-                        "s": 0 
+                        "s": 0
                     })
                 
                 current_lemma = lemma
