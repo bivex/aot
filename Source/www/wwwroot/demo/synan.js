@@ -479,6 +479,19 @@ function addPopups() {
 
 function drawAll() {
     removePopups();
+    
+    // Get available width from container for full-width rendering
+    var wrapper = document.getElementById('canvasWrapper');
+    if (wrapper) {
+        var style = getComputedStyle(wrapper);
+        var paddingX = (parseFloat(style.paddingLeft) || 0) + (parseFloat(style.paddingRight) || 0);
+        var availableWidth = wrapper.clientWidth - paddingX;
+        // Set the main canvas width to container width for full-width rendering
+        if (availableWidth > 0 && availableWidth !== ctxMain.canvas.width) {
+            ctxMain.canvas.width = availableWidth;
+        }
+    }
+    
     var height = calcMaxArcHeight() + TOP_SPACE;
     var width = calcWordsLength();
     ctx.canvas.height = height + FONT_SIZE*1.6;

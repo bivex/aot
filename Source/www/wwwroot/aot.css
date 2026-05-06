@@ -19,15 +19,21 @@ body {
 .ui.canvas.segment {
 	background: #f8fafc;
 	border: 2px solid #e5e7eb;
+	border-radius: 8px;
 	padding: 1.5rem;
+	margin-top: 1.5rem;
 	display: flex;
-	align-items: center;
+	align-items: flex-start;
 	justify-content: center;
+	min-height: 500px;
+	overflow-x: auto;
 }
 
 #synanCanvas {
-	max-width: 100%;
-	height: auto;
+	width: 100% !important;
+	height: auto !important;
+	max-width: none;
+	display: block;
 }
 
 /* Hero header override */
