@@ -4,6 +4,8 @@
 	<title>АОТ :: Онлайн демо :: Синтаксис</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="Демонстрация синтаксического анализа текста в системе АОТ (Автоматическая Обработка Текста)">
+	<meta name="keywords" content="АОТ, синтаксис, синтаксический анализ, текст, обработка текста">
 	
 	<!-- Fomantic UI CSS -->
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fomantic-ui@2.9.3/dist/semantic.min.css">
@@ -14,48 +16,49 @@
 </head>
 
 <body>
+	<!-- Skip to main content link for accessibility -->
+	<a href="#main-content" class="ui sr-only">Перейти к основному содержанию</a>
+	
 	<!-- Fixed navigation -->
-	<div class="ui fixed menu aot-nav">
+	<nav class="ui fixed menu aot-nav" role="navigation" aria-label="Основное меню">
 		<div class="ui container">
 			<a href="/index.html" class="item">Главная</a>
 			<a href="/history.html" class="item">О нас</a>
 			<a href="/product.html" class="item">Продукты</a>
 			<a href="/download.php" class="item">Скачать</a>
-			<a href="/onlinedemo.html" class="item">Демо</a>
+			<a href="/onlinedemo.html" class="item active">Демо</a>
 			<a href="/technology.html" class="item">Технологии</a>
 			<div class="right menu">
-				<a href="#top" class="item" title="Наверх">↑</a>
+				<a href="#top" class="item" title="Наверх" aria-label="Наверх">↑</a>
 			</div>
 		</div>
-	</div>
-	
-	<!-- Skip to main content link for accessibility -->
-	<a href="#main-content" class="ui sr-only">Перейти к основному содержанию</a>
+	</nav>
 	
 	<!-- Hero header -->
-	<div class="ui hero header" id="top">
+	<header class="ui hero header" id="top" role="banner">
 		<div class="ui container">
 			<h1>АОТ</h1>
 			<p class="subtitle">Автоматическая Обработка Текста</p>
 		</div>
-	</div>
+	</header>
 	
 	<!-- Main content -->
-	<main id="main-content" class="ui main container">
+	<main id="main-content" class="ui main container" role="main">
 		
 		<!-- Demo card -->
-		<div class="ui demo card">
-			<div class="header">Dialing Synt</div>
+		<section class="ui demo card aot-card" aria-labelledby="demo-title">
+			<h2 id="demo-title" class="header">Dialing Synt</h2>
 			
-			<form class="ui form" id="syntax-form">
+			<form class="ui form" id="syntax-form" autocomplete="off">
 				<div class="field">
-					<label for="InputText">Input your text:</label>
+					<label for="InputText">Ввод текста:</label>
 					<div class="ui demo textarea">
 						<textarea 
 							id="InputText" 
 							name="InputText" 
 							placeholder="Введите текст для анализа синтаксиса..."
 							aria-label="Текст для синтаксического анализа"
+							rows="6"
 						></textarea>
 					</div>
 				</div>
@@ -69,33 +72,38 @@
 					</select>
 				</div>
 				
-				<button type="button" class="ui primary button" onclick="window.syntax_request()" aria-label="Отправить запрос на анализ">
-					Submit Request
-				</button>
+				<div class="field">
+					<button type="button" class="ui primary button aot-primary" onclick="window.syntax_request()" aria-label="Отправить запрос на анализ">
+						Submit Request
+					</button>
+					<button type="button" class="ui button" onclick="clearForm()" aria-label="Очистить форму">
+						Clear
+					</button>
+				</div>
 			</form>
 			
-		<!-- Canvas output -->
-		<div class="ui canvas segment" id="canvasWrapper" role="region" aria-label="Результат синтаксического анализа">
-			<canvas id="synanCanvas"></canvas>
-		</div>
-		</div>
+			<!-- Canvas output -->
+			<div class="ui canvas segment" id="canvasWrapper" role="region" aria-live="polite" aria-label="Результат синтаксического анализа">
+				<canvas id="synanCanvas"></canvas>
+			</div>
+		</section>
 		
 		<!-- Info section -->
-		<section class="ui info segment">
-			<h3 class="ui header">О модуле синтаксис</h3>
+		<section class="ui info segment" aria-labelledby="info-title">
+			<h3 id="info-title" class="ui header">О модуле синтаксис</h3>
 			<p>Краткое описание <a href="/demo/rus_syn_consts.html">констант русского синтаксиса</a>.</p>
 		</section>
 		
 	</main>
 	
 	<!-- Footer -->
-	<footer class="ui footer segment">
+	<footer class="ui footer segment" role="contentinfo">
 		<div class="ui container">
 			<p>
 				Разработка <a href="mailto:simple@mosk.ru">DiP</a>.
 				&copy; 2003 <a href="http://www.aot.ru/">АОТ</a>. Все права защищены.
 			</p>
-			<a href="#top" class="ui" title="Наверх">↑ Наверх</a>
+			<a href="#top" class="ui" title="Наверх" aria-label="Наверх">↑ Наверх</a>
 		</div>
 	</footer>
 	
@@ -104,11 +112,16 @@
 	<script src="https://cdn.jsdelivr.net/npm/fomantic-ui@2.9.3/dist/semantic.min.js"></script>
 	<script type="module" src="synan.js?v=4"></script>
 	
-	<!-- Initialize dropdown -->
+	<!-- Initialize components -->
 	<script>
 		$(document).ready(function() {
 			$('#Language').dropdown();
 		});
+		
+		function clearForm() {
+			$('#InputText').val('');
+			$('#canvasWrapper').empty().append('<canvas id="synanCanvas"></canvas>');
+		}
 	</script>
 </body>
 </html>
