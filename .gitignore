@@ -101,3 +101,5 @@ Docs/latex/
 *.tag
 *.md5
 *.layout
+SynanDaemon.lck
+SemanDaemon.lck
