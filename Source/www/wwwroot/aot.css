@@ -58,12 +58,14 @@ body {
 	margin: 0;
 }
 
-/* Demo card override */
+/* Demo card override - full width */
 .ui.demo.card {
 	border-radius: 8px;
 	box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 	margin: 2rem 0;
 	padding: 2rem;
+	width: 100% !important;
+	max-width: none !important;
 }
 
 .ui.demo.card .header {
@@ -126,8 +128,21 @@ body {
 	border: 0;
 }
 
+/* Main container - allow full width for demo sections */
+.ui.main.container {
+	max-width: 100% !important;
+	width: 100% !important;
+	padding-left: 1rem !important;
+	padding-right: 1rem !important;
+}
+
 /* Mobile adjustments */
 @media (max-width: 768px) {
+	.ui.main.container {
+		padding-left: 1rem !important;
+		padding-right: 1rem !important;
+	}
+	
 	.ui.hero.header {
 		padding: 2rem 1rem;
 	}

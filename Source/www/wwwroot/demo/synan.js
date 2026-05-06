@@ -1,5 +1,7 @@
 import { SynanDaemonUrl } from './common.js';
 
+console.log('[synan.js] loaded - version with full-width canvas fix');
+
 var TopClauses = [];
 var cursor;
 
@@ -478,6 +480,7 @@ function addPopups() {
 };
 
 function drawAll() {
+    console.log('[drawAll] called');
     removePopups();
     
     // Get available width from container for full-width rendering
@@ -486,14 +489,21 @@ function drawAll() {
         var style = getComputedStyle(wrapper);
         var paddingX = (parseFloat(style.paddingLeft) || 0) + (parseFloat(style.paddingRight) || 0);
         var availableWidth = wrapper.clientWidth - paddingX;
+        console.log('[drawAll] wrapper w=' + wrapper.clientWidth + ' padding=' + paddingX + ' available=' + availableWidth + ' canvasBefore=' + ctxMain.canvas.width);
         // Set the main canvas width to container width for full-width rendering
         if (availableWidth > 0 && availableWidth !== ctxMain.canvas.width) {
             ctxMain.canvas.width = availableWidth;
+            console.log('[drawAll] SET ctxMain.canvas.width =', availableWidth);
+        } else {
+            console.log('[drawAll] no change needed (available=' + availableWidth + ' current=' + ctxMain.canvas.width + ')');
         }
+    } else {
+        console.log('[drawAll] wrapper not found');
     }
     
     var height = calcMaxArcHeight() + TOP_SPACE;
     var width = calcWordsLength();
+    console.log('[drawAll] total content width=' + width + ' height=' + height);
     ctx.canvas.height = height + FONT_SIZE*1.6;
     ctx.canvas.width = width;
     ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
@@ -505,6 +515,8 @@ function drawAll() {
     }
     wrapAll();
     addPopups();
+    
+    console.log('[drawAll] DONE: main canvas w=' + ctxMain.canvas.width + ' h=' + ctxMain.canvas.height);
 }
 
 
