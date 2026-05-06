@@ -239,7 +239,7 @@ ERROR [TRMLHttpServer::OnHttpRequest@136] Error: cannot find action Request: /
 Возвращает все возможные морфологические интерпретации слова.
 
 **Параметры:**
-- `langua` — язык: `Russian`, `German`, `English`
+- `langua` — язык: `Russian`, `German`, `English`, `Ukrainian`
 - `query` — слово или словосочетание
 - `action=morph`
 
@@ -264,6 +264,14 @@ curl -G --data-urlencode "action=morph" \
     "homonymWeight": 0
   }
 ]
+```
+
+**Пример для Ukrainian:**
+```bash
+curl -G --data-urlencode "action=morph" \
+     --data-urlencode "langua=Ukrainian" \
+     --data-urlencode "query=слово" \
+     http://127.0.0.1:8082/
 ```
 
 #### 13.1.2 Синтаксический разбор (`action=syntax`)

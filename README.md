@@ -1,6 +1,6 @@
 # RML — Russian Morphological Dictionary
 
-> **RML** ( Russian Morphological Library) — a linguistic environment for processing Russian, English, and German texts. Includes morphological analyzers, syntactic parsers, and semantic analysis tools.
+> **RML** (Russian Morphological Library) — a linguistic environment for processing Russian, English, German, and Ukrainian texts. Includes morphological analyzers, syntactic parsers, and semantic analysis tools.
 
 ## 📖 Table of Contents
 
@@ -25,7 +25,7 @@
 
 ## About
 
-RML is a comprehensive linguistic processing framework developed for natural language processing (NLP) tasks in Russian, English, and German. The project started in Moscow at Dialing Company and was later extended with German support at the Berlin-Brandenburg Academy of Sciences and Humanities (DWDS project).
+RML is a comprehensive linguistic processing framework developed for natural language processing (NLP) tasks in Russian, English, German, and Ukrainian. The project started in Moscow at Dialing Company and was later extended with German support at the Berlin-Brandenburg Academy of Sciences and Humanities (DWDS project).
 
 **Official website:** [www.aot.ru](http://www.aot.ru) (Russian)
 
