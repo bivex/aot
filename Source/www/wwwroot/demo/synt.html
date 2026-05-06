@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -6,209 +5,277 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	
-	<!-- Preconnect to Google Fonts (if used) -->
-	<link rel="preconnect" href="https://fonts.googleapis.com">
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<!-- Fomantic UI CSS -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fomantic-ui@2.9.3/dist/semantic.min.css">
 	
-	<!-- Critical CSS inline for above-the-fold content -->
+	<!-- Custom overrides for brand colors -->
 	<style>
-		/* Critical above-the-fold styles */
-		* { box-sizing: border-box; }
-		html { font-size: 16px; -webkit-font-smoothing: antialiased; }
-		body { 
-			margin: 0; 
-			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-			line-height: 1.6;
-			color: #1a1a1a;
-			background: #F3F3F3;
+		/* Brand colors */
+		:root {
+			--aot-primary: #6366f1;
+			--aot-secondary: #4f46e5;
+			--aot-dark: #1a1a1a;
+			--aot-light: #f3f3f3;
 		}
-		.container {
-			max-width: 760px;
-			margin: 2rem auto;
-			background: #fff;
-			box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-			border-radius: 8px;
-			overflow: hidden;
+		
+		/* Fixed top navigation */
+		.ui.fixed.menu {
+			background: var(--aot-dark) !important;
+			box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 		}
-		.site-header {
-			background: linear-gradient(135deg, #1a1a1a 0%, #333 100%);
+		
+		.ui.fixed.menu .item,
+		.ui.fixed.menu .dropdown .item {
+			color: rgba(255,255,255,0.9) !important;
+		}
+		
+		.ui.fixed.menu .active.item,
+		.ui.fixed.menu .item:hover {
+			color: #fff !important;
+			background: rgba(255,255,255,0.1) !important;
+		}
+		
+		/* Hero header */
+		.ui.hero.header {
+			background: linear-gradient(135deg, var(--aot-dark) 0%, #333 100%);
 			color: #fff;
-			padding: 2rem;
-			text-align: center;
+			padding: 3rem 1rem;
+			margin: 0;
+			border-radius: 0;
 		}
-		.brand {
+		
+		.ui.hero.header h1 {
 			font-size: 3.5rem;
 			font-weight: 700;
-			margin: 0;
 			letter-spacing: -0.03em;
-			line-height: 1;
-			color: #fff;
+			margin: 0 0 0.5rem 0;
+			line-height: 1.1;
 		}
-		.tagline {
-			font-size: 1.125rem;
-			margin: 0.75rem 0 0;
-			opacity: 0.9;
-		}
-		.main-nav {
-			background: #000;
-			padding: 0.75rem 2rem;
-			border-top: 1px solid #444;
-			border-bottom: 1px solid #444;
-		}
-		.main-nav ul {
-			display: flex;
-			flex-wrap: wrap;
-			justify-content: center;
-			gap: 2rem;
-			list-style: none;
-			margin: 0;
-			padding: 0;
-		}
-		.main-nav a {
-			color: #fff;
-			text-decoration: underline;
-			text-underline-offset: 2px;
-			font-size: 0.9rem;
-		}
-		.demo-section { padding: 2rem; }
-		.section-title {
-			background: #e5e7eb;
-			padding: 0.75rem 1rem;
-			margin: 0 0 1.5rem 0;
+		
+		.ui.hero.header .subtitle {
 			font-size: 1.25rem;
-			font-weight: 600;
-			border-left: 4px solid #6366f1;
+			opacity: 0.9;
+			margin: 0;
 		}
-		textarea {
-			width: 100%;
-			max-width: 720px;
-			padding: 1rem;
+		
+		/* Demo section card */
+		.ui.demo.card {
+			background: #fff;
+			border-radius: 8px;
+			box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+			margin: 2rem 0;
+			padding: 2rem;
+		}
+		
+		.ui.demo.card .header {
+			background: #e5e7eb;
+			color: var(--aot-dark);
+			border-radius: 4px;
+			padding: 0.75rem 1rem;
+			font-size: 1.25rem;
+			margin: 0 0 1.5rem 0;
+			border-left: 4px solid var(--aot-primary);
+		}
+		
+		/* Textarea */
+		.ui.demo.textarea textarea {
+			min-height: 200px;
 			font-size: 1rem;
 			line-height: 1.6;
-			border: 2px solid #d1d5db;
-			border-radius: 8px;
-			min-height: 200px;
 			resize: vertical;
 		}
-		.submit-btn {
-			padding: 0.75rem 2rem;
-			font-size: 1rem;
-			font-weight: 600;
-			color: #fff;
-			background: linear-gradient(135deg, #6366f1, #4f46e5);
-			border: none;
-			border-radius: 8px;
-			cursor: pointer;
+		
+		/* Language dropdown */
+		.ui.demo.selection.dropdown {
+			min-width: 250px;
 		}
-		.canvas-wrapper {
+		
+		/* Primary button with gradient */
+		.ui.primary.button {
+			background: linear-gradient(135deg, var(--aot-primary) 0%, var(--aot-secondary) 100%);
+			box-shadow: 0 2px 4px rgba(99,102,241,0.3);
+			font-weight: 600;
+			padding: 0.75rem 2rem;
+			border-radius: 8px;
+			transition: all 0.2s ease;
+		}
+		
+		.ui.primary.button:hover {
+			box-shadow: 0 4px 8px rgba(99,102,241,0.4);
+			transform: translateY(-1px);
+			background: linear-gradient(135deg, var(--aot-secondary) 0%, var(--aot-primary) 100%);
+		}
+		
+		.ui.primary.button:active {
+			transform: translateY(0);
+		}
+		
+		/* Canvas wrapper */
+		.ui.canvas.segment {
 			background: #f8fafc;
 			border: 2px solid #e5e7eb;
 			border-radius: 8px;
 			padding: 1.5rem;
-			margin-top: 1rem;
-			display: flex;
-			justify-content: center;
+			margin-top: 1.5rem;
 			min-height: 400px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
 		}
-		#synanCanvas { max-width: 100%; }
-		.info-section { padding: 2rem; background: #f9fafb; }
-		.site-footer {
-			background: #1a1a1a;
+		
+		#synanCanvas {
+			max-width: 100%;
+			height: auto;
+		}
+		
+		/* Info section */
+		.ui.info.segment {
+			background: #f9fafb;
+			border-top: 1px solid #e5e7eb;
+			border-radius: 0;
+			padding: 2rem;
+			margin: 0;
+		}
+		
+		/* Footer */
+		.ui.footer.segment {
+			background: var(--aot-dark);
 			color: #9ca3af;
 			padding: 1.5rem 2rem;
-			text-align: center;
-			font-size: 0.875rem;
+			margin: 0;
 		}
+		
+		.ui.footer.segment a {
+			color: #d1d5db;
+			text-decoration: underline;
+		}
+		
+		.ui.footer.segment a:hover {
+			color: #fff;
+		}
+		
+		/* Mobile spacing adjustments */
 		@media (max-width: 768px) {
-			.container { margin: 1rem; border-radius: 0; }
-			.brand { font-size: 2.5rem; }
-			.main-nav ul { gap: 0.75rem 1rem; }
+			.ui.hero.header {
+				padding: 2rem 1rem;
+			}
+			
+			.ui.hero.header h1 {
+				font-size: 2.5rem;
+			}
+			
+			.ui.fixed.menu .item {
+				padding: 0.5rem 0.75rem !important;
+				font-size: 0.9rem;
+			}
+			
+			.ui.demo.card {
+				padding: 1.5rem;
+				margin: 1rem 0;
+			}
 		}
 	</style>
-	
-	<!-- Non-critical CSS loaded asynchronously -->
-	<link href="../aot.css" rel="stylesheet" type="text/css" media="print" onload="this.media='all'">
-	<noscript><link href="../aot.css" rel="stylesheet" type="text/css"></noscript>
-	<link rel="stylesheet" type="text/css" href="/demo/synan.css" media="print" onload="this.media='all'">
-	<noscript><link rel="stylesheet" type="text/css" href="/demo/synan.css"></noscript>
 </head>
 
-
 <body>
-	<a name="top" id="top"></a>
+	<!-- Fixed navigation -->
+	<div class="ui fixed menu">
+		<div class="ui container">
+			<a href="/index.html" class="item">главная</a>
+			<a href="/history.html" class="item">о нас</a>
+			<a href="/product.html" class="item">продукты</a>
+			<a href="/download.php" class="item">скачать</a>
+			<a href="/onlinedemo.html" class="item">демо</a>
+			<a href="/technology.html" class="item">технологии</a>
+			<a href="#top" class="item" title="наверх">↑</a>
+		</div>
+	</div>
 	
-	<main class="container">
-		<header class="site-header">
-			<h1 class="brand">АОТ</h1>
-			<p class="tagline">Автоматическая Обработка Текста</p>
-		</header>
-
-		<nav class="main-nav" aria-label="Основная навигация">
-			<ul>
-				<li><a href="/index.html">главная</a></li>
-				<li><a href="/history.html">о&nbsp;нас</a></li>
-				<li><a href="/product.html">продукты</a></li>
-				<li><a href="/download.php">скачать</a></li>
-				<li><a href="/onlinedemo.html"><strong>демо</strong></a></li>
-				<li><a href="/technology.html">технологии</a></li>
-				<li><a href="#top" title="наверх" class="back-to-top">^</a></li>
-			</ul>
-		</nav>
-
-		<section class="demo-section">
-			<h2 class="section-title">Dialing Synt</h2>
+	<!-- Skip to main content link for accessibility -->
+	<a href="#main-content" class="ui sr-only">Перейти к основному содержанию</a>
+	
+	<!-- Hero header -->
+	<div class="ui hero header" id="top">
+		<div class="ui container">
+			<h1>АОТ</h1>
+			<p class="subtitle">Автоматическая Обработка Текста</p>
+		</div>
+	</div>
+	
+	<!-- Main content -->
+	<main id="main-content" class="ui main container">
+		
+		<!-- Demo card -->
+		<div class="ui demo card">
+			<div class="header">Dialing Synt</div>
 			
-			<div class="demo-controls">
-				<label for="InputText" class="control-label">Input your text:</label>
-				<div class="language-select">
-					<label for="Language">Язык / Language:</label>
-					<select id="Language" name="Language">
-						<option value="Russian" selected>Русский (Russian)</option>
-						<option value="German">Deutsch (German)</option>
-						<option value="Ukrainian">Українська (Ukrainian)</option>
-					</select>
+			<form class="ui form" id="syntax-form">
+				<div class="field">
+					<label for="InputText">Input your text:</label>
+					<div class="ui demo textarea">
+						<textarea 
+							id="InputText" 
+							name="InputText" 
+							placeholder="Введите текст для анализа синтаксиса..."
+							aria-label="Текст для синтаксического анализа"
+						></textarea>
+					</div>
 				</div>
-				<div class="textarea-wrapper">
-					<textarea 
-						id="InputText" 
-						name="InputText" 
-						rows="10" 
-						cols="55" 
-						placeholder="Введите текст для анализа синтаксиса..."
-						aria-label="Текст для синтаксического анализа"
-					></textarea>
+				
+				<div class="field">
+					<label>Язык / Language:</label>
+					<div class="ui selection dropdown" id="Language">
+						<input type="hidden" name="language">
+						<i class="dropdown icon"></i>
+						<div class="default text">Select language</div>
+						<div class="menu">
+							<div class="item" data-value="Russian" selected>Русский (Russian)</div>
+							<div class="item" data-value="German">Deutsch (German)</div>
+							<div class="item" data-value="Ukrainian">Українська (Ukrainian)</div>
+						</div>
+					</div>
 				</div>
-				<button type="button" class="submit-btn" onclick="window.syntax_request()" aria-label="Отправить запрос на анализ">
+				
+				<button type="button" class="ui primary button" onclick="window.syntax_request()" aria-label="Отправить запрос на анализ">
 					Submit Request
 				</button>
-			</div>
-
-			<div class="canvas-wrapper" id="canvasWrapper" role="region" aria-label="Результат синтаксического анализа">
+			</form>
+			
+			<!-- Canvas output -->
+			<div class="ui canvas segment" id="canvasWrapper" role="region" aria-label="Результат синтаксического анализа">
 				<canvas id="synanCanvas" width="720" height="500" aria-label="Синтаксическое дерево"></canvas>
 			</div>
+		</div>
+		
+		<!-- Info section -->
+		<section class="ui info segment">
+			<h3 class="ui header">О модуле синтаксис</h3>
+			<p>Краткое описание <a href="/demo/rus_syn_consts.html">констант русского синтаксиса</a>.</p>
 		</section>
-
-		<section class="info-section">
-			<h2 class="section-title">О модуле синтаксис</h2>
-			<p class="info-text">
-				Краткое описание <a href="/demo/rus_syn_consts.html">констант русского синтаксиса</a>.
-			</p>
-		</section>
-
-		<footer class="site-footer">
-			<p class="footer-text">
+		
+	</main>
+	
+	<!-- Footer -->
+	<footer class="ui footer segment">
+		<div class="ui container">
+			<p>
 				Разработка <a href="mailto:simple@mosk.ru">DiP</a>.
 				&copy; 2003 <a href="http://www.aot.ru/">АОТ</a>. Все права защищены.
 			</p>
-			<a href="#top" class="footer-top" title="Наверх" aria-label="Вернуться к началу страницы">↑ Наверх</a>
-		</footer>
-	</main>
+			<a href="#top" class="ui" title="Наверх">↑ Наверх</a>
+		</div>
+	</footer>
 	
-	<!-- Defer non-critical JS -->
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js" defer></script>
-	<script type="module" src="synan.js" defer></script>
+	<!-- Scripts -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/fomantic-ui@2.9.3/dist/semantic.min.js"></script>
+	<script type="module" src="synan.js"></script>
 	
-	<!-- Preload critical font if needed -->
-	<link rel="preload" href="../aot.css" as="style">
+	<!-- Initialize dropdown -->
+	<script>
+		$(document).ready(function() {
+			$('#Language').dropdown();
+		});
+	</script>
 </body>
 </html>
