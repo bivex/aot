@@ -98,13 +98,13 @@ void ReadBigrams(std::string path, std::vector<CWordInfo> &wordInfos) {
         MakeUpperUtf8(w2);
         auto curr_it = lower_bound(wordInfos.begin(), wordInfos.end(), w1);
         if (curr_it == wordInfos.end()) {
-            throw CExpc("Cannot find word \"%s\" in at line %zu\n", w1, linesCount);
+            throw CExpc("Cannot find word \"%s\" in at line %zu\n", w1.c_str(), linesCount);
         }
         size_t word1 = curr_it - wordInfos.begin();
 
         curr_it = lower_bound(wordInfos.begin(),wordInfos.end(), w2);
         if (curr_it == wordInfos.end()) {
-            throw CExpc("Cannot find word \"%s\" in at line %zu\n", w2, linesCount);
+            throw CExpc("Cannot find word \"%s\" in at line %zu\n", w2.c_str(), linesCount);
         }
         size_t word2 = curr_it - wordInfos.begin();
         wordInfos[word1].m_Bigrams1.push_back({(uint32_t)word2, (uint32_t)bigramFreq});

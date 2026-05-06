@@ -1,7 +1,87 @@
-*.bin
+# Build directories
+build/
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
+!CMakeLists.my
+CTestTestfile.cmake
+
+# Compiled binaries (executables and libraries)
+*.exe
+*.out
+*.dylib
+*.so
+*.a
+*.o
+*.obj
+
+# Main daemon executables (to be built)
+Bin/SemanDaemon
+Bin/SynanDaemon
+
+# Generated dictionary binary files (all .bin files in Dicts)
+Dicts/**/*.bin
+Dicts/**/*.options
+Dicts/**/*.weight
+Dicts/**/*.annot
+Dicts/**/*.bases
+Dicts/**/*.forms_autom
+Dicts/**/*.npredict
+Dicts/**/*.wrd_idx
+Dicts/Bigrams/*.gz
+Dicts/Bigrams/unigrams.txt
+
+# Generated source files (flex/bison)
+*_yacc.cpp
+*_yacc.hpp
+*_lex.cpp
+chunker_yacc.cpp
+chunker_yacc.hpp
+chunker_lex.cpp
+
+# Logs and temporary
 *.log
-*.lem
-*.table
-*.automat
-*.grammar_precompiled
-*.morph
+*.pid
+*.lock
+*.tmp
+*.swp
+*~
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.user
+*.suo
+*.sln
+*.vcxproj*
+*.cbp
+.layout
+
+# Archives
+*.tar.gz
+*.zip
+*.tgz
+
+# Test outputs
+test_*
+Test*
+*.test
+
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+venv/
+.env
+
+# macOS
+.AppleDouble
+.LSOverride
+.Spotlight-V100
+.Trashes
+
+# Lock files
+*.lck

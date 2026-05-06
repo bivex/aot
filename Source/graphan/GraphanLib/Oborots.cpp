@@ -219,7 +219,7 @@ void BuildOborottosIndex(CGraphanDicts& C)
 			k = T[k];
 		}
 		if (c.m_TokenIds.empty()) {
-			throw CExpc("fail to build oborot %s", convert_to_utf8(c.m_UnitStr, C.m_Language));
+			throw CExpc("fail to build oborot %s", convert_to_utf8(c.m_UnitStr, C.m_Language).c_str());
 		}
 		C.m_OborottosFirstWordIndex[c.m_TokenIds[0]].push_back((uint16_t)OborotNo);
 	};

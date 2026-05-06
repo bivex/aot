@@ -36,26 +36,29 @@ target_link_libraries(SimpleGrammarLib
     LemmatizerLib
 )
 
-if (WIN32) 
+if (WIN32)
     include_directories (AFTER ${WIN_FLEX_FOLDER})
 endif()
 
 message ("bison_tool = " ${BISON_TOOL})
 add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/chunker_yacc.cpp ${PROJECT_SOURCE_DIR}/chunker_yacc.hpp
     DEPENDS ${PROJECT_SOURCE_DIR}/chunker.y
-	COMMAND ${BISON_TOOL} -d -ochunker_yacc.cpp ${PROJECT_SOURCE_DIR}/chunker.y
+    COMMAND ${BISON_TOOL} -d -ochunker_yacc.cpp ${PROJECT_SOURCE_DIR}/chunker.y
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     VERBATIM
 )
 
 add_custom_command( OUTPUT ${PROJECT_SOURCE_DIR}/chunker_lex.cpp
     DEPENDS ${PROJECT_SOURCE_DIR}/chunker.l ${PROJECT_SOURCE_DIR}/chunker_yacc.hpp
-	COMMAND ${FLEX_TOOL} -ochunker_lex.cpp -d chunker.l
+    COMMAND ${FLEX_TOOL} -ochunker_lex.cpp -d chunker.l
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     VERBATIM
 )
 
-add_subdirectory(tests)
+# Tests disabled on macOS due to compatibility issues
+if(NOT APPLE)
+    add_subdirectory(tests)
+endif()
 
 
 

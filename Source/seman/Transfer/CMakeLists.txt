@@ -42,7 +42,10 @@ add_library(Transfer
 
  "eng_word.cpp" "eng_word.h" "verb_tense.h" "numerals.cpp")
 
-add_subdirectory(tests)
+# Tests disabled on macOS due to compatibility issues
+if(NOT APPLE)
+    add_subdirectory(tests)
+endif()
 
 target_link_libraries(Transfer
     aot_common

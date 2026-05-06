@@ -27,7 +27,7 @@ std::string CStructEntry::GetEntryAndMeanNum() const {
 void CStructEntry::SetEntryStr(const std::string& s)  {
 	m_EntryStr = s;
 	if (m_EntryStr.length() >= EntryStrSize) {
-		throw CExpc("Dict Entry %s is longer than %i bytes", m_EntryStr, EntryStrSize);
+		throw CExpc("Dict Entry %s is longer than %i bytes", m_EntryStr.c_str(), EntryStrSize);
 	}
 }
 
@@ -95,7 +95,7 @@ void CStructEntry::MakeEmpty()  {
 void CStructEntry::SetUnitAuthor(std::string s) {
 	m_AuthorStr = s;
 	if (m_AuthorStr.length() >= EntryAuthorStrSize) {
-		throw CExpc("Dict Entry %s is longer than %i bytes", m_AuthorStr, EntryAuthorStrSize);
+		throw CExpc("Dict Entry %s is longer than %i bytes", m_AuthorStr.c_str(), EntryAuthorStrSize);
 	}
 
 }

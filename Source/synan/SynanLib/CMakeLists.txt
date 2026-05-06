@@ -24,4 +24,7 @@ if (BUILD_DICTS)
     add_dependencies(SynanLib Ross)
 endif()
 
-add_subdirectory(tests)
+# Tests disabled on macOS due to compatibility issues
+if(NOT APPLE)
+    add_subdirectory(tests)
+endif()

@@ -1,0 +1,2 @@
+# Override defaults
+set(BUILD_HTTP_SERVERS 1 CACHE BOOL "Build HTTP servers" FORCE)

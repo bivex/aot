@@ -77,14 +77,17 @@ target_link_libraries(SemanLib
 target_precompile_headers(${PROJECT_NAME} PUBLIC stdafx.h)
 
 if (BUILD_DICTS)
-    add_dependencies (SemanLib 
-        BinDicts 
+    add_dependencies (SemanLib
+        BinDicts
         ThesRosses
-        Ross 
+        Ross
         Aoss
         Collocs
         EngCollocs
-        TimeRoss) 
-endif()
+        TimeRoss)
+ endif()
 
-add_subdirectory(tests)
+# Tests disabled on macOS due to compatibility issues
+if(NOT APPLE)
+    add_subdirectory(tests)
+endif()

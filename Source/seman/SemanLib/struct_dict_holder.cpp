@@ -178,7 +178,7 @@ dom_item_id_t CStructDictHolder::GetItemNoByItemStr1(const std::string& ItemStr,
 {
 	auto item_id = GetRoss()->GetItemIdByItemStr(ItemStr, dom_no);
 	if (throw_exception && is_null(item_id)) {
-		throw CExpc("cannot find %s in domain %zi, struct dict name %s", ItemStr.c_str(), dom_no, m_Ross.GetDictName());
+		throw CExpc("cannot find %s in domain %d, struct dict name %s", ItemStr.c_str(), (int)dom_no, m_Ross.GetDictName().c_str());
 	}
 	return item_id;
 }

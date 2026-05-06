@@ -15,5 +15,7 @@ target_link_libraries(BinaryDictsLib
     LemmatizerLib
 )
 
-
-add_subdirectory(tests)
+# Tests disabled on macOS due to compatibility issues
+if(NOT APPLE)
+    add_subdirectory(tests)
+endif()

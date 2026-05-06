@@ -130,7 +130,7 @@ void update_word_map_by_file(std::string filename, std::map<word_pair, int>& wor
 	std::string r_str, e_str;
 	while (std::getline(in, r_str)) {
 		if (!std::getline(in, e_str)) {
-			throw CExpc("cannot read the last English sentence in {}", filename);
+			throw CExpc("cannot read the last English sentence in %s", filename.c_str());
 		}
 		StringTokenizer r_tok(r_str.c_str(), " \t");
 		StringTokenizer e_tok(e_str.c_str(), " \t");

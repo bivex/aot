@@ -2,15 +2,18 @@
 
 //#define chunk_query_l
 #define YY_NO_UNISTD_H
+#define YY_NO_INPUT 1
+#define YY_NO_OUTPUT 1
 #include "ChunkParser.h"
 #include "chunker_yacc.hpp"
 
-
-
 %}
+
 %option c++
 %option noyywrap
 %option yyclass="CChunkParser"
+%option noinput
+%option nounput
  
  
 ws			[ \t\r]+
