@@ -203,9 +203,12 @@
 			<a href="#top" class="footer-top" title="Наверх" aria-label="Вернуться к началу страницы">↑ Наверх</a>
 		</footer>
 	</main>
-
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script type="module" src="synan.js"></script>
-
+	
+	<!-- Defer non-critical JS -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js" defer></script>
+	<script type="module" src="synan.js" defer></script>
+	
+	<!-- Preload critical font if needed -->
+	<link rel="preload" href="../aot.css" as="style">
 </body>
 </html>
