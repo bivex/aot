@@ -3,14 +3,16 @@ import { SynanDaemonUrl } from './common.js';
 var TopClauses = [];
 var cursor;
 
-var FONT_COLOR = 'black',
+var FONT_COLOR = '#1e293b',
     BG_COLOR = 'white',
-    GROUP_ARC_COLOR = 'blue',
-    NONGROUP_ARC_COLOR = 'red',
+    GROUP_ARC_COLOR = '#6366f1',
+    NONGROUP_ARC_COLOR = '#f43f5e',
+    SUBJ_COLOR = '#10b981',
+    PREDIC_COLOR = '#f59e0b',
     FONT = 'Arial',
     ARC_FONT = 'Arial',
     FONT_SIZE = 20,
-    ARC_FONT_SIZE = 14,
+    ARC_FONT_SIZE = 12,
     SPACE_SIZE = 10,
     LEFT_SPACE = 2,
     TOP_SPACE = 30,
@@ -80,14 +82,22 @@ class WordArc {
 
         this.drawOneLineArc = function(Clause, leftPoint, rightPoint) {
             var WordPannelLeft = Clause.WordPanels[this.firstWord];
+            var x1 = leftPoint.x;
+            var y1 = leftPoint.y;
+            var x2 = rightPoint.x;
+            var y2 = rightPoint.y;
+            var yTop = WordPannelLeft.y - this.height;
+            var midX = (x1 + x2) / 2;
+            var cpOffset = this.height * 0.6;
+
             ctx.beginPath();
-            ctx.moveTo(leftPoint.x, leftPoint.y);
-            ctx.lineTo(leftPoint.x, WordPannelLeft.y - this.height);
-            ctx.lineTo(rightPoint.x, WordPannelLeft.y - this.height);
-            ctx.lineTo(rightPoint.x, rightPoint.y);
+            ctx.moveTo(x1, y1);
+            ctx.bezierCurveTo(x1, y1 - cpOffset, midX, yTop - cpOffset * 0.3, midX, yTop);
+            ctx.bezierCurveTo(midX, yTop - cpOffset * 0.3, x2, y2 - cpOffset, x2, y2);
             ctx.stroke();
-            this.parentGroupLeg.x = leftPoint.x + (rightPoint.x - leftPoint.x)/2;
-            this.parentGroupLeg.y = WordPannelLeft.y - this.height;
+
+            this.parentGroupLeg.x = midX;
+            this.parentGroupLeg.y = yTop;
         };
 
         this.draw = function(Clause) {
@@ -98,15 +108,66 @@ class WordArc {
             var leftPoint = this.getLeftLegPoint(Clause);
             var rightPoint = this.getRightLegPoint(Clause);
 
-            if(this.groupArc)
-                ctx.strokeStyle = GROUP_ARC_COLOR;
-            else
-                ctx.strokeStyle = NONGROUP_ARC_COLOR;
+            var arcColor = this.groupArc ? GROUP_ARC_COLOR : NONGROUP_ARC_COLOR;
+            ctx.strokeStyle = arcColor;
+            ctx.lineWidth = this.groupArc ? 2 : 1.5;
+
+            if (!this.groupArc) {
+                ctx.setLineDash([4, 3]);
+            } else {
+                ctx.setLineDash([]);
+            }
 
             this.drawOneLineArc(Clause, leftPoint, rightPoint);
+            ctx.setLineDash([]);
 
-            ctx.font = ARC_FONT_SIZE + 'px ' + ARC_FONT;
-            ctx.fillText(this.strName, this.parentGroupLeg.x - ctx.measureText(this.strName).width / 2, this.parentGroupLeg.y - ARC_FONT_SIZE*0.3);
+            // Connection dots at endpoints
+            var dotRadius = 3;
+            ctx.fillStyle = arcColor;
+            ctx.beginPath();
+            ctx.arc(leftPoint.x, leftPoint.y, dotRadius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(rightPoint.x, rightPoint.y, dotRadius, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Label with background pill
+            var label = this.strName.replace(/\0/g, '').trim();
+            if (label) {
+                ctx.font = ARC_FONT_SIZE + 'px ' + ARC_FONT;
+                var textWidth = ctx.measureText(label).width;
+                var padX = 5, padY = 3;
+                var lx = this.parentGroupLeg.x - textWidth / 2;
+                var ly = this.parentGroupLeg.y - ARC_FONT_SIZE * 0.3;
+
+                ctx.fillStyle = this.groupArc ? 'rgba(99,102,241,0.12)' : 'rgba(244,63,94,0.12)';
+                ctx.beginPath();
+                var rx = lx - padX, ry = ly - ARC_FONT_SIZE - padY;
+                var rw = textWidth + padX * 2, rh = ARC_FONT_SIZE + padY * 2;
+                var r = 4;
+                ctx.moveTo(rx + r, ry);
+                ctx.lineTo(rx + rw - r, ry);
+                ctx.quadraticCurveTo(rx + rw, ry, rx + rw, ry + r);
+                ctx.lineTo(rx + rw, ry + rh - r);
+                ctx.quadraticCurveTo(rx + rw, ry + rh, rx + rw - r, ry + rh);
+                ctx.lineTo(rx + r, ry + rh);
+                ctx.quadraticCurveTo(rx, ry + rh, rx, ry + rh - r);
+                ctx.lineTo(rx, ry + r);
+                ctx.quadraticCurveTo(rx, ry, rx + r, ry);
+                ctx.closePath();
+                ctx.fill();
+
+                ctx.strokeStyle = arcColor;
+                ctx.lineWidth = 1;
+                ctx.stroke();
+
+                ctx.fillStyle = arcColor;
+                ctx.font = 'bold ' + ARC_FONT_SIZE + 'px ' + ARC_FONT;
+                ctx.fillText(label, lx, ly);
+            }
+
+            // Reset
+            ctx.lineWidth = 1;
         };
 
         this.getLeftLegPoint = function(Clause) {
@@ -259,7 +320,6 @@ class TopClause {
         this.drawSubjPredic = function () {
             if (this.currentMorphVariant < 0) return;
             var homs = this.MorphVariants[this.currentMorphVariant];
-            ctx.strokeStyle = FONT_COLOR;
             for(var i = 0; i < homs.subjArcs.length; i++) {
                 var arc = homs.subjArcs[i];
                 var panel1 = this.WordPanels[arc.firstWord];
@@ -270,21 +330,38 @@ class TopClause {
         };
 
         this.drawSubj = function(panel) {
+            var y = panel.y + FONT_SIZE * 1.2;
+            ctx.strokeStyle = SUBJ_COLOR;
+            ctx.lineWidth = 2.5;
             ctx.beginPath();
-            ctx.moveTo(panel.x, panel.y + FONT_SIZE*1.2);
-            ctx.lineTo(panel.x + panel.width, panel.y + FONT_SIZE*1.2);
+            ctx.moveTo(panel.x - 2, y);
+            ctx.lineTo(panel.x + panel.width + 2, y);
             ctx.stroke();
+            // Small "S" label
+            ctx.font = 'bold 10px ' + ARC_FONT;
+            ctx.fillStyle = SUBJ_COLOR;
+            ctx.fillText('S', panel.x + panel.width + 5, y + 4);
+            ctx.lineWidth = 1;
         };
 
         this.drawPredic = function(panel) {
+            var y1 = panel.y + FONT_SIZE * 1.2;
+            var y2 = panel.y + FONT_SIZE * 1.45;
+            ctx.strokeStyle = PREDIC_COLOR;
+            ctx.lineWidth = 2.5;
             ctx.beginPath();
-            ctx.moveTo(panel.x, panel.y + FONT_SIZE*1.2);
-            ctx.lineTo(panel.x + panel.width, panel.y + FONT_SIZE*1.2);
+            ctx.moveTo(panel.x - 2, y1);
+            ctx.lineTo(panel.x + panel.width + 2, y1);
             ctx.stroke();
             ctx.beginPath();
-            ctx.moveTo(panel.x, panel.y + FONT_SIZE*1.4);
-            ctx.lineTo(panel.x + panel.width, panel.y + FONT_SIZE*1.4);
+            ctx.moveTo(panel.x - 2, y2);
+            ctx.lineTo(panel.x + panel.width + 2, y2);
             ctx.stroke();
+            // Small "P" label
+            ctx.font = 'bold 10px ' + ARC_FONT;
+            ctx.fillStyle = PREDIC_COLOR;
+            ctx.fillText('P', panel.x + panel.width + 5, y2 + 4);
+            ctx.lineWidth = 1;
         };
 
         this.drawArcs = function() {
@@ -509,6 +586,65 @@ function drawAll() {
     }
     wrapAll();
     addPopups();
+    drawLegend();
+}
+
+function drawLegend() {
+    var x = 12, y = ctxMain.canvas.height - 10;
+    var lineLen = 20, gap = 18, lineH = 16;
+    ctxMain.font = '11px Arial';
+    ctxMain.lineWidth = 1;
+
+    // Group arc
+    y -= lineH;
+    ctxMain.strokeStyle = GROUP_ARC_COLOR;
+    ctxMain.setLineDash([]);
+    ctxMain.beginPath();
+    ctxMain.moveTo(x, y + 6);
+    ctxMain.lineTo(x + lineLen, y + 6);
+    ctxMain.stroke();
+    ctxMain.fillStyle = GROUP_ARC_COLOR;
+    ctxMain.fillText('— группа', x + lineLen + 4, y + 10);
+
+    // Non-group arc
+    y -= lineH;
+    ctxMain.strokeStyle = NONGROUP_ARC_COLOR;
+    ctxMain.setLineDash([4, 3]);
+    ctxMain.beginPath();
+    ctxMain.moveTo(x, y + 6);
+    ctxMain.lineTo(x + lineLen, y + 6);
+    ctxMain.stroke();
+    ctxMain.fillStyle = NONGROUP_ARC_COLOR;
+    ctxMain.fillText('- - связь', x + lineLen + 4, y + 10);
+
+    // Subject
+    y -= lineH;
+    ctxMain.strokeStyle = SUBJ_COLOR;
+    ctxMain.setLineDash([]);
+    ctxMain.lineWidth = 2.5;
+    ctxMain.beginPath();
+    ctxMain.moveTo(x, y + 6);
+    ctxMain.lineTo(x + lineLen, y + 6);
+    ctxMain.stroke();
+    ctxMain.fillStyle = SUBJ_COLOR;
+    ctxMain.fillText('S подлежащее', x + lineLen + 4, y + 10);
+
+    // Predicate
+    y -= lineH;
+    ctxMain.strokeStyle = PREDIC_COLOR;
+    ctxMain.beginPath();
+    ctxMain.moveTo(x, y + 4);
+    ctxMain.lineTo(x + lineLen, y + 4);
+    ctxMain.stroke();
+    ctxMain.beginPath();
+    ctxMain.moveTo(x, y + 8);
+    ctxMain.lineTo(x + lineLen, y + 8);
+    ctxMain.stroke();
+    ctxMain.fillStyle = PREDIC_COLOR;
+    ctxMain.fillText('P сказуемое', x + lineLen + 4, y + 10);
+
+    ctxMain.setLineDash([]);
+    ctxMain.lineWidth = 1;
 }
 
 
