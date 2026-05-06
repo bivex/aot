@@ -47,7 +47,7 @@
 		
 		<!-- Demo card -->
 		<section class="ui demo card aot-card" aria-labelledby="demo-title">
-			<h2 id="demo-title" class="header">Dialing Synt</h2>
+			<h2 id="demo-title" class="header">Синтаксический анализ</h2>
 			
 			<form class="ui form" id="syntax-form" autocomplete="off">
 				<div class="field">
@@ -121,6 +121,7 @@
 		function clearForm() {
 			$('#InputText').val('');
 			$('#canvasWrapper').empty().append('<canvas id="synanCanvas"></canvas>');
+			if (window.reinitCanvas) window.reinitCanvas();
 		}
 	</script>
 </body>
