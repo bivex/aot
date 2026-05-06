@@ -223,17 +223,12 @@
 				</div>
 				
 				<div class="field">
-					<label>Язык / Language:</label>
-					<div class="ui selection dropdown" id="Language">
-						<input type="hidden" name="language">
-						<i class="dropdown icon"></i>
-						<div class="default text">Select language</div>
-						<div class="menu">
-							<div class="item" data-value="Russian" selected>Русский (Russian)</div>
-							<div class="item" data-value="German">Deutsch (German)</div>
-							<div class="item" data-value="Ukrainian">Українська (Ukrainian)</div>
-						</div>
-					</div>
+					<label for="Language">Язык / Language:</label>
+					<select id="Language" name="Language" class="ui fluid dropdown">
+						<option value="Russian" selected>Русский (Russian)</option>
+						<option value="German">Deutsch (German)</option>
+						<option value="Ukrainian">Українська (Ukrainian)</option>
+					</select>
 				</div>
 				
 				<button type="button" class="ui primary button" onclick="window.syntax_request()" aria-label="Отправить запрос на анализ">

@@ -110,7 +110,7 @@ class WordArc {
             var bSet = false;
             if(this.childArcs.length > 0) {
                 var wordArcLeft = this.childArcs[0];
-                //Магическое какое-то условие
+                //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ-пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                 if ( (wordArcLeft.firstWord == this.firstWord) &&
                     ((wordArcLeft.groupArc && this.groupArc) ||
                     (!wordArcLeft.groupArc && !this.groupArc)||
@@ -458,7 +458,7 @@ function wrapAll() {
 function removePopups() {
     var wrapper = document.getElementById('canvasWrapper');
     var popDiv = wrapper.getElementsByClassName("synanWordPanel");
-    while (popDiv.length > 0){                                      //Именно так, иначе не работает
+    while (popDiv.length > 0){                                      //пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         for (var i = 0; i < popDiv.length; i++)
             popDiv[i].parentNode.removeChild(popDiv[i]);
         popDiv = wrapper.getElementsByClassName("synanWordPanel");
@@ -499,20 +499,31 @@ function drawAll() {
 function syntax_request() {
     var langua = document.getElementById("Language").value;
     var query = document.getElementById("InputText").value.trim();
+    
+    if (!query || query.length === 0) {
+        alert('Please enter text to analyze');
+        return;
+    }
 
-    var url = SynanDaemonUrl + "&action=syntax&langua=" + langua;
-    url +=  "&query=" + query;
+    var url = SynanDaemonUrl + "&action=syntax&langua=" + encodeURIComponent(langua);
+    url +=  "&query=" + encodeURIComponent(query);
 
     fetch(url)
         .then(function(response) {
+            if (!response.ok) {
+                throw new Error('Server returned ' + response.status);
+            }
             return response.json();
         })
         .then(function(synanJson) {
-            console.log (JSON.stringify(synanJson, null));
+            console.log(JSON.stringify(synanJson, null));
             parseSynanJson(synanJson);
             drawAll();
         })
-        .catch( alert );
+        .catch(function(err) {
+            console.error('Syntax request failed:', err);
+            alert('Error: ' + err.message);
+        });
 }
 
 window.syntax_request = syntax_request
