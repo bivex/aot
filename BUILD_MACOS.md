@@ -49,170 +49,22 @@ source ~/.zshrc
 
 ## 4. Патчи для macOS совместимости
 
-Создайте файл `CMakeLists.my` в корне проекта:
+Данный репозиторий уже содержит все необходимые исправления для сборки на macOS, **за исключением одного файла в подмодуле `morph_dict`**. Подмодуль является отдельным репозиторием, поэтому изменение нужно применить вручную после инициализации подмодулей.
+
+### 4.1 Применить патч к morph_dict
+
+После выполнения шага 2.2 (`git submodule update --init --recursive`) примените патч:
+
 ```bash
-cat > CMakeLists.my << 'EOF'
-# Override defaults
-set(BUILD_HTTP_SERVERS 1 CACHE BOOL "Build HTTP servers" FORCE)
-EOF
+cd $RML
+git apply --directory=Source/morph_dict patches/morph_dict-common-cmakelists.patch
 ```
 
-### 4.1 Патчи исходных файлов (исправления для Clang)
+Это отключит тесты в `morph_dict/common/CMakeLists.txt`, которые вызывают ошибки на macOS.
 
-**Примечание:** Эти патчи уже применены в текущем коде, но если вы запускаете чистую версию, выполните:
+**Что делает патч:** добавляет `if(NOT APPLE)` вокруг `add_subdirectory(tests)`.
 
-#### 4.1.1 Исключить тесты на macOS (Source/morph_dict/common/CMakeLists.txt)
-```cmake
-add_library(morphology_common  ${my_SOURCES})
-
-# Tests disabled on macOS due to char32_t locale incompatibility
-if(NOT APPLE)
-    add_subdirectory(tests)
-endif()
-```
-
-#### 4.1.2 Fix non-pod-varargs в StructEntry.cpp
-```bash
-sed -i '' 's/throw CExpc("Dict Entry %s is longer than %i bytes", m_EntryStr, EntryStrSize);/throw CExpc("Dict Entry %s is longer than %i bytes", m_EntryStr.c_str(), EntryStrSize);/' Source/dicts/StructDictLib/StructEntry.cpp
-
-sed -i '' 's/throw CExpc("Dict Entry %s is longer than %i bytes", m_AuthorStr, EntryAuthorStrSize);/throw CExpc("Dict Entry %s is longer than %i bytes", m_AuthorStr.c_str(), EntryAuthorStrSize);/' Source/dicts/StructDictLib/StructEntry.cpp
-```
-
-#### 4.1.3 Fix BigramsIndex.cpp
-```bash
-sed -i '' 's/throw CExpc("Cannot find word \"%s\" in at line %zu\\n", w1, linesCount);/throw CExpc("Cannot find word \"%s\" in at line %zu\\n", w1.c_str(), linesCount);/' Source/dicts/Bigrams/BigramsIndex/BigramsIndex.cpp
-sed -i '' 's/throw CExpc("Cannot find word \"%s\" in at line %zu\\n", w2, linesCount);/throw CExpc("Cannot find word \"%s\" in at line %zu\\n", w2.c_str(), linesCount);/' Source/dicts/Bigrams/BigramsIndex/BigramsIndex.cpp
-```
-
-#### 4.1.4 Fix GenFreqDict/main.cpp
-```bash
-sed -i '' 's/throw CExpc("cannot read the last English sentence in {}", filename);/throw CExpc("cannot read the last English sentence in %s", filename.c_str());/' Source/dicts/GenFreqDict/main.cpp
-```
-
-#### 4.1.5 Fix struct_dict_holder.cpp
-```bash
-sed -i '' 's/throw CExpc("cannot find %s in domain %zi, struct dict name %s", ItemStr.c_str(), dom_no, m_Ross.GetDictName());/throw CExpc("cannot find %s in domain %d, struct dict name %s", ItemStr.c_str(), (int)dom_no, m_Ross.GetDictName().c_str());/' Source/seman/SemanLib/struct_dict_holder.cpp
-```
-
-#### 4.1.6 Fix Oborots.cpp
-```bash
-sed -i '' 's/throw CExpc("fail to build oborot %s", convert_to_utf8(c.m_UnitStr, C.m_Language));/throw CExpc("fail to build oborot %s", convert_to_utf8(c.m_UnitStr, C.m_Language).c_str());/' Source/graphan/GraphanLib/Oborots.cpp
-```
-
-#### 4.1.7 Исключить тесты из CMakeLists.txt
-Для каждого из следующих файлов добавьте `if(NOT APPLE)` вокруг `add_subdirectory(tests)`:
-
-**Source/synan/SynanLib/CMakeLists.txt:**
-```cmake
-if (BUILD_DICTS)
-    add_dependencies(SynanLib Ross)
-endif()
-
-# Tests disabled on macOS due to compatibility issues
-if(NOT APPLE)
-    add_subdirectory(tests)
-endif()
-```
-
-**Source/synan/SimpleGrammarLib/CMakeLists.txt:**
-```cmake
-# ... существующий код ...
-
-# Tests disabled on macOS due to compatibility issues
-if(NOT APPLE)
-    add_subdirectory(tests)
-endif()
-```
-
-**Source/seman/Transfer/CMakeLists.txt:**
-```cmake
-add_library(Transfer ...)
-
-# Tests disabled on macOS due to compatibility issues
-if(NOT APPLE)
-    add_subdirectory(tests)
-endif()
-
-target_link_libraries(Transfer ...)
-```
-
-**Source/seman/SemanLib/CMakeLists.txt:**
-```cmake
-if (BUILD_DICTS)
-    add_dependencies (SemanLib BinDicts ThesRosses Ross Aoss Collocs EngCollocs TimeRoss)
-endif()
-
-# Tests disabled on macOS due to compatibility issues
-if(NOT APPLE)
-    add_subdirectory(tests)
-endif()
-```
-
-**Source/dicts/StructDictLoader/CMakeLists.txt:**
-```cmake
-add_executable (${PROJECT_NAME}  "Main.cpp")
-target_link_libraries(${PROJECT_NAME} StructDictLib)
-
-# Tests disabled on macOS due to compatibility issues
-if(NOT APPLE)
-    add_subdirectory(tests)
-endif()
-```
-
-**Source/dicts/BinaryDictsLib/CMakeLists.txt:**
-```cmake
-target_link_libraries(BinaryDictsLib
-    LemmatizerLib
-)
-
-# Tests disabled on macOS due to compatibility issues
-if(NOT APPLE)
-    add_subdirectory(tests)
-endif()
-```
-
-#### 4.1.8 Fix Source/CMakeLists.txt для macOS
-Замените блок `ELSE (WIN32)` на:
-```cmake
-ELSEIF (APPLE)
-    # macOS/Clang configuration
-    SET (FLEX_TOOL /opt/homebrew/opt/flex/bin/flex)
-    SET (BISON_TOOL /opt/homebrew/opt/bison/bin/bison)
-    # Add Homebrew flex include path to use matching FlexLexer.h
-    include_directories(/opt/homebrew/opt/flex/include)
-    # No special linker flags needed for macOS; filesystem is in libc++
-ELSE (WIN32)
-    # Linux/GCC configuration
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lstdc++fs")
-    SET (CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -pthread -lstdc++fs -static")
-    SET (FLEX_TOOL flex)
-    SET (BISON_TOOL bison)
-ENDIF()
-```
-
-#### 4.1.9 Fix Source/www/CMakeLists.txt
-```cmake
-declare_cmake_min_version()
-
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
-find_package(Libevent REQUIRED)
-message ("LIBEVENT_INCLUDE =  ${LIBEVENT_INCLUDE_DIR}" )
-message ("LIBEVENT_LIBRARY =  ${LIBEVENT_LIBRARY}" )
-
-# Extract library directory for linking
-get_filename_component(LIBEVENT_LIBRARY_DIR ${LIBEVENT_LIBRARY} DIRECTORY)
-
-include_directories(${LIBEVENT_INCLUDE_DIR})
-link_directories(${LIBEVENT_LIBRARY_DIR} /opt/homebrew/lib)
-
-if ($JAVA_INCLUDES)  # not tested under cmake
-    add_subdirectory (www/JNIMorphAPI)
-    add_subdirectory (www/JNIMorphAPITest)
-endif()
-
-add_subdirectory (SynanDaemon)
-add_subdirectory (SemanDaemon)
-```
+Остальные исправления (if NOT APPLE в других CMakeLists.txt, исправления varargs, настройки Flex/Bison, libevent linking и т.д.) уже включены в данную ветку репозитория и не требуют дополнительных действий.
 
 ## 5. Конфигурация CMake
 
