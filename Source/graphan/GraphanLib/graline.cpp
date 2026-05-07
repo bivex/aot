@@ -489,6 +489,14 @@ void CGraLine::InitWordsAndNumbers(bool b_force_to_rus) {
                 if (is_latin_alpha(c))
                     fl_la = true;
         }
+        else if (m_Language == morphUkrainian)
+        {
+            if (is_ukrainian_upper((BYTE)c) || is_ukrainian_lower((BYTE)c))
+                fl_ra = true;
+            else
+                if (is_latin_alpha(c))
+                    fl_la = true;
+        }
         else
             fl_la = fl_la || is_latin_alpha(c);
 
@@ -617,7 +625,11 @@ void CGraLine::InitNonContextDescriptors(bool b_force_to_rus)
 MorphLanguageEnum CGraLine::GetTokenLanguage() const
 {
     if (HasDes(ORLE))
+    {
+        if (m_Language == morphUkrainian)
+            return morphUkrainian;
         return morphRussian;
+    }
     else
         if (HasDes(OLLE))
         {

@@ -24,7 +24,7 @@ public:
         o.add_int("last", m_W2);
         o.add_bool("isGroup", m_IsGroup);
         o.add_bool("isSubj", m_IsSubj);
-        o.add_string("descr", m_strDescr);
+        o.add_string_copy("descr", m_strDescr);
 	}
 
 };
