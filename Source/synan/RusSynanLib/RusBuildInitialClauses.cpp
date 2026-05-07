@@ -9,6 +9,15 @@
 
 bool	CRusSentence::IsInitialClauseType(EClauseType ClauseType) const
 {
+	if (GetOpt()->m_Language == morphUkrainian) {
+		if (ClauseType == VERB_PERS_T || ClauseType == ADVERB_PARTICIPLE_T || ClauseType == PARTICIPLE_SHORT_T || 
+		    ClauseType == ADJ_SHORT_T || ClauseType == PARTICIPLE_T || ClauseType == INFINITIVE_T || 
+		    ClauseType == INP_T || ClauseType == 7 /*Category State*/ || ClauseType == 14 /*Impersonal Verb*/ || 
+		    ClauseType == 17 /*Nominative*/ || ClauseType == 21 /*Vocative*/) {
+			return true;
+		}
+	}
+
 	return 	
 			ClauseType  == VERB_PERS_T
 		||	ClauseType  == ADVERB_PARTICIPLE_T

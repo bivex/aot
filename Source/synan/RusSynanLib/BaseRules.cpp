@@ -292,7 +292,9 @@ bool CRusSentence::RuleForDashClause(int iClauseNum)
 	int iWord = pClause1->m_iFirstWord;
 
 
-	if( GetWords()[pClause1->m_iFirstWord].m_strWord != "-" ) return false;
+    const std::string& dashWord = GetWords()[pClause1->m_iFirstWord].m_strWord;
+    // Accept both ASCII hyphen-minus "-" and Unicode em-dash "\xe2\x80\x94" (—)
+	if (dashWord != "-" && dashWord != "\xe2\x80\x94") return false;
 
 	CClause* pClauseLeft = NULL;
 	int iPrev = GetMaxClauseByLastWord(pClause1->m_iFirstWord - 1);
@@ -312,7 +314,11 @@ bool CRusSentence::RuleForDashClause(int iClauseNum)
     long DashWordNo =  pClause1->m_iFirstWord;
 	CClause& newClause = UniteClauses(iPrev, iClauseNum, LeftClauseParams);
 
-	newClause.ChangeAllClauseTypesToOneType(SClauseType(DASH_T,DashWordNo, 0));		
+    if (GetOpt()->m_Language == morphUkrainian) {
+        newClause.ChangeAllClauseTypesToOneType(SClauseType(16 /*Ellipsis*/,DashWordNo, 0));
+    } else {
+	    newClause.ChangeAllClauseTypesToOneType(SClauseType(DASH_T,DashWordNo, 0));		
+    }
 
 	return true;
 }

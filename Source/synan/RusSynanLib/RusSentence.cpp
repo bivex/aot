@@ -442,16 +442,31 @@ bool CRusSentence::IsRelativSentencePronoun(int ClauseStartWordNo, int WordNo, i
 
 EClauseType CRusSentence::GetClauseTypeByAncodePattern(const CAncodePattern &Pattern) const {
 
-    if (Pattern.HasPos(VERB))
+    if (GetOpt()->m_Language == morphUkrainian) {
+        if (Pattern.HasPos(NOUN) && Pattern.HasGrammem(rVocativ))
+            return 21; // Vocative (ОБРАЩ)
+        if (Pattern.HasPos(NOUN) && Pattern.HasGrammem(rNominativ))
+            return 17; // Nominative (НАЗЫВ)
+        if (Pattern.HasPos(VERB) && (Pattern.HasGrammem(rImpersonal) || (Pattern.HasGrammem(rNeutrum) && Pattern.HasGrammem(rSingular))))
+            return 14; // Impersonal Verb (БЕЗЛ_ГЛ)
+        if (Pattern.HasPos(PREDK) || Pattern.HasPos(ADV))
+            return 7; // Category State (КАТ_СОСТ)
+    }
+
+    if (Pattern.HasPos(VERB)) {
+        if (GetOpt()->m_Language == morphUkrainian && Pattern.HasGrammem(rImpersonal)) return 14;
         return VERB_PERS_T;
+    }
     else if (Pattern.HasPos(ADVERB_PARTICIPLE))
         return ADVERB_PARTICIPLE_T;
     else if (Pattern.HasPos(PARTICIPLE_SHORT))
         return PARTICIPLE_SHORT_T;
     else if (Pattern.HasPos(ADJ_SHORT))
         return ADJ_SHORT_T;
-    else if (Pattern.HasPos(PREDK))
+    else if (Pattern.HasPos(PREDK)) {
+        if (GetOpt()->m_Language == morphUkrainian) return 7;
         return PREDK_T;
+    }
     else if (Pattern.HasPos(PARTICIPLE))
         return PARTICIPLE_T;
     else if (Pattern.HasPos(INFINITIVE))

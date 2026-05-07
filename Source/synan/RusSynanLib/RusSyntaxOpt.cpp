@@ -148,14 +148,16 @@ void CRusSyntaxOpt::InitOptionsLanguageSpecific() {
     m_VerbsThatCanSubdueInfinitive.set_poses( _QM(VERB) | _QM(INFINITIVE) | _QM(ADVERB_PARTICIPLE) | _QM(PARTICIPLE_SHORT) | _QM(PARTICIPLE));
     m_pVerbsWithInstrObj.set_poses(_QM(VERB) | _QM(INFINITIVE) | _QM(ADVERB_PARTICIPLE) | _QM(PARTICIPLE_SHORT) | _QM(PARTICIPLE));
 
-    // Russian‑ and German‑specific resources (skip for Ukrainian)
+    // Load ross dictionary (shared for Russian, German, English, skipped for others if unsupported, but here we enable it)
     if (m_Language != morphUkrainian) {
         // loading ross
         CDictionary piRossDict;
         std::string strPath = GetRegistryString(g_strRegRossDicPath);
         piRossDict.Load(strPath.c_str());
         LoadFromRoss(&piRossDict);
+    }
 
+    if (m_Language == morphRussian) {
         // Russian‑specific paradigm lookups
         std::vector<CFormInfo> Paradigms;
         std::string s8 = _R("нечего");
@@ -168,11 +170,12 @@ void CRusSyntaxOpt::InitOptionsLanguageSpecific() {
                 break;
             }
         }
-
-        auto grs = _QM(rMasculinum)|_QM(rSingular)|_QM(rNominativ);
-        m_MasSingNomNounGramCode = GetGramTab()->GetAllGramCodes(NOUN, grs, GrammemsEqu);
-        assert(m_MasSingNomNounGramCode.length() == 2);
     }
+
+    // MasSingNomNounGramCode is needed by all languages that use gender/number/case
+    auto grs = _QM(rMasculinum)|_QM(rSingular)|_QM(rNominativ);
+    m_MasSingNomNounGramCode = GetGramTab()->GetAllGramCodes(NOUN, grs, GrammemsEqu);
+    assert(m_MasSingNomNounGramCode.length() == 2);
 
     // Language‑neutral data files for all languages
     m_CompAdvList.read_from_file(MakePath(Path, "comp_adv.dat"));
