@@ -278,8 +278,9 @@ void CGraphmatFile::ReadToken(const char* in_str, CGraLine& token) const {
 
 	/* if it is a hard delimiter (repeat) */
 	while ((
-		std::iswpunct(in_str[len])
-		|| is_pseudo_graph((BYTE)in_str[len])
+		std::iswpunct((unsigned char)in_str[len])
+		|| (is_pseudo_graph((BYTE)in_str[len])
+			&& !(m_Language == morphUkrainian && (is_ukrainian_upper((BYTE)in_str[len]) || is_ukrainian_lower((BYTE)in_str[len]))))
 		)
 		&& (in_str[len] == in_str[0])
 		)
