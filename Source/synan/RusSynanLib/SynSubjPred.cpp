@@ -35,7 +35,7 @@ bool	CRusSentence::IsGoodSubject(const CMorphVariant& synVariant, const std::str
 	const CSynWord& SubjWord = m_Words[SubjUnit.m_SentPeriod.m_iFirstWord];
 	const CSynHomonym& SubjHom = SubjWord.m_Homonyms[SubjUnit.m_iHomonymNum];
 
-	if( SubjHom.IsLemma("ЧТО") )
+	if( SubjHom.IsLemma("ЧТО") || (GetOpt()->m_Language == morphUkrainian && SubjHom.IsLemma("ЩО")) )
 		return false;
 
 
@@ -244,7 +244,7 @@ bool CRusSentence::can_be_subject(const CMorphVariant& synVariant, int SubjWordN
 
 	// случай a)
 	// "я знаю, кто пришел", "кто" - неомонимичное союзное слово, может быть только подл.
-	if (strWord == "КТО")
+	if (strWord == "КТО" || (GetOpt()->m_Language == morphUkrainian && strWord == "ХТО"))
 		return true;
 
 
@@ -275,7 +275,7 @@ bool CRusSentence::can_be_subject(const CMorphVariant& synVariant, int SubjWordN
 				  "папа", "мама"
 				*/
 				if(			!(grammems & (rAllCases & ~_QM(rNominativ)))
-						&&	(strWord !="ЧТО")
+						 && (strWord != "ЧТО" && !(GetOpt()->m_Language == morphUkrainian && strWord == "ЩО"))
 					)
 					return true;
 				else
@@ -290,7 +290,7 @@ bool CRusSentence::can_be_subject(const CMorphVariant& synVariant, int SubjWordN
 				  "стол", "дуб"
 				*/
 				if(	    ( (grammems & rAllCases)  == ( _QM(rNominativ) | _QM(rAccusativ)) ) 
-					&&	(strWord != "ЧТО") 
+					&& (strWord != "ЧТО" && !(GetOpt()->m_Language == morphUkrainian && strWord == "ЩО"))
 				   )
 					return true;
 				else
@@ -309,7 +309,7 @@ bool CRusSentence::can_be_subject(const CMorphVariant& synVariant, int SubjWordN
 					 есть "что", тогда надо выйти 
 					*/
 					if  (    !bCanBeWhatAsSubj
-						  && (strWord == "ЧТО") 
+						  && (strWord == "ЧТО" || (GetOpt()->m_Language == morphUkrainian && strWord == "ЩО")) 
 						)
 						break;
 					else
@@ -613,8 +613,8 @@ bool CRusSentence::find_subj(CMorphVariant& synVariant, int predk)
 	 "Леди следует в Париж " - (у слова "леди"  все падежи)
 	 Это нужно, чтобы отличить преликативное употребление от личной формы.
 	*/
-	if (   PredHom.IsLemma("СЛЕДОВАТЬ") 
-		|| PredHom.IsLemma("КАЗАТЬСЯ") 
+	if (   PredHom.IsLemma("СЛЕДОВАТЬ") || (GetOpt()->m_Language == morphUkrainian && PredHom.IsLemma("СЛІДУВАТИ")) 
+		|| PredHom.IsLemma("КАЗАТЬСЯ") || (GetOpt()->m_Language == morphUkrainian && PredHom.IsLemma("ЗДАВАТИСЯ")) 
 	   )
 	   if (    (PredHom.m_iGrammems  & (_QM(rThirdPerson) | _QM(rSingular) ))//"кажется"
 		    || (PredHom.m_iGrammems  & _QM(rNeutrum)) //"казалось"
