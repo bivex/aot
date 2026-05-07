@@ -33,6 +33,7 @@ void CRusSentence::ReadNextFromPlmLinesLanguageSpecific() {
 }
 
 void CRusSentence::ChooseClauseType(const std::vector<SClauseType> &vectorTypes, CMorphVariant &V) {
+	LOGI << "ChooseClauseType for lang=" << (int)GetOpt()->m_Language << " vectorTypes.size()=" << vectorTypes.size();
     int empty_type = -1;
 
     for (int i = 0; i < vectorTypes.size(); i++) {
@@ -42,6 +43,7 @@ void CRusSentence::ChooseClauseType(const std::vector<SClauseType> &vectorTypes,
 
             int iUnit = V.UnitNoByWordNo(node);
             assert (iUnit != -1);
+			LOGI << "  Type[" << i << "]: node=" << node << " hom=" << hom << " iUnit=" << iUnit << " unitHom=" << V.m_SynUnits[iUnit].m_iHomonymNum;
             if (V.m_SynUnits[iUnit].m_iHomonymNum == hom) {
                 V.m_ClauseTypeNo = i;
                 return;
@@ -51,7 +53,7 @@ void CRusSentence::ChooseClauseType(const std::vector<SClauseType> &vectorTypes,
 
     }
     V.m_ClauseTypeNo = empty_type;
-
+	LOGI << "  No match, using empty_type=" << empty_type;
 }
 
 bool CRusSentence::RunSyntaxInClauses(ESynRulesSet type) {

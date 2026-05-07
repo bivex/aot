@@ -48,6 +48,10 @@ CRusSyntaxOpt::CRusSyntaxOpt(MorphLanguageEnum langua) : CSyntaxOpt(langua) {
     m_NameGroupType = NAMES;
     m_DisruptConjRelation = DISRUPT_CONJ_RELATION;
     m_DisruptConjGroupType = DISRUPT_CONJ;
+    m_bEnableLocThesaurus = false;
+	m_bEnableFinThesaurus = false;
+	m_bEnableCompThesaurus = false;
+	m_bEnableOmniThesaurus = false;
     m_OborotGroupType = OBOROTS;
     m_WWWGroupType = WEB_ADDR;
     m_KEYBGroupType = KEYB;
@@ -137,51 +141,57 @@ void CRusSyntaxOpt::LoadFromRoss(CDictionary *piRossDict) {
 const char g_strRegRossDicPath[] = "Software\\Dialing\\Ross\\DictPath";
 
 void CRusSyntaxOpt::InitOptionsLanguageSpecific() {
-    if (m_Language == morphUkrainian) {
-        // Ukrainian uses the same syntax engine but doesn't have ROSS dictionary
-        // or Russian-specific data files. Initialize verb masks which are
-        // language-independent (based on grammems shared with Ukrainian).
-        m_VerbsThatCanSubdueInfinitive.set_poses( _QM(VERB) | _QM(INFINITIVE) | _QM(ADVERB_PARTICIPLE) | _QM(PARTICIPLE_SHORT) | _QM(PARTICIPLE));
-        m_pVerbsWithInstrObj.set_poses(_QM(VERB) | _QM(INFINITIVE) | _QM(ADVERB_PARTICIPLE) | _QM(PARTICIPLE_SHORT) | _QM(PARTICIPLE));
-        return;
-    }
-    //loading ross
-    CDictionary piRossDict;
-    std::string strPath = GetRegistryString(g_strRegRossDicPath);
-    piRossDict.Load(strPath.c_str());
-    LoadFromRoss(&piRossDict);
     auto rml = fs::path(GetRmlVariable());
     std::string Path = ( rml / "Dicts" / "SynAn").string();
 
+    // Common verb masks for all languages
+    m_VerbsThatCanSubdueInfinitive.set_poses( _QM(VERB) | _QM(INFINITIVE) | _QM(ADVERB_PARTICIPLE) | _QM(PARTICIPLE_SHORT) | _QM(PARTICIPLE));
+    m_pVerbsWithInstrObj.set_poses(_QM(VERB) | _QM(INFINITIVE) | _QM(ADVERB_PARTICIPLE) | _QM(PARTICIPLE_SHORT) | _QM(PARTICIPLE));
+
+    // Russian‑ and German‑specific resources (skip for Ukrainian)
+    if (m_Language != morphUkrainian) {
+        // loading ross
+        CDictionary piRossDict;
+        std::string strPath = GetRegistryString(g_strRegRossDicPath);
+        piRossDict.Load(strPath.c_str());
+        LoadFromRoss(&piRossDict);
+
+        // Russian‑specific paradigm lookups
+        std::vector<CFormInfo> Paradigms;
+        std::string s8 = _R("нечего");
+        GetLemmatizer()->CreateParadigmCollection(true, s8, false, false, Paradigms);
+        for (auto p: Paradigms) {
+            BYTE POS = GetGramTab()->GetPartOfSpeech(p.GetAncode(0).c_str());
+            if (POS == PRONOUN_PREDK) {
+                m_lPradigmID_NECHEGO = p.GetParadigmId();
+                m_Gramcode_NECHEGO = p.GetAncode(0);
+                break;
+            }
+        }
+
+        auto grs = _QM(rMasculinum)|_QM(rSingular)|_QM(rNominativ);
+        m_MasSingNomNounGramCode = GetGramTab()->GetAllGramCodes(NOUN, grs, GrammemsEqu);
+        assert(m_MasSingNomNounGramCode.length() == 2);
+    }
+
+    // Language‑neutral data files for all languages
     m_CompAdvList.read_from_file(MakePath(Path, "comp_adv.dat"));
     m_NounNumList.read_from_file(MakePath(Path, "noun_num.dat"));
     m_NumberAdverbsList.read_from_file(MakePath(Path,"num_pr.dat"));
-    m_VerbsThatCanSubdueInfinitive.set_poses( _QM(VERB) | _QM(INFINITIVE) | _QM(ADVERB_PARTICIPLE) | _QM(PARTICIPLE_SHORT) | _QM(PARTICIPLE));
     m_VerbsThatCanSubdueInfinitive.read_from_file(MakePath(Path, "verbs_with_inf.txt"));
-
-    m_pVerbsWithInstrObj.set_poses(_QM(VERB) | _QM(INFINITIVE) | _QM(ADVERB_PARTICIPLE) | _QM(PARTICIPLE_SHORT) | _QM(PARTICIPLE));
     m_pVerbsWithInstrObj.read_from_file(MakePath(Path,"verbs_with_inf.txt"));
+
     if (m_Professions.is_empty_list()) {
-        // read it from file if thesaurus is disabled
         m_Professions.read_from_file(MakePath(Path, "profes.txt"));
     }
 
-    std::vector<CFormInfo> Paradigms;
-    std::string s8 = _R("нечего");
-    GetLemmatizer()->CreateParadigmCollection(true, s8, false, false, Paradigms);
+    // Load thesaurus if present
+  //     LoadTerminsForOneThesaurus("RML_THES_OMNI");
 
-    for (auto p: Paradigms) {
-        BYTE POS = GetGramTab()->GetPartOfSpeech(p.GetAncode(0).c_str());
-        if (POS == PRONOUN_PREDK) {
-            m_lPradigmID_NECHEGO = p.GetParadigmId();
-            m_Gramcode_NECHEGO = p.GetAncode(0);
-            break;
-        };
-    };
-
-    auto grs = _QM(rMasculinum)|_QM(rSingular)|_QM(rNominativ);
-    m_MasSingNomNounGramCode = GetGramTab()->GetAllGramCodes(NOUN, grs, GrammemsEqu);
-    assert(m_MasSingNomNounGramCode.length() == 2);
+    // Load oborots (idioms) if present
+    if (m_pOborDic) {
+        m_pOborDic->ReadOborots(m_piOborDictionaryWeak);
+    }
 }
 
 

@@ -45,6 +45,7 @@ bool	CRusSentence::IsGoodSubject(const CMorphVariant& synVariant, const std::str
 
 void CRusSentence::BuildSubjAndPredRelation(CMorphVariant& synVariant, long RootWordNo, EClauseType ClauseType)
 {
+	LOGI << "BuildSubjAndPredRelation: ClauseType=" << ClauseType << " RootWordNo=" << RootWordNo << " Language=" << (int)GetOpt()->m_Language;
 	synVariant.ResetSubj();
 
 	if( ClauseType == DASH_T )
@@ -55,7 +56,9 @@ void CRusSentence::BuildSubjAndPredRelation(CMorphVariant& synVariant, long Root
 			||  (ClauseType == COMPARATIVE_T) 
 			||  (ClauseType == VERB_PERS_T)
 			)
-		find_subj(synVariant, RootWordNo);
+			find_subj(synVariant, RootWordNo);
+		else
+			LOGI << "  Skipping find_subj - wrong clause type";
 
 	synVariant.m_bGoodSubject = IsGoodSubject(synVariant, m_Words.back().m_strWord);
 }
