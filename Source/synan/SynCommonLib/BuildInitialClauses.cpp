@@ -576,13 +576,14 @@ void CSentence::InitClauseType(CClause& clause)
 			type.m_Root.m_WordNo = j;
 			type.m_Root.m_HomonymNo = k;
 
-			if	(		GetOpt()->GetGramTab()->IsStrongClauseRoot(H.m_iPoses) 
+			if	(		GetOpt()->GetGramTab()->IsStrongClauseRoot(H.m_iPoses)
 					&&	(type.m_Type != UnknownPartOfSpeech)
-				)
-				clause.m_vectorTypes.push_back(type);
+				) {
+				    clause.m_vectorTypes.push_back(type);
+                }
 			else
 			{
-				if (		bHasAuxVerb 
+				if (		bHasAuxVerb
 						&&	(AuxVerbClauseType != UnknownPartOfSpeech)
 						&&	(		(GetOpt()->m_Language != morphRussian)
 								||	(type.m_Type != COMPARATIVE_T)

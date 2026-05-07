@@ -105,3 +105,4 @@ SynanDaemon.lck
 SemanDaemon.lck
 /.playwright-mcp
 input.lem
+/build_fast
