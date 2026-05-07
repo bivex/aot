@@ -9,6 +9,9 @@
 #include "RusWord.h"
 #include "morph_dict/agramtab/UkrGramTab.h"
 
+using namespace UkrClauseType;
+#include "morph_dict/agramtab/UkrGramTab.h"
+
 CSentence *NewSentenceRussian(const CSyntaxOpt *pSyntaxOptions) {
     return new CRusSentence(pSyntaxOptions);
 }
@@ -444,40 +447,74 @@ bool CRusSentence::IsRelativSentencePronoun(int ClauseStartWordNo, int WordNo, i
 EClauseType CRusSentence::GetClauseTypeByAncodePattern(const CAncodePattern &Pattern) const {
 
     if (GetOpt()->m_Language == morphUkrainian) {
-        if (Pattern.HasPos(NOUN) && Pattern.HasGrammem(uVocativ))
-            return 21; // Vocative (ОБРАЩ)
-        if (Pattern.HasPos(NOUN) && Pattern.HasGrammem(uNominativ))
-            return 17; // Nominative (НАЗЫВ)
-        if (Pattern.HasPos(VERB) && (Pattern.HasGrammem(uImpersonal) || (Pattern.HasGrammem(uNeutrum) && Pattern.HasGrammem(uSingular))))
-            return 14; // Impersonal Verb (БЕЗЛ_ГЛ)
-        if (Pattern.HasPos(PREDK) || Pattern.HasPos(ADV))
-            return 7; // Category State (КАТ_СОСТ)
+        if (Pattern.HasPos(uNOUN) && Pattern.HasGrammem(uVocativ))
+            return Vocative; // 21 - ОБРАЩ
+        if (Pattern.HasPos(uNOUN) && Pattern.HasGrammem(uNominativ))
+            return NominativeSent; // 17 - НАЗЫВ
+        if (Pattern.HasPos(uVERB) && (Pattern.HasGrammem(uImpersonal) || (Pattern.HasGrammem(uNeutrum) && Pattern.HasGrammem(uSingular))))
+            return ImpersonalVerb; // 14 - БЕЗЛ_ГЛ
+        if (Pattern.HasPos(uPREDK) || Pattern.HasPos(uADV))
+            return CategoryState; // 7 - КАТ_СОСТ
+
+        // Імений предикат (після тире або окремо): Він — вчитель.
+        if (Pattern.HasPos(uNOUN) && Pattern.HasGrammem(uNominativ))
+            return NounPredicate; // 5 - ІМ_СКАЗ (можливо, для називного, але у нас вже NominativeSent) 
+
+        if (Pattern.HasPos(uVERB)) {
+            if (Pattern.HasGrammem(uImpersonal)) return ImpersonalVerb; // 14
+            // Перевіряємо аналітичні форми (будучи, маючи + дієприслівник/дієслово)
+            // Поки що спрощено — повертаємо FiniteVerb
+            return FiniteVerb; // 0 - ГЛ_ЛИЧН
+        }
+        else if (Pattern.HasPos(uADVERB_PARTICIPLE))
+            return AdverbialParticiple; // 3 - ДПР
+        else if (Pattern.HasPos(uPARTICIPLE_SHORT))
+            return Participial; // 2 - КР_ПРЧ
+        else if (Pattern.HasPos(uADJ_SHORT))
+            return Predicative; // 4 - ПРЕДК
+        else if (Pattern.HasPos(uPREDK)) {
+            return Predicative; // 4 - ПРЕДК
+        }
+        else if (Pattern.HasPos(uPARTICIPLE)) {
+            // Перевіряємо, чи не пасивний предикат (причастия пасинка)
+            if (Pattern.HasGrammem(uPassiveVoice))
+                return PassivePredicate; // 9 - ПАССИВ
+            return Participial; // 2 - ПРЧ
+        }
+        else if (Pattern.HasPos(uINFINITIVE))
+            return Infinitive; // 1 - ИНФ
+        else if (Pattern.HasPos(uINP))
+            return Introductory; // 18 - ВВОД
+        else if ((Pattern.HasPos(uADJ_FULL) || Pattern.HasPos(uNUMERAL)) && Pattern.HasGrammem(uComparative))
+            return Comparative; // 20 - СРАВН
+        // Фразеологізми — окрема логіка, поки що не реалізовано
+        // UndetachedAdjParticiple — невідокремлене причастя (потрібне окреме правило)
+
+        return UnknownPartOfSpeech;
     }
 
+    // Russian and other languages
     if (Pattern.HasPos(VERB)) {
-        if (GetOpt()->m_Language == morphUkrainian && Pattern.HasGrammem(uImpersonal)) return 14;
-        return VERB_PERS_T;
+        return VERB_PERS_T;  // 0 - ГЛ_ЛИЧН
     }
     else if (Pattern.HasPos(ADVERB_PARTICIPLE))
-        return ADVERB_PARTICIPLE_T;
+        return ADVERB_PARTICIPLE_T; // 1 - ДПР
     else if (Pattern.HasPos(PARTICIPLE_SHORT))
-        return PARTICIPLE_SHORT_T;
+        return PARTICIPLE_SHORT_T; // 2 - КР_ПРЧ
     else if (Pattern.HasPos(ADJ_SHORT))
-        return ADJ_SHORT_T;
+        return ADJ_SHORT_T; // 3 - КР_ПРИЛ
     else if (Pattern.HasPos(PREDK)) {
-        if (GetOpt()->m_Language == morphUkrainian) return 7;
-        return PREDK_T;
+        return PREDK_T; // 4 - ПРЕДК
     }
     else if (Pattern.HasPos(PARTICIPLE))
-        return PARTICIPLE_T;
+        return PARTICIPLE_T; // 5 - ПРЧ
     else if (Pattern.HasPos(INFINITIVE))
-        return INFINITIVE_T;
+        return INFINITIVE_T; // 6 - ИНФ
     else if (Pattern.HasPos(INP))
-        return INP_T;
+        return INP_T; // 7 - ВВОД
     else if ((Pattern.HasPos(ADJ_FULL) || Pattern.HasPos(NUMERAL)) && Pattern.HasGrammem(rComparative))
-        return COMPARATIVE_T;
+        return COMPARATIVE_T; // 10 - СРАВН
 
-    //возвращаем  несуществующую часть речи
     return UnknownPartOfSpeech;
 };
 
