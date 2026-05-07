@@ -7,6 +7,7 @@
 #include "RusSentence.h"
 #include "groups/RusFormatCaller.h"
 #include "RusWord.h"
+#include "morph_dict/agramtab/UkrGramTab.h"
 
 CSentence *NewSentenceRussian(const CSyntaxOpt *pSyntaxOptions) {
     return new CRusSentence(pSyntaxOptions);
@@ -443,18 +444,18 @@ bool CRusSentence::IsRelativSentencePronoun(int ClauseStartWordNo, int WordNo, i
 EClauseType CRusSentence::GetClauseTypeByAncodePattern(const CAncodePattern &Pattern) const {
 
     if (GetOpt()->m_Language == morphUkrainian) {
-        if (Pattern.HasPos(NOUN) && Pattern.HasGrammem(rVocativ))
+        if (Pattern.HasPos(NOUN) && Pattern.HasGrammem(uVocativ))
             return 21; // Vocative (ОБРАЩ)
-        if (Pattern.HasPos(NOUN) && Pattern.HasGrammem(rNominativ))
+        if (Pattern.HasPos(NOUN) && Pattern.HasGrammem(uNominativ))
             return 17; // Nominative (НАЗЫВ)
-        if (Pattern.HasPos(VERB) && (Pattern.HasGrammem(rImpersonal) || (Pattern.HasGrammem(rNeutrum) && Pattern.HasGrammem(rSingular))))
+        if (Pattern.HasPos(VERB) && (Pattern.HasGrammem(uImpersonal) || (Pattern.HasGrammem(uNeutrum) && Pattern.HasGrammem(uSingular))))
             return 14; // Impersonal Verb (БЕЗЛ_ГЛ)
         if (Pattern.HasPos(PREDK) || Pattern.HasPos(ADV))
             return 7; // Category State (КАТ_СОСТ)
     }
 
     if (Pattern.HasPos(VERB)) {
-        if (GetOpt()->m_Language == morphUkrainian && Pattern.HasGrammem(rImpersonal)) return 14;
+        if (GetOpt()->m_Language == morphUkrainian && Pattern.HasGrammem(uImpersonal)) return 14;
         return VERB_PERS_T;
     }
     else if (Pattern.HasPos(ADVERB_PARTICIPLE))
