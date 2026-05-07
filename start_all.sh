@@ -19,8 +19,8 @@ stop_services() {
     
     # Try using lock file PID first
     if [ -f "$SYNAN_LCK" ]; then
-        PID=$(cat "$SYNAN_LCK")
-        if ps -p "$PID" > /dev/null; then
+        PID=$(cat "$SYNAN_LCK" 2>/dev/null)
+        if [ -n "$PID" ] && ps -p "$PID" > /dev/null; then
             echo "Killing SynanDaemon (PID $PID) from lock file..."
             kill "$PID" 2>/dev/null
         fi
@@ -34,9 +34,11 @@ stop_services() {
     MAX_WAIT=5
     COUNT=0
     while pgrep -f "SynanDaemon|SemanDaemon" > /dev/null && [ $COUNT -lt $MAX_WAIT ]; do
+        echo -n "."
         sleep 1
         ((COUNT++))
     done
+    echo ""
     
     if pgrep -f "SynanDaemon|SemanDaemon" > /dev/null; then
         echo "Forcing shutdown..."
@@ -50,7 +52,7 @@ stop_services() {
 }
 
 start_services() {
-    echo "Starting services..."
+    echo "Starting services in background..."
     
     SYNAN_BIN="${BUILD_DIR}/Source/www/SynanDaemon/SynanDaemon"
     SEMAN_BIN="${BUILD_DIR}/Source/www/SemanDaemon/SemanDaemon"
@@ -60,20 +62,21 @@ start_services() {
         return 1
     fi
 
-    echo "Starting SynanDaemon on port $PORT_SYNAN..."
-    "$SYNAN_BIN" --host 0.0.0.0 --port "$PORT_SYNAN" --log-level info > "${LOG_DIR}/synan_stdout.log" 2>&1 &
+    # Start SynanDaemon with nohup and redirect to log
+    nohup "$SYNAN_BIN" --host 0.0.0.0 --port "$PORT_SYNAN" --log-level info > "${LOG_DIR}/synan_stdout.log" 2>&1 &
     SYNAN_PID=$!
-    echo "SynanDaemon PID: $SYNAN_PID"
+    echo "SynanDaemon started with PID $SYNAN_PID (Port $PORT_SYNAN)"
 
     if [ -f "$SEMAN_BIN" ]; then
-        echo "Starting SemanDaemon on port $PORT_SEMAN..."
-        "$SEMAN_BIN" --host 0.0.0.0 --port "$PORT_SEMAN" --log-level info > "${LOG_DIR}/seman_stdout.log" 2>&1 &
+        nohup "$SEMAN_BIN" --host 0.0.0.0 --port "$PORT_SEMAN" --log-level info > "${LOG_DIR}/seman_stdout.log" 2>&1 &
         SEMAN_PID=$!
-        echo "SemanDaemon PID: $SEMAN_PID"
+        echo "SemanDaemon started with PID $SEMAN_PID (Port $PORT_SEMAN)"
     fi
     
-    echo "--- Services started ---"
-    echo "Use 'tail -f Logs/synan_dmn.log' to monitor."
+    echo ""
+    echo "Initialization takes ~10-15 seconds."
+    echo "Check progress: tail -f Logs/synan_dmn.log"
+    echo "Check output: tail -f Logs/synan_stdout.log"
 }
 
 case "$1" in
@@ -89,11 +92,7 @@ case "$1" in
         start_services
         ;;
     *)
-        # Default to restart behavior if no arg provided
         echo "Usage: $0 {start|stop|restart}"
-        echo "Defaulting to restart..."
-        stop_services
-        sleep 1
-        start_services
+        exit 1
         ;;
 esac
