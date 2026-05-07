@@ -45,6 +45,10 @@ CEngSyntaxOpt :: CEngSyntaxOpt (MorphLanguageEnum langua) : CSyntaxOpt(langua)
 	for (size_t i=0; i < eSyntaxGroupTypesCount; i++)
 		m_SyntaxGroupTypes[i] = eSyntaxGroupTypes[i];
 	m_piGramTab = new CEngGramTab();
+m_bEnableLocThesaurus = false;
+	m_bEnableFinThesaurus = false;
+	m_bEnableCompThesaurus = false;
+	m_bEnableOmniThesaurus = false;
 	
 
 }
@@ -58,7 +62,10 @@ void CEngSyntaxOpt::DestroyOptions ()
 
 void CEngSyntaxOpt :: InitOptionsLanguageSpecific()
 {
-	
+	auto synan_directory = GetRegistryString("EngSynan");
+	std::string strFileName = MakePath(synan_directory, "synan.grm");
+	m_FormatsGrammar.InitalizeGrammar(morphEnglish, strFileName);
+	m_FormatsGrammar.LoadGrammarForGLR(true);
 }
 
 

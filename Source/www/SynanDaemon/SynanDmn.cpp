@@ -7,7 +7,8 @@ TSynanHttpServer::TSynanHttpServer() :
     TRMLHttpServer(),
     RussianSyntaxHolder(morphRussian),
     GermanSyntaxHolder(morphGerman),
-    UkrainianSyntaxHolder(morphUkrainian)
+    UkrainianSyntaxHolder(morphUkrainian),
+    EnglishSyntaxHolder(morphEnglish)
 {
 
 }
@@ -45,6 +46,8 @@ std::string TSynanHttpServer::ProcessSyntax(TDaemonParsedRequest &request) {
         P = &GermanSyntaxHolder;
     } else if (request.Langua == morphUkrainian) {
         P = &UkrainianSyntaxHolder;
+    } else if (request.Langua == morphEnglish) {
+        P = &EnglishSyntaxHolder;
     }
     
     if (P == nullptr) {
@@ -55,17 +58,42 @@ std::string TSynanHttpServer::ProcessSyntax(TDaemonParsedRequest &request) {
 
 
 void TSynanHttpServer::LoadSynan(bool loadBigrams) {
-    LOGI <<"Loading Russian Syntax";
-    RussianSyntaxHolder.LoadSyntax();
-
-    LOGI <<"Loading German Syntax";
-    GermanSyntaxHolder.LoadSyntax();
-
-    LOGI <<"Loading Ukrainian Syntax";
-    UkrainianSyntaxHolder.LoadSyntax();
-
-    LOGI <<"Loading English Morphology";
-    EnglishMorphHolder.LoadMorphology(morphEnglish);
+    try {
+        LOGI <<"Loading Russian Syntax";
+        RussianSyntaxHolder.LoadSyntax();
+    } catch (CExpc& e) {
+        LOGE << "Failed to load Russian Syntax: " << e.what();
+    }
+    try {
+        LOGI <<"Loading German Syntax";
+        GermanSyntaxHolder.LoadSyntax();
+    } catch (CExpc& e) {
+        LOGE << "Failed to load German Syntax: " << e.what();
+    }
+    try {
+        LOGI <<"Loading Ukrainian Syntax";
+        UkrainianSyntaxHolder.LoadSyntax();
+    } catch (CExpc& e) {
+        LOGE << "Failed to load Ukrainian Syntax: " << e.what();
+    }
+    try {
+        LOGI <<"Loading Ukrainian Morphology";
+        UkrainianMorphHolder.LoadMorphology(morphUkrainian);
+    } catch (CExpc& e) {
+        LOGE << "Failed to load Ukrainian Morphology: " << e.what();
+    }
+    try {
+        LOGI <<"Loading English Morphology";
+        EnglishMorphHolder.LoadMorphology(morphEnglish);
+    } catch (CExpc& e) {
+        LOGE << "Failed to load English Morphology: " << e.what();
+    }
+    try {
+        LOGI <<"Loading English Syntax";
+        EnglishSyntaxHolder.LoadSyntax();
+    } catch (CExpc& e) {
+        LOGE << "Failed to load English Syntax: " << e.what();
+    }
 
     if (loadBigrams) {
         auto path = fs::path(GetRmlVariable()) / "Dicts" / "Bigrams";

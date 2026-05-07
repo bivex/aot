@@ -6,6 +6,7 @@ class TSynanHttpServer : public TRMLHttpServer {
     CSyntaxHolder RussianSyntaxHolder;
     CSyntaxHolder GermanSyntaxHolder;
     CSyntaxHolder UkrainianSyntaxHolder;
+    CSyntaxHolder EnglishSyntaxHolder;
     CMorphanHolder EnglishMorphHolder;
     CMorphanHolder UkrainianMorphHolder;
 

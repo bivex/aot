@@ -42,7 +42,7 @@ void CSyntaxHolder::LoadSyntax()
 		else
 			m_pPostMorph = nullptr;
 
-		if (!m_pPostMorph && m_Language != morphUkrainian)
+		if (!m_pPostMorph && m_Language != morphUkrainian && m_Language != morphEnglish)
 		{
 			throw CExpc("Cannot load postmorphology\n");
 		}
@@ -60,11 +60,11 @@ void CSyntaxHolder::LoadSyntax()
 	}
 	catch (CExpc& e) {
 		LOGE << "LoadSyntax failed: " << e.what();
-		if (m_Language != morphUkrainian) throw;
+		if (m_Language != morphUkrainian && m_Language != morphEnglish) throw;
 	}
 	catch (...) {
 		LOGE << "LoadSyntax failed with unknown error";
-		if (m_Language != morphUkrainian) throw;
+		if (m_Language != morphUkrainian && m_Language != morphEnglish) throw;
 	}
 };
 

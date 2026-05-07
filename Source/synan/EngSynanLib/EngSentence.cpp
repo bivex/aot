@@ -62,14 +62,9 @@ bool CEngSentence::RunSyntaxInClauses(ESynRulesSet)
 		if( m_pSyntaxOptions == NULL )
 			return false;
 		
-		CEngFormatCaller FormatCaller(GetOpt());
-		
-		FormatCaller.AddAllRules( );
-
 		for(int i = 0 ; i < GetClausesCount() ; i++ )
 		{
-			GetClause(i).BuildGroups(FormatCaller, true);		
-			FormatCaller.Reset();
+            BuildGLRGroupsInClause(GetClause(i));
 		}
 
 		
@@ -132,6 +127,8 @@ bool CEngSentence::BuildClauses()
 	assert ( GetClausesCount() == 0 );
 
 	FindGraPairs();
+
+    BuildGLRGroupsInSentence();
 
 	if(! BuildInitialClauses() )
 	{

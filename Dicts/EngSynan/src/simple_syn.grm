@@ -1,0 +1,25 @@
+%% ========== Minimal English Syntax Rules ==========
+%% Single root: SYN_GROUP
+
+%% NP building
+[NP] -> [TOKEN grm="NOUN"];
+[NP] -> [TOKEN grm="PN"];
+[NP] -> [TOKEN grm="PRON"];
+[NP] -> [TOKEN grm="ARTICLE"] [TOKEN grm="NOUN"];
+[NP] -> [TOKEN grm="ADJECTIVE"] [TOKEN grm="NOUN"];
+[NP] -> [TOKEN grm="ARTICLE"] [TOKEN grm="ADJECTIVE"] [TOKEN grm="NOUN"];
+
+%% PP
+[PP] -> [TOKEN grm="PREP"] [NP];
+
+%% VP
+[VP] -> [TOKEN grm="VERB"];
+[VP] -> [TOKEN grm="VERB"] [NP];
+[VP] -> [TOKEN grm="VBE"] [TOKEN grm="ADJECTIVE"];
+[VP] -> [TOKEN grm="VBE"] [NP];
+[VP] -> [TOKEN grm="VERB"] [NP] [PP];
+
+%% Root
+[SYN_GROUP] -> [NP] | [VP] | [PP] | [TOKEN grm="ADVERB"];
+[SYN_GROUP] -> [NP] [VP];
+[SYN_GROUP] -> [NP] [VP] [PP];
