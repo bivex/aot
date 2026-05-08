@@ -5,6 +5,7 @@
 #include "Sentence.h"
 #include "FormatCaller.h"
 #include "morph_dict/agramtab/RusGramTab.h"
+#include "morph_dict/agramtab/UkrGramTab.h"
 
 
 class CWord_eq
@@ -297,7 +298,7 @@ int CSentence::IsClauseBorder(int WordNo, int& iStartSearch,int& iPunctsCount, i
 	const CSynWord& pWord = m_Words[WordNo];
 
 
-	if (GetOpt()->m_Language == morphRussian)
+	if (GetOpt()->m_Language == morphRussian || GetOpt()->m_Language == morphUkrainian)
 	{	// a clause border cannot divide an analytical verb form (for Russian)
 		int  NextWord  = FindFirstAuxVerb(WordNo);
 		if (!pWord.m_MainVerbs.empty())
@@ -515,6 +516,31 @@ int CSentence::IsClauseBorder(int WordNo, int& iStartSearch,int& iPunctsCount, i
 		};
 	};
 
+	// Ukrainian: prevent splitting aux verb + infinitive (e.g. "Він буде читати")
+	if (GetOpt()->m_Language == morphUkrainian && WordNo > 0) {
+		const auto& prevW = m_Words[WordNo-1];
+		bool prevIsAux = false;
+		for (size_t hi = 0; hi < prevW.m_Homonyms.size(); hi++) {
+			auto& hom = prevW.m_Homonyms[hi];
+			if ((hom.HasPos(uVERB) || hom.HasPos(uINFINITIVE))
+				&& (hom.GetLemma() == "БУТИ" || hom.GetLemma() == "СТАТИ")) {
+				prevIsAux = true;
+				break;
+			}
+		}
+		if (prevIsAux) {
+			const auto& curW = m_Words[WordNo];
+			for (size_t hi = 0; hi < curW.m_Homonyms.size(); hi++) {
+				auto& hom = curW.m_Homonyms[hi];
+				if (hom.HasPos(uINFINITIVE)
+					|| (hom.HasPos(uVERB) && (endswith(hom.GetLemma(), "ТИ") || endswith(hom.GetLemma(), "ТЬ")))) {
+					iStartSearch = WordNo + 1;
+					return -1;
+				}
+			}
+		}
+	}
+
 	//если два предиката в одной клаузе, проводим границу до второго предиката
 	if (SetClauseBorderIfThereAreTwoPotentialPredicates(iFWrd, WordNo))
 	{
@@ -678,7 +704,6 @@ void CSentence::InitConjunctions(CClause* pClause)
 bool CSentence::BuildInitialClauses()
 {
     int n = (int)m_Words.size();
-    fprintf(stderr, "BuildInitialClauses started, words.size=%d\n", n); fflush(stderr);
 	CClauseCollection::Clear();
     // IsValid();
 
@@ -692,9 +717,7 @@ bool CSentence::BuildInitialClauses()
 	for(int WordNo = 0 ; WordNo < n; )
 	{		
 		int iNextPunctCount = 0;
-		fprintf(stderr, "BuildInitialClauses: loop WordNo=%d iFirstWord=%d\n", WordNo, iFirstWord); fflush(stderr);
 		int iLastWord = IsClauseBorder(WordNo, iStartSearch, iNextPunctCount, iFirstWord);
-		fprintf(stderr, "BuildInitialClauses: IsClauseBorder(WordNo=%d) returned iLastWord=%d iStartSearch=%d\n", WordNo, iLastWord, iStartSearch); fflush(stderr);
 
 		if	(		(iLastWord != -1) 
 				&&	(iLastWord >= iFirstWord)
@@ -705,7 +728,6 @@ bool CSentence::BuildInitialClauses()
 
 			//creating clause			
 			CClause clause(this, iFirstWord,iLastWord);
-			fprintf(stderr, "BuildInitClauses: added clause (%d, %d)\n", iFirstWord, iLastWord); fflush(stderr);
 			//assigning clause type
 			InitClauseType(clause);
 			int debug = clause.m_vectorTypes.size();
@@ -717,14 +739,12 @@ bool CSentence::BuildInitialClauses()
 		} 
 
         if (iStartSearch <= WordNo) {
-            fprintf(stderr, "BuildInitialClauses: iStartSearch (%d) <= WordNo (%d), incrementing to avoid infinite loop\n", iStartSearch, WordNo);
             WordNo++;
         } else {
             WordNo = iStartSearch;
         }
 	}
 
-	fprintf(stderr, "BuildInitialClauses finished, clauses count = %d\n", GetClausesCount()); fflush(stderr);
 	return true;
 }
 

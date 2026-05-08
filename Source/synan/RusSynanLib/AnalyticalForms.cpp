@@ -8,6 +8,7 @@
 #include "assert.h"
 #undef NDEBUG
 #include "groups/RusFormatCaller.h"
+#include "morph_dict/agramtab/UkrGramTab.h"
 
 
 bool HasDeclinableSynNounInInstrumentalis(const CSynWord& _W)
@@ -150,6 +151,21 @@ bool HasInfinitive(const CSynWord& W)
 	return false; 		
 }
 
+// Ukrainian infinitives end in "-ти" (ТИ) or "-ть" (ТЬ)
+// The morph predictor may tag them as uVERB instead of uINFINITIVE
+static bool HasUkrInfinitive(const CSynWord& W) {
+	for (int i = 0; i < W.m_Homonyms.size(); i++) {
+		auto& h = W.m_Homonyms[i];
+		if (h.HasPos(uINFINITIVE)) return true;
+		if (h.HasPos(uVERB)) {
+			const std::string& lem = h.GetLemma();
+			if (endswith(lem, "ТИ") || endswith(lem, "ТЬ"))
+				return true;
+		}
+	}
+	return false;
+}
+
 
 
 
@@ -173,56 +189,41 @@ void CRusSentence::BuildAnalyticalVerbForms()
 				&&	(FindFirstAuxVerb(WordNo) == -1)
 			)
 		{
-			if (m_Words[WordNo].GetHomonymsCount() == 0) {
-				fprintf(stderr, "BuildAnVrb: WordNo=%d word='%s' HAS NO HOMONYMS!\n", WordNo, m_Words[WordNo].m_strWord.c_str());
+			if (m_Words[WordNo].GetHomonymsCount() == 0)
 				continue;
-			}
 			std::string s_lem = m_Words[WordNo].GetSynHomonym(0).GetLemma();
 			if (m_Words[WordNo].IsInOborot()) continue;
 			//ищем гл. "быть" или "стать"
 			bool isAuxVerb = m_Words[WordNo].HasAnalyticalBeRus() || (GetOpt()->m_Language == morphUkrainian && m_Words[WordNo].HasAnalyticalBeUkr());
-			fprintf(stderr, "BuildAnVrb: WordNo=%d word='%s' lem='%s' HasBeRus=%d HasBeUkr=%d isAux=%d\n",
-				WordNo, m_Words[WordNo].m_strWord.c_str(), s_lem.c_str(),
-				(int)m_Words[WordNo].HasAnalyticalBeRus(),
-				(int)(GetOpt()->m_Language == morphUkrainian ? m_Words[WordNo].HasAnalyticalBeUkr() : -1),
-				(int)isAuxVerb);
-				if (isAuxVerb && iBe == -1)
+			if (isAuxVerb && iBe == -1)
 			{
 				iBe = WordNo;
 				continue;
 			}
 
-			if ( HasInfinitive(m_Words[WordNo]))
+			if ( (GetOpt()->m_Language == morphUkrainian) ? HasUkrInfinitive(m_Words[WordNo]) : HasInfinitive(m_Words[WordNo]))
 			{
 				v_AnalyticalFormVars.push_back( SAnalyticalFormVariant(WordNo, m_Words[WordNo].GetHomonymsCount(), SAnalyticalFormVariant::Infinitive, s_lem, AllHomonymsArePredicates(m_Words[WordNo])) );
 				continue;
 			}
 
-			if ( HasPredik( m_Words[WordNo]) ) 
+			if ( HasPredik( m_Words[WordNo]) )
 			{
 				v_AnalyticalFormVars.push_back( SAnalyticalFormVariant(WordNo, m_Words[WordNo].GetHomonymsCount(), SAnalyticalFormVariant::Predikative, s_lem, AllHomonymsArePredicates(m_Words[WordNo])) );
 				continue;
 			}
 
-			if (HasShortParticipleOrAdj(m_Words[WordNo])) 
+			if (HasShortParticipleOrAdj(m_Words[WordNo]))
 			{
 				v_AnalyticalFormVars.push_back( SAnalyticalFormVariant(WordNo, m_Words[WordNo].GetHomonymsCount(), SAnalyticalFormVariant::Short_Form, s_lem, AllHomonymsArePredicates(m_Words[WordNo])) );
 				continue;
 			}
-			//поиск сравнительной степени
-			if ( HasCompar(m_Words[WordNo]) ) 		 
+			//Ð¿Ð¾Ð¸ÑÐº ÑÑÐ°Ð²Ð½Ð¸ÑÐµÐ»ÑÐ½Ð¾Ð¹ ÑÑÐµÐ¿ÐµÐ½Ð¸
+			if ( HasCompar(m_Words[WordNo]) )
 				v_AnalyticalFormVars.push_back( SAnalyticalFormVariant(WordNo, m_Words[WordNo].GetHomonymsCount(), SAnalyticalFormVariant::Comp_Adj, s_lem, AllHomonymsArePredicates(m_Words[WordNo])) );
 		}
 
-		// DEBUG: dump all words in clause to understand why none qualified
-		for (int dbg = PrCl.m_iFirstWord; dbg <= PrCl.m_iLastWord; dbg++) {
-			fprintf(stderr, "  DEBUG word[%d]='%s' MainVerbsEmpty=%d FindFirstAuxVerb=%d\n",
-				dbg, m_Words[dbg].m_strWord.c_str(),
-				(int)m_Words[dbg].m_MainVerbs.empty(),
-				FindFirstAuxVerb(dbg));
-		}
-
- 		if (iBe != -1 && v_AnalyticalFormVars.size() > 0)
+			if (iBe != -1 && v_AnalyticalFormVars.size() > 0)
 		{
 			{
 				//правило для цепочки {"быть"(буд.), предикатив (омонимичный), инфинитив (нс)}, тогда строим ан.ф. с инфинитивом
@@ -285,7 +286,6 @@ void CRusSentence::BuildAnalyticalVerbForms()
 					m_Words[iBe].m_MainVerbs.push_back( v_AnalyticalFormVars[k].iWordNum );
 					{
 						std::string dump =  m_Words[iBe].m_strWord  + " " + m_Words[v_AnalyticalFormVars[k].iWordNum].m_strWord;
-						fprintf(stderr, "analytical form \"%s\" was created\n", dump.c_str()); fflush(stderr);
 						LOGV << "analytical form \"" << dump << "\" was created";
 					};
 
@@ -305,17 +305,11 @@ void CRusSentence::BuildAnalyticalVerbForms()
 
 					InitClauseType(GetClause(ClauseNo));
 
-					// For Ukrainian: if the clause root is FiniteVerb from
-					// an auxiliary (БУТИ/СТАТИ), upgrade to AnalyticVerb (10)
 					if (GetOpt()->m_Language == morphUkrainian) {
 						CClause& cl = GetClause(ClauseNo);
 						for (size_t ti = 0; ti < cl.m_vectorTypes.size(); ti++) {
-							if (cl.m_vectorTypes[ti].m_Type == 0 /*FiniteVerb*/) {
-								int rootWord = cl.m_vectorTypes[ti].m_Root.m_WordNo;
-								if (rootWord >= 0 && rootWord < (int)m_Words.size()
-									&& m_Words[rootWord].HasAnalyticalBeUkr()) {
-									cl.m_vectorTypes[ti].m_Type = 10; // AnalyticVerb
-								}
+							if (cl.m_vectorTypes[ti].m_Type == 0 || cl.m_vectorTypes[ti].m_Type == 1) {
+								cl.m_vectorTypes[ti].m_Type = 10; /* AnalyticVerb */
 							}
 						}
 					}
@@ -354,6 +348,30 @@ bool CRusSentence::CheckAnalyticalVerbForm(int iVWrd, int iSWrd)
 bool CRusSentence::IsAnalyticalVerbForm(int iVerbWrd, int iSWrd, int& VerbHomNo, CIntVector& AnalyticHom)
 {
 	AnalyticHom.clear();
+
+	// Ukrainian: simplified check — aux verb (БУТИ/СТАТИ) + infinitive
+	if (GetOpt()->m_Language == morphUkrainian) {
+		for (VerbHomNo = 0; VerbHomNo < m_Words[iVerbWrd].GetHomonymsCount(); VerbHomNo++) {
+			const CSynHomonym& VerbHom = m_Words[iVerbWrd].GetSynHomonym(VerbHomNo);
+			if (!VerbHom.IsLemma("БУТИ") && !VerbHom.IsLemma("СТАТИ")) continue;
+			for (int j = 0; j < m_Words[iSWrd].GetHomonymsCount(); j++) {
+				CSynHomonym ShHom = m_Words[iSWrd].GetSynHomonym(j);
+				if (ShHom.HasPos(uINFINITIVE)) {
+					AnalyticHom.push_back(j);
+					continue;
+				}
+				// Fallback: Ukrainian infinitives end in ТИ or ТЬ
+				if (ShHom.HasPos(uVERB)) {
+					const std::string& lem = ShHom.GetLemma();
+					if (endswith(lem, "ТИ") || endswith(lem, "ТЬ")) {
+						AnalyticHom.push_back(j);
+					}
+				}
+			}
+			if (!AnalyticHom.empty()) return true;
+		}
+		return false;
+	}
 
 	//с предикативными значениями "много и "мало" анал. форм не строить 
 	if ( ( m_Words[iSWrd].FindLemma("МНОГО") || m_Words[iSWrd].FindLemma("МАЛО") ) &&
