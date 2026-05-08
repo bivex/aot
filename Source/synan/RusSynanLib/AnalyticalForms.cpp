@@ -177,7 +177,11 @@ void CRusSentence::BuildAnalyticalVerbForms()
 			if (m_Words[WordNo].IsInOborot()) continue;
 			//ищем гл. "быть" или "стать"
 			bool isAuxVerb = m_Words[WordNo].HasAnalyticalBeRus() || (GetOpt()->m_Language == morphUkrainian && m_Words[WordNo].HasAnalyticalBeUkr());
-				LOGI << "BuildAnVrb: WordNo=" << WordNo << " word='" << m_Words[WordNo].m_strWord << "' lem='" << s_lem << "' HasBeRus=" << m_Words[WordNo].HasAnalyticalBeRus() << " HasBeUkr=" << (GetOpt()->m_Language == morphUkrainian ? m_Words[WordNo].HasAnalyticalBeUkr() : -1) << " isAux=" << isAuxVerb;
+			fprintf(stderr, "BuildAnVrb: WordNo=%d word='%s' lem='%s' HasBeRus=%d HasBeUkr=%d isAux=%d\n",
+				WordNo, m_Words[WordNo].m_strWord.c_str(), s_lem.c_str(),
+				(int)m_Words[WordNo].HasAnalyticalBeRus(),
+				(int)(GetOpt()->m_Language == morphUkrainian ? m_Words[WordNo].HasAnalyticalBeUkr() : -1),
+				(int)isAuxVerb);
 				if (isAuxVerb && iBe == -1)
 			{
 				iBe = WordNo;
@@ -205,8 +209,16 @@ void CRusSentence::BuildAnalyticalVerbForms()
 			if ( HasCompar(m_Words[WordNo]) ) 		 
 				v_AnalyticalFormVars.push_back( SAnalyticalFormVariant(WordNo, m_Words[WordNo].GetHomonymsCount(), SAnalyticalFormVariant::Comp_Adj, s_lem, AllHomonymsArePredicates(m_Words[WordNo])) );
 		}
-		
-		if (iBe != -1 && v_AnalyticalFormVars.size() > 0)
+
+		// DEBUG: dump all words in clause to understand why none qualified
+		for (int dbg = PrCl.m_iFirstWord; dbg <= PrCl.m_iLastWord; dbg++) {
+			fprintf(stderr, "  DEBUG word[%d]='%s' MainVerbsEmpty=%d FindFirstAuxVerb=%d\n",
+				dbg, m_Words[dbg].m_strWord.c_str(),
+				(int)m_Words[dbg].m_MainVerbs.empty(),
+				FindFirstAuxVerb(dbg));
+		}
+
+ 		if (iBe != -1 && v_AnalyticalFormVars.size() > 0)
 		{
 			{
 				//правило для цепочки {"быть"(буд.), предикатив (омонимичный), инфинитив (нс)}, тогда строим ан.ф. с инфинитивом
