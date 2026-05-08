@@ -290,12 +290,10 @@ std::string BuildJson(CSyntaxHolder* pSyntaxHolder, const std::string& query) {
     rapidjson::Document d;
     CJsonObject sents(d, rapidjson::kArrayType);
 	for (auto& s : pSyntaxHolder->m_Synan.m_vectorSents) {
-
         CJsonObject o(d, rapidjson::kArrayType);
         builder.BuildJson(*s, o);
         sents.push_back(o.get_value());
 	}
 	return sents.dump_rapidjson();
-	
 }
 

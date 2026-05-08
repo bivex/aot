@@ -181,6 +181,7 @@ bool CSentencesCollection::ReadAndProcessSentences(const CLemmatizedText* text) 
 
     }
 
+
     if (m_bEnableProgressBar) {
         time_t t2;
         time(&t2);

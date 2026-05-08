@@ -91,9 +91,10 @@ bool CSyntaxHolder::GetSentencesFromSynAn(std::string utf8str, bool bFile)
 		m_LemText.SaveToFile("after.lem");
 #endif
 		
+		LOGI << "GetSentencesFromSynAn: ProcessData lang=" << m_Language;
 		if (!m_Synan.ProcessData(&m_LemText))
 		{
-			fprintf (stderr, "  Synan has crushed!\n");
+			LOGE << "GetSentencesFromSynAn: Synan has crushed lang=" << m_Language;
 			return false;
 		};
 

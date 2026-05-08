@@ -137,12 +137,11 @@ bool CEngSentence::BuildClauses()
 	};
 
 	RunSyntaxInClauses(AllRules);
-	
 
-	return true;	
+	AssignClauseNoToWords();
+
+	return true;
 }
-
-
 
 
 

@@ -1392,7 +1392,7 @@ bool  CSentence::CreateSyntaxStructure() {
     assert(IsValid());
 
     CalculatePrimitiveClausesCount();
-    
+
     m_OutputClauseVars.clear();
     m_OutputClauseVars.resize(GetPrimitiveClausesCount());
     m_ClauseClauseVarsCount= 1;
