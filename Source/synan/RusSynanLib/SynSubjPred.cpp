@@ -45,12 +45,9 @@ bool	CRusSentence::IsGoodSubject(const CMorphVariant& synVariant, const std::str
 
 void CRusSentence::BuildSubjAndPredRelation(CMorphVariant& synVariant, long RootWordNo, EClauseType ClauseType)
 {
-    fprintf(stderr, "BuildSubjAndPredRelation: ClauseType=%d RootWordNo=%ld lang=%d\n", ClauseType, RootWordNo, (int)GetOpt()->m_Language); fflush(stderr);
-	LOGI << "BuildSubjAndPredRelation: ClauseType=" << ClauseType << " RootWordNo=" << RootWordNo << " Language=" << (int)GetOpt()->m_Language;
 	synVariant.ResetSubj();
 
 	if( ClauseType == DASH_T ) {
-        fprintf(stderr, "BuildSubjAndPredRelation: calling find_subj_and_predic_noun_with_dash\n"); fflush(stderr);
 		find_subj_and_predic_noun_with_dash(synVariant) ;
     }
 	else 
@@ -59,18 +56,13 @@ void CRusSentence::BuildSubjAndPredRelation(CMorphVariant& synVariant, long Root
 			||  (ClauseType == COMPARATIVE_T) 
 			||  (ClauseType == VERB_PERS_T)
 			) {
-            fprintf(stderr, "BuildSubjAndPredRelation: calling find_subj\n"); fflush(stderr);
 			find_subj(synVariant, RootWordNo);
         }
 		else
         {
-			LOGI << "  Skipping find_subj - wrong clause type";
-            fprintf(stderr, "BuildSubjAndPredRelation: skipping find_subj\n"); fflush(stderr);
         }
 
-    fprintf(stderr, "BuildSubjAndPredRelation: calling IsGoodSubject\n"); fflush(stderr);
 	synVariant.m_bGoodSubject = IsGoodSubject(synVariant, m_Words.back().m_strWord);
-    fprintf(stderr, "BuildSubjAndPredRelation: finished\n"); fflush(stderr);
 }
 
 

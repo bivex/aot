@@ -657,14 +657,12 @@ void CreateGroupsForTermins(CClause& C, CFormatCaller& FormatCaller, CMorphVaria
 //вызывается, когда еще syn-варианты еще не построены(т.е. в первый раз)
 bool CClause::BuildGroupsAndSynVariants(CFormatCaller& FormatCaller)
 {
-    fprintf(stderr, "BuildGroupsAndSynVariants started for clause (%d, %d)\n", m_iFirstWord, m_iLastWord); fflush(stderr);
 	try
 	{		
 		//строим декартово произведение омонимов и
 		//заполняем очередным набором омонимов FormatCaller.sent
 		BuildSynVariants();
 
-        fprintf(stderr, "BuildGroupsAndSynVariants: variants count = %zu\n", m_SynVariants.size()); fflush(stderr);
 
 		for(SVI  pVar  = m_SynVariants.begin() ; pVar != m_SynVariants.end(); pVar++ )
 		{	
@@ -680,9 +678,7 @@ bool CClause::BuildGroupsAndSynVariants(CFormatCaller& FormatCaller)
 			FormatCaller.BuildAutomaticSynrels();
 
 			synVariant.m_vectorGroups = FormatCaller;
-            fprintf(stderr, "BuildGroupsAndSynVariants: before BuildSubjAndPredMember\n"); fflush(stderr);
 			BuildSubjAndPredMember(synVariant);
-            fprintf(stderr, "BuildGroupsAndSynVariants: after BuildSubjAndPredMember\n"); fflush(stderr);
 			
 			AssignVariantWeight(synVariant);
 			TranslateFormatCallerGroups(synVariant);
@@ -796,7 +792,6 @@ bool CClause::BuildGroupsForExistingSynVariants(CFormatCaller& FormatCaller, boo
 
 bool CClause::BuildGroups(CFormatCaller& FormatCaller, bool bRebuildAllGroups)
 {
-    fprintf(stderr, "CClause::BuildGroups: starting for clause (%d, %d)\n", m_iFirstWord, m_iLastWord); fflush(stderr);
 	bool bRes;
 
 	if( m_SynVariants.empty() )
@@ -804,11 +799,8 @@ bool CClause::BuildGroups(CFormatCaller& FormatCaller, bool bRebuildAllGroups)
 	else
 		bRes = BuildGroupsForExistingSynVariants(FormatCaller, bRebuildAllGroups);
 
-    fprintf(stderr, "CClause::BuildGroups: after variants build\n"); fflush(stderr);
 	m_SynVariants.sort( GreaterByWeight );
-    fprintf(stderr, "CClause::BuildGroups: after sort\n"); fflush(stderr);
 	m_pSent->AfterBuildGroupsTrigger (*this);
-    fprintf(stderr, "CClause::BuildGroups: after trigger\n"); fflush(stderr);
 	
 
 	return bRes;

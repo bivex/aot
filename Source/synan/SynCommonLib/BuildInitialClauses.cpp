@@ -730,7 +730,6 @@ bool CSentence::BuildInitialClauses()
 			CClause clause(this, iFirstWord,iLastWord);
 			//assigning clause type
 			InitClauseType(clause);
-			int debug = clause.m_vectorTypes.size();
 			clause.m_iPunctSignsCount = iPunctSignsCount;
 			iPunctSignsCount = iNextPunctCount;
 			InitConjunctions(&clause);			
