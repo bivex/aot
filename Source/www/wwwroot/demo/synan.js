@@ -659,9 +659,11 @@ function syntax_request() {
     }
 
     var url = SynanDaemonUrl + "&action=syntax&langua=" + encodeURIComponent(langua);
-    url +=  "&query=" + encodeURIComponent(query);
 
-    fetch(url)
+    fetch(url, {
+        method: 'POST',
+        body: query
+    })
         .then(function(response) {
             if (!response.ok) {
                 throw new Error('Server returned ' + response.status);

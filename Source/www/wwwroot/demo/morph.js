@@ -51,12 +51,14 @@ function morph_request() {
     var query = document.getElementById("SearchText").value;
     var withParadigms = document.getElementById("WithParadigms").checked;
 
-    var url = SynanDaemonUrl + "&action=morph&langua=" + langua + "&query=" + query;
+    var url = SynanDaemonUrl + "&action=morph&langua=" + langua;
     if (withParadigms) {
         url += "&withparadigms=1";
     }
-    //fetch(url'http://127.0.0.1:17017?action=morph&langua=Russian&query=%D0%BC%D0%B0%D0%BC%D0%B0')
-    fetch(url)
+    fetch(url, {
+        method: 'POST',
+        body: query
+    })
         .then(function(response) {
             //alert(response.headers.get('Content-Type')); // application/json; charset=utf-8
             //alert(response.status); // 200

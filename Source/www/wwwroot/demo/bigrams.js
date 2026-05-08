@@ -64,14 +64,19 @@ function bigrams_request() {
     var minFreq = document.getElementById("MinBigramFreq").value;
     var direct = document.querySelector('input[name="BigramElement"]:checked').value == "FirstWord";
 
-    var url = SynanDaemonUrl + "&action=bigrams&langua=Russian&sortMode=" + sortMode;
-    url +=  "&query=" + query + "&minBigramsFreq=" + minFreq;
-    if (direct) {
-        url += "&direct=1";
-    }
+    var params = new URLSearchParams();
+    params.append('action', 'bigrams');
+    params.append('langua', 'Russian');
+    params.append('sortMode', sortMode);
+    params.append('query', query);
+    params.append('minBigramsFreq', minFreq);
+    if (direct) params.append('direct', '1');
 
-    fetch(url)
-        .then(function(response) {
+    fetch(SynanDaemonUrl, {
+        method: 'POST',
+        body: params
+    })
+    .then(function(response) {
             return response.json();
         })
         .then(function(table) {

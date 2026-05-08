@@ -7,7 +7,7 @@
 #include <signal.h>
 #pragma comment(lib, "Ws2_32.lib")
 #else
-#include <sys/signal.h>	
+#include <sys/signal.h>
 #endif
 
 
@@ -71,6 +71,8 @@ void TRMLHttpServer::Initialize(std::string host, uint16_t port) {
 	}
 
 	evhttp_set_default_content_type(Server.get(), "application/json; charset=utf8");
+	// Accept both GET and POST requests
+	evhttp_set_allowed_methods(Server.get(), EVHTTP_REQ_GET | EVHTTP_REQ_POST | EVHTTP_REQ_OPTIONS);
 	if (signal(SIGTERM, termination_handler) == SIG_IGN)
 		signal(SIGTERM, SIG_IGN);
 };
@@ -99,11 +101,70 @@ void TRMLHttpServer::OnHttpRequest(evhttp_request *req) {
 	if (!outBuf)
 		return;
 
+	auto cmdType = evhttp_request_get_command(req);
+	LOGI << "request method: " << cmdType << " (GET=1,POST=2,OPTIONS=16)";
+
+	// Handle CORS preflight
+	if (cmdType == EVHTTP_REQ_OPTIONS) {
+		auto *outHdrs = evhttp_request_get_output_headers(req);
+		evhttp_add_header(outHdrs, "Access-Control-Allow-Origin", "*");
+		evhttp_add_header(outHdrs, "Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+		evhttp_add_header(outHdrs, "Access-Control-Allow-Headers", "Content-Type");
+		evhttp_send_reply(req, HTTP_OK, "", nullptr);
+		return;
+	}
+
 	const char* uri = evhttp_request_get_uri(req);
-    LOGI << uri;
-	struct evkeyvalq headers {}; // zero initialized with {}
-	auto r = evhttp_parse_query(uri, &headers);
+	LOGI << uri;
+	struct evkeyvalq headers {};
+	evhttp_parse_query(uri, &headers);
+
 	try {
+		std::string inputQuery;
+		std::string postBody;
+
+		// Read POST body if present
+		if (cmdType == EVHTTP_REQ_POST) {
+			auto *inBuf = evhttp_request_get_input_buffer(req);
+			if (inBuf) {
+				size_t len = evbuffer_get_length(inBuf);
+				LOGI << "POST body length: " << len;
+				if (len > 0) {
+					auto *data = evbuffer_pullup(inBuf, len);
+					postBody.assign(reinterpret_cast<const char*>(data), len);
+				}
+			}
+		}
+
+		// Determine if POST body is URL-encoded form data
+		if (!postBody.empty()) {
+			// Fetch Content-Type from actual input headers (req->input_headers)
+			const char* contentType = evhttp_find_header(evhttp_request_get_input_headers(req), "Content-Type");
+			bool isFormEncoded = contentType && strstr(contentType, "application/x-www-form-urlencoded") != nullptr;
+
+			if (isFormEncoded) {
+				// Parse form data and merge parameters into headers
+				evkeyvalq formParams{};
+				if (evhttp_parse_query_str(postBody.c_str(), &formParams) == 0) {
+					// Extract 'query' from form data
+					auto* formQuery = evhttp_find_header(&formParams, "query");
+					if (formQuery) {
+						inputQuery = formQuery;
+					}
+					// Merge all form parameters into main headers (form overrides URL)
+					for (auto* kv = formParams.tqh_first; kv != nullptr; kv = kv->next.tqe_next) {
+						evhttp_add_header(&headers, kv->key, kv->value);
+					}
+				}
+				evhttp_clear_headers(&formParams);
+			}
+			
+			if (inputQuery.empty()) {
+				// Raw text body or missing 'query' parameter
+				inputQuery = postBody;
+			}
+		}
+
 		auto action = evhttp_find_header(&headers, "action");
 		if (action == nullptr) {
 			throw CExpc("cannot find action");
@@ -118,22 +179,27 @@ void TRMLHttpServer::OnHttpRequest(evhttp_request *req) {
 			throw CExpc(Format("unsupported language: %s", languaStr));
 		}
 
-		auto query = evhttp_find_header(&headers, "query");
-		if (query == nullptr) {
-			throw CExpc("cannot find query");
+		// Fallback to URL query parameter if no input yet
+		if (inputQuery.empty()) {
+			auto query = evhttp_find_header(&headers, "query");
+			if (query == nullptr) {
+				throw CExpc("cannot find query");
+			}
+			inputQuery = query;
 		}
-        std::string inputQuery = query;
+
+
 		Trim(inputQuery);
 		if (inputQuery.empty()) {
 			throw CExpc("Empty input query");
 		};
 		TDaemonParsedRequest parsedRequest{ req, uri, headers, action, langua, inputQuery};
 		auto result = OnParsedRequest(parsedRequest);
-		evbuffer_add_printf(outBuf, result.c_str());
+		evbuffer_add_printf(outBuf, "%s", result.c_str());
 		SendReply(req, HTTP_OK, outBuf);
 	}
 	catch (std::exception& e) {
-        LOGE << "Error: " << e.what() << " Request: "  << uri;
+		LOGE << "Error: " << e.what() << " Request: "  << uri;
 		SendReply(req, HTTP_BADREQUEST, nullptr);
 		return;
 	}
