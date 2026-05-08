@@ -40,3 +40,7 @@ The project includes large-scale databases for Russian-English translation and l
 *   **Location:** `Dicts/EngSynan/`
 *   **Rules:** `synan.grm` and `src/simple_syn.grm`.
 *   **Function:** Defines the grammar rules for the English syntactic analyzer.
+*   **Syntactic Relations (NEW):**
+    *   **Subject-Predicate (SP)**: Identified via heuristics in `CEngSentence`. The parser finds the first verb as the predicate and the preceding noun-like unit as the subject.
+    *   **Phrasal Groups**: `[NP]` (Noun Phrase), `[VP]` (Verb Phrase), and `[PP]` (Prepositional Phrase).
+    *   **SP Relation Tag**: Marked as `isSubj` in the API output to enable visualization.

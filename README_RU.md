@@ -302,7 +302,7 @@ RML=$RML ./Bin/SynanDaemon --host 127.0.0.1 --port 8082
 | Action | Параметры | Описание |
 |--------|-----------|---------|
 | `morph` | `langua=<Russian\|German\|English>`, `query=<слово>` | Морфологический разбор слова |
-| `syntax` | `langua=<Russian\|German>`, `query=<предложение>` | Синтаксический разбор предложения |
+| `syntax` | `langua=<Russian\|German\|English>`, `query=<предложение>` | Синтаксический разбор предложения |
 | `bigrams` | `langua=Russian`, `query=<слово>`, `minBigramsFreq=<N>`, `sortMode=<freq\|mi>` | Поиск слов-соседей (коллокаций) |
 
 **Пример:**
@@ -337,6 +337,8 @@ curl -G --data-urlencode "action=morph" \
 
 ## Документация
 
+- **Поддерживаемые части предложения (синтаксис):** `Docs/syntactic_relations.md`
+- **Английские лингвистические ресурсы:** `Docs/english_resources.md`
 - **Документация по морфологическому словарю:** `Docs/Morph_UNIX.txt`
 - **README подмодуля morph_dict:** `Source/morph_dict/README.md`
 - **Инструкция по сборке на macOS:** `BUILD_MACOS.md`

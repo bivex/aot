@@ -302,7 +302,7 @@ RML=$RML ./Bin/SynanDaemon --host 127.0.0.1 --port 8082
 | Action | Parameters | Description |
 |--------|-----------|-------------|
 | `morph` | `langua=<Russian\|German\|English>`, `query=<word>` | Morphological analysis of a word |
-| `syntax` | `langua=<Russian\|German>`, `query=<sentence>` | Syntactic parsing of a sentence |
+| `syntax` | `langua=<Russian\|German\|English>`, `query=<sentence>` | Syntactic parsing of a sentence |
 | `bigrams` | `langua=Russian`, `query=<word>`, `minBigramsFreq=<N>`, `sortMode=<freq\|mi>` | Find collocations |
 
 **Example:**
@@ -337,6 +337,8 @@ CORS header `Access-Control-Allow-Origin: *` is set for all responses.
 
 ## Documentation
 
+- **Supported Syntactic Relations:** `Docs/syntactic_relations.md`
+- **English Language Resources:** `Docs/english_resources.md`
 - **Morphology dictionary documentation:** `Docs/Morph_UNIX.txt`
 - **Morph_dict submodule README:** `Source/morph_dict/README.md`
 - **Build instructions for macOS:** `BUILD_MACOS.md`
