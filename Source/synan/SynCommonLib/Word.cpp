@@ -214,6 +214,7 @@ void CSynWord::InitLevelSpecific(CSynHomonym& h)
 
 	if	(		( m_bWord && (GetOpt()->m_Language == morphRussian))
 			||	( HasDes(OLLE) && (GetOpt()->m_Language != morphRussian))
+			||	( GetOpt()->m_Language == morphEnglish )
 		)
 	{
 		m_pSent->InitHomonymMorphInfo(h);

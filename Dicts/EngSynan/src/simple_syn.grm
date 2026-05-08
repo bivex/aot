@@ -20,6 +20,5 @@
 [VP] -> [TOKEN grm="VERB"] [NP] [PP];
 
 %% Root
-[SYN_GROUP] -> [NP] | [VP] | [PP] | [TOKEN grm="ADVERB"];
-[SYN_GROUP] -> [NP] [VP];
-[SYN_GROUP] -> [NP] [VP] [PP];
+[SP] -> [NP] [VP];
+[SYN_GROUP] -> [NP] | [VP] | [PP] | [TOKEN grm="ADVERB"] | [SP];

@@ -154,17 +154,19 @@ void CSyntaxOpt::InitializeOptions() {
         auto pOborDictionary = new CDictionary;
         if (m_Language == morphRussian)
             strPath = GetRegistryString(g_strRusRegOborDicPath);
-        else
+        else if (m_Language == morphGerman)
             strPath = GetRegistryString(g_strGerRegOborDicPath);
-
-        pOborDictionary->Load(strPath.c_str());
+        
+        if (!strPath.empty()) {
+            pOborDictionary->Load(strPath.c_str());
+        }
 
         m_piOborDictionary.reset(pOborDictionary);
         m_piOborDictionaryWeak = pOborDictionary;
     }
 
     if (!m_pOborDic->ReadOborots(m_piOborDictionaryWeak)) {
-        if (m_Language != morphUkrainian) {
+        if (m_Language != morphUkrainian && m_Language != morphEnglish) {
             throw CExpc("Failed read oborots");
         }
     }

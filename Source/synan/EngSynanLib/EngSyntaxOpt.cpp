@@ -3,13 +3,14 @@
 #include "EngSentence.h"
 #include "EngOborDic.h"
 
-const int eSyntaxGroupTypesCount = 13;
+const int eSyntaxGroupTypesCount = 16;
 const char eSyntaxGroupTypes [eSyntaxGroupTypesCount][30] = 
 {
 	"DET_ADJ_NOUN", "ADJ_NOUN",  "PP",
 	"NP_left", "DET_NP_left", "NP_right", "DET_NP_right",
 	"SIMIL_NP", "SIMIL_ADJ", "MODIF_ADJ", "DIRECT_OBJ","PARTIC_CONSTR",
-	"FOREIGN_GROUP"
+	"FOREIGN_GROUP",
+	"NP", "VP", "SP"
 };
 
 
@@ -65,7 +66,7 @@ void CEngSyntaxOpt :: InitOptionsLanguageSpecific()
 	auto synan_directory = GetRegistryString("EngSynan");
 	std::string strFileName = MakePath(synan_directory, "synan.grm");
 	m_FormatsGrammar.InitalizeGrammar(morphEnglish, strFileName);
-	m_FormatsGrammar.LoadGrammarForGLR(true);
+	m_FormatsGrammar.LoadGrammarForGLR(false);
 }
 
 
@@ -73,7 +74,7 @@ void CEngSyntaxOpt :: InitOptionsLanguageSpecific()
 
 bool CEngSyntaxOpt::is_firm_group(int GroupType) const
 {
-	return false;
+	return GroupType >= 13; // NP, VP, SP are firm
 }
 
 bool CEngSyntaxOpt::IsGroupWithoutWeight(int GroupType, const char* cause) const

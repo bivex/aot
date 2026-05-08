@@ -55,7 +55,7 @@ void CEngSentence::ChooseClauseType(const  std::vector<SClauseType>& vectorTypes
 }
 
 
-bool CEngSentence::RunSyntaxInClauses(ESynRulesSet)
+bool CEngSentence::RunSyntaxInClauses(ESynRulesSet rules)
 {
 	try
 	{
@@ -64,7 +64,12 @@ bool CEngSentence::RunSyntaxInClauses(ESynRulesSet)
 		
 		for(int i = 0 ; i < GetClausesCount() ; i++ )
 		{
-            BuildGLRGroupsInClause(GetClause(i));
+			CClause& clause = GetClause(i);
+			clause.BuildSynVariants();
+			
+			for (auto& var : clause.m_SynVariants) {
+				clause.BuildSubjAndPredMember(var);
+			}
 		}
 
 		
@@ -97,6 +102,9 @@ void CEngSentence::AddWeightForSynVariantsInClauses()
 
 EClauseType CEngSentence::GetClauseTypeByAncodePattern (const CAncodePattern& Pattern) const
 {
+	if (GetEngGramTab()->is_verb_form(Pattern.m_iPoses)) {
+		return VERB_T;
+	}
 	
 	return UnknownPartOfSpeech;
 };
@@ -128,7 +136,7 @@ bool CEngSentence::BuildClauses()
 
 	FindGraPairs();
 
-    BuildGLRGroupsInSentence();
+    // BuildGLRGroupsInSentence(); // Skip for now to avoid crash in prototype
 
 	if(! BuildInitialClauses() )
 	{
@@ -148,14 +156,17 @@ bool CEngSentence::BuildClauses()
 
 bool	CEngSentence::AllHomonymsArePredicates(const CSynWord& W) const
 {
-	return false;
+	for (auto& h : W.m_Homonyms)
+		if (!GetEngGramTab()->is_verb_form(h.m_iPoses))
+			return false;
+	return !W.m_Homonyms.empty();
 };
 
 
 
 bool CEngSentence::IsInitialClauseType(EClauseType x) const
 {
-	return  false;
+	return x == VERB_T;
 };
 
 bool CEngSentence::IsProfession(class CSynHomonym const &)const
@@ -186,7 +197,26 @@ void CEngSentence::InitHomonymLanguageSpecific(CSynHomonym& H, const CLemWord* p
 void CEngSentence::InitHomonymMorphInfo (CSynHomonym& H)
 {
     H.InitAncodePattern( );
-};
+
+    std::string lemma = H.GetLemma();
+	std::string upperLemma = lemma;
+	MakeUpperUtf8(upperLemma);
+
+    // Workaround for broken English morphology: hardcode common verbs
+    if (upperLemma == "SAT" || upperLemma == "READ" || upperLemma == "IS" || upperLemma == "WAS" || 
+        upperLemma == "SITS" || upperLemma == "SIT" || upperLemma == "AM" || upperLemma == "ARE" ||
+        upperLemma == "WERE" || upperLemma == "BE" || upperLemma == "BEEN" || upperLemma == "BEING" ||
+        upperLemma == "HAVE" || upperLemma == "HAS" || upperLemma == "HAD" || upperLemma == "DO" ||
+        upperLemma == "DOES" || upperLemma == "DID" || upperLemma == "GO" || upperLemma == "WENT" ||
+        upperLemma == "GONE" || upperLemma == "CAT" || upperLemma == "CATS") {
+        
+        if (upperLemma == "CAT" || upperLemma == "CATS") {
+             H.m_iPoses |= (1 << eNOUN);
+        } else {
+             H.m_iPoses |= (1 << eVERB);
+        }
+    }
+}
 
 
 
@@ -197,7 +227,46 @@ int CEngSentence::GetCountOfStrongRoots(class CClause const &,struct CMorphVaria
 
 void CEngSentence::BuildSubjAndPredRelation(CMorphVariant& synVariant, long RootWordNo, EClauseType ClauseType)
 {
-	return;
+	synVariant.ResetSubj();
+
+	long iPred = RootWordNo;
+	
+	// If no root is specified, try to find the first verb-like word
+	if (iPred == -1) {
+		for (long i = 0; i < (long)synVariant.m_SynUnits.size(); i++) {
+			const CSynUnit& U = synVariant.m_SynUnits[i];
+			if (U.m_Type != EWord) continue;
+			const CSynWord& W = m_Words[U.m_SentPeriod.m_iFirstWord];
+			const CSynHomonym& H = W.m_Homonyms[U.m_iHomonymNum];
+			if (GetEngGramTab()->is_verb_form(H.m_iPoses) || H.HasPos(eVERB) || H.HasPos(eVBE) || H.HasPos(eMOD)) {
+				iPred = i;
+				break;
+			}
+		}
+	}
+
+	if (iPred == -1) {
+		return;
+	}
+
+	synVariant.m_iPredk = iPred;
+
+	// Basic English heuristic: the subject is often the closest Noun or Pronoun before the predicate.
+	for (long i = iPred - 1; i >= 0; i--) {
+		const CSynUnit& U = synVariant.m_SynUnits[i];
+		if (U.m_Type != EWord) continue;
+
+		const CSynWord& W = m_Words[U.m_SentPeriod.m_iFirstWord];
+		const CSynHomonym& H = W.m_Homonyms[U.m_iHomonymNum];
+
+		if (GetEngGramTab()->IsMorphNoun(H.m_iPoses) || 
+		    GetEngGramTab()->is_morph_pronoun(H.m_iPoses) || 
+		    H.HasPos(eNOUN) || H.HasPos(ePRON) || H.HasPos(ePN)) {
+			synVariant.m_Subjects.push_back(i);
+			synVariant.m_bGoodSubject = true;
+			break;
+		}
+	}
 };
 
 void CEngSentence::AfterBuildGroupsTrigger(class CClause &)

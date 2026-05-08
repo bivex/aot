@@ -5,3 +5,9 @@
 [submodule "Source/dict_uk"]
 	path = Source/dict_uk
 	url = https://github.com/brown-uk/dict_uk
+[submodule "Dicts/Morph/English/unimorph"]
+	path = Dicts/Morph/English/unimorph
+	url = https://github.com/unimorph/eng
+[submodule "Dicts/EngSynan/ud-ewt"]
+	path = Dicts/EngSynan/ud-ewt
+	url = https://github.com/UniversalDependencies/UD_English-EWT
