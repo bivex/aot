@@ -26,6 +26,7 @@ static int GetConjProperties(const CSentence& S, int WordNo, ConjFromWhatList& F
 	int OborotNo = S.m_Words[WordNo].GetOborotNo();
 
 	if	(		OborotNo != -1 
+			&& OborotNo < S.GetOpt()->GetOborDic()->m_Entries.size()
 			&& 	S.GetOpt()->GetOborDic()->m_Entries[OborotNo].HasPartOfSpeech(S.GetOpt()->m_Conjunction)
 		)
 	{
@@ -507,6 +508,7 @@ int CSentence::IsClauseBorder(int WordNo, int& iStartSearch,int& iPunctsCount, i
 				&&	(WordNo > 0)
 				&&	!m_Words[WordNo-1].m_bSimilarConj 
                 &&	!m_Words[WordNo-1].HasDes(OPun)
+				&&	(m_Words[WordNo].GetOborotPtr() != nullptr)
 				&&	(m_Words[WordNo].GetOborotPtr()->HasPartOfSpeech (GetOpt()->m_Conjunction) )
 			)
 			return WordNo-1;

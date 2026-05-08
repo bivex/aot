@@ -124,7 +124,7 @@ void CSynWord::CloneHomonymForOborot(int HNum)
 	{
 		//nim : добавить ч.р. = ВВОДН для оборота с одноименной GF 
 		if (!m_bBadParenthesis)
-			if ( GetOborotPtr()->HasPartOfSpeech(GetOpt()->m_RusParenthesis) )
+			if ( GetOborotPtr() != nullptr && GetOborotPtr()->HasPartOfSpeech(GetOpt()->m_RusParenthesis) )
             {
                 H.m_iPoses |= (1<<GetOpt()->m_RusParenthesis);
             }

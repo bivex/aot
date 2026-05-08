@@ -59,9 +59,11 @@ BOOL CVisualWord::Init(const CSynWord& piWord, const CSentence& piSentence)
 				assert (OborotId != -1);
 				if (OborotId != -1)
 				{
-					CString str;
-					str.Format(_T("Ob: %s"), FromRMLEncode(piHomonym.GetOborotPtr()->m_OborotEntryStr));
-					pHomonym->m_strOborotsNum += str; 
+					if (piHomonym.GetOborotPtr() != nullptr) {
+						CString str;
+						str.Format(_T("Ob: %s"), FromRMLEncode(piHomonym.GetOborotPtr()->m_OborotEntryStr));
+						pHomonym->m_strOborotsNum += str; 
+					}
 				};
 			}
 

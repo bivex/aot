@@ -779,8 +779,10 @@ void CRusSentence::CloneHomonymsForOborots() {
         if (!FirstWord.HasOborot2()) {
             // многословные обороты
             for (int j = i; j < m_Words.size(); j++) {
+                int oborotNo = m_Words[j].m_Homonyms[0].m_OborotNo;
+                if (oborotNo == -1 || oborotNo >= GetOpt()->GetOborDic()->m_Entries.size()) continue;
                 //"судя по многочисленным фак
-                std::string title = GetOpt()->GetOborDic()->m_Entries[m_Words[j].m_Homonyms[0].m_OborotNo].m_OborotEntryStr;
+                std::string title = GetOpt()->GetOborDic()->m_Entries[oborotNo].m_OborotEntryStr;
                 MakeUpperUtf8(title);
                 int b = title.find(m_Words[j].m_strUpperWord + "(");
                 if (b != -1) {
@@ -830,7 +832,7 @@ void CRusSentence::CloneHomonymsForOborots() {
             // однословные обороты
             for (int k = 0; k < FirstWord.GetHomonymsCount(); k++) {
                 CSynHomonym &H = FirstWord.GetSynHomonym(k);
-                if (H.m_OborotNo != -1) {
+                if (H.m_OborotNo != -1 && H.m_OborotNo < GetOpt()->GetOborDic()->m_Entries.size()) {
                     const COborotForSyntax &O = GetOpt()->GetOborDic()->m_Entries[H.m_OborotNo];
                     //Проверяем соответствие найденных  графематикой   оборотов и морфологии.
                     //Для омонимов, которые не являются союзом, предлогом, вводным словом или наречием ("GF      = 1  НАР")

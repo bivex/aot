@@ -40,7 +40,7 @@ const	CSyntaxOpt* CSynHomonym::GetOpt() const
 
 const COborotForSyntax* CSynHomonym::GetOborotPtr()  const
 {
-	assert(m_OborotNo != -1);
+	if (m_OborotNo == -1 || m_OborotNo >= GetOpt()->GetOborDic()->m_Entries.size()) return nullptr;
 	return &GetOpt()->GetOborDic()->m_Entries[m_OborotNo];
 };
 

@@ -43,7 +43,7 @@ std::vector<CPeriod> CRusSentence::FindParenthesisOborotsWithoutComma() const
         for (size_t HomNo=0; HomNo< m_Words[i].GetHomonymsCount(); HomNo++)
         {
             const CSynHomonym* pH = &m_Words[i].GetSynHomonym(HomNo);
-            if ( pH->m_bOborot1 &&  pH->GetOborotPtr()->HasPartOfSpeech(INP) )
+            if ( pH->m_bOborot1 && pH->GetOborotPtr() != nullptr && pH->GetOborotPtr()->HasPartOfSpeech(INP) )
             {
                 for (int j=i; j < m_Words.size(); j++)
                     if (m_Words[j].HasOborot2())
@@ -84,7 +84,7 @@ void CRusSentence::DetermineParenthesis()
         }
         else
         {
-            if (!FirstWord.GetSynHomonym(0).GetOborotPtr()->HasOnlyPartOfSpeech(INP) )
+            if (FirstWord.GetSynHomonym(0).GetOborotPtr() != nullptr && !FirstWord.GetSynHomonym(0).GetOborotPtr()->HasOnlyPartOfSpeech(INP) )
             {
                 // помечаем,  что данный оборот не может стать причиной веришины "вводн", 
                 // поскольку выяснилось, что оборот стоит внутри клаузы с другим словами и 
