@@ -2,14 +2,22 @@
 #include "StdSynan.h"
 #include "RusSentence.h"
 
-void InitCopulList(StringVector& v_CopulList)
+void InitCopulList(StringVector& v_CopulList, MorphLanguageEnum langua)
 {
 	v_CopulList.clear();
-	v_CopulList.push_back("как");
-	v_CopulList.push_back("словно");
-	v_CopulList.push_back("будто");
-	v_CopulList.push_back("что");
-	v_CopulList.push_back("точно");
+	if (langua == morphUkrainian) {
+		v_CopulList.push_back("ніби");
+		v_CopulList.push_back("мов");
+		v_CopulList.push_back("наче");
+		v_CopulList.push_back("що");
+		v_CopulList.push_back("точно");
+	} else {
+		v_CopulList.push_back("как");
+		v_CopulList.push_back("словно");
+		v_CopulList.push_back("будто");
+		v_CopulList.push_back("что");
+		v_CopulList.push_back("точно");
+	}
 }
 
 bool HasAdjInNom(const CSynWord& _W)
@@ -88,7 +96,10 @@ void CRusSentence::BuildDash(int iClauseNum, int iWrdAfter, bool bCopul)
 
 	if (bCopul)
 	{
-		pClause.ChangeAllClauseTypesToOneType(SClauseType(COPUL_T, -1,-1));		
+		if (GetOpt()->m_Language == morphUkrainian)
+			pClause.ChangeAllClauseTypesToOneType(SClauseType(15 /*Copula*/, -1,-1));
+		else
+			pClause.ChangeAllClauseTypesToOneType(SClauseType(COPUL_T, -1,-1));
 
 		return;
 	}
@@ -104,14 +115,17 @@ void CRusSentence::BuildDash(int iClauseNum, int iWrdAfter, bool bCopul)
 	m_Words.insert(m_Words.begin() + DashWordNo, CreateDash(this));
 
 	RecalculateIndicesAfterInsertingWord(DashWordNo);
-	pClause.ChangeAllClauseTypesToOneType(SClauseType(DASH_T, DashWordNo, 0) );		
+	if (GetOpt()->m_Language == morphUkrainian)
+		pClause.ChangeAllClauseTypesToOneType(SClauseType(19 /*Dash*/, DashWordNo, 0));
+	else
+		pClause.ChangeAllClauseTypesToOneType(SClauseType(DASH_T, DashWordNo, 0));
 }
 
 
 void CRusSentence::TryToRebuildDashInClause()
 {
 	StringVector v_CopulList;
-	InitCopulList(v_CopulList);
+	InitCopulList(v_CopulList, GetOpt()->m_Language);
 
 	for (int ClauseNo = 0; ClauseNo < GetClausesCount(); ClauseNo++)
 	{
@@ -135,6 +149,7 @@ void CRusSentence::TryToRebuildDashInClause()
 		int j = pClause.m_iFirstWord;
 		for (; j <= pClause.m_iLastWord; j++)
 			if (	!m_Words[j].GetSynHomonym(0).IsLemma("У")
+					&& !(GetOpt()->m_Language == morphUkrainian && m_Words[j].GetSynHomonym(0).IsLemma("В"))
 				&&	m_Words[j].GetHomonymByPOS(PREP) != -1 
 				)
 				 break;
@@ -147,7 +162,8 @@ void CRusSentence::TryToRebuildDashInClause()
 
 		for (j = pClause.m_iFirstWord; j <= pClause.m_iLastWord; j++)
 		{
-			if ( m_Words[j].GetSynHomonym(0).IsLemma("ЭТО")	)
+			if ( m_Words[j].GetSynHomonym(0).IsLemma("ЭТО")
+				|| (GetOpt()->m_Language == morphUkrainian && m_Words[j].GetSynHomonym(0).IsLemma("ЦЕ"))	)
 			{
 				Eto.push_back(j);
 				continue;
@@ -162,7 +178,8 @@ void CRusSentence::TryToRebuildDashInClause()
 
 			if ( m_Words[j].GetHomonymsCount() > 1 && !isdigit((BYTE)m_Words[j].m_strWord[0]) ) continue;
 
-			if ( m_Words[j].GetSynHomonym(0).IsLemma("КОТОРЫЙ")) 
+			if ( m_Words[j].GetSynHomonym(0).IsLemma("КОТОРЫЙ")
+				|| (GetOpt()->m_Language == morphUkrainian && m_Words[j].GetSynHomonym(0).IsLemma("ЯКИЙ")))
 				continue;
 
 			if (		HasNounInNom( m_Words[j]) 
@@ -180,7 +197,8 @@ void CRusSentence::TryToRebuildDashInClause()
 				continue;
 			}
 
-			if ( m_Words[j].GetSynHomonym(0).IsLemma("У") )
+			if ( m_Words[j].GetSynHomonym(0).IsLemma("У")
+				|| (GetOpt()->m_Language == morphUkrainian && m_Words[j].GetSynHomonym(0).IsLemma("В")) )
 			{
 				Prep_U = j;
 				continue;
@@ -206,7 +224,7 @@ void CRusSentence::TryToRebuildDashInClause()
 		if (0 == Noun_Nom.size() && 0 == Eto.size() && 
 			0 == Adj_Nom.size() && -1 == Prep_U)
 			continue;
-		if ( Vozrast && 0 < Noun_Nom.size() && m_Words[Noun_Nom[0]].m_strUpperWord == "ГОД" && 0 == Eto.size() && 1 == Adj_Nom.size() && -1 == Prep_U) //ему 21 год
+		if ( Vozrast && 0 < Noun_Nom.size() && (m_Words[Noun_Nom[0]].m_strUpperWord == "ГОД" || (GetOpt()->m_Language == morphUkrainian && m_Words[Noun_Nom[0]].m_strUpperWord == "РІК")) && 0 == Eto.size() && 1 == Adj_Nom.size() && -1 == Prep_U) //ему 21 год
 			Noun_Nom.clear();
 
 		if (0 == Noun_Nom.size() && 0 == Eto.size() && 1 == Adj_Nom.size() && -1 == Prep_U) // Глаза красивые.

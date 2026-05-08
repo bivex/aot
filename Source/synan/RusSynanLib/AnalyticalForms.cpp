@@ -176,7 +176,9 @@ void CRusSentence::BuildAnalyticalVerbForms()
 			std::string s_lem = m_Words[WordNo].GetSynHomonym(0).GetLemma();
 			if (m_Words[WordNo].IsInOborot()) continue;
 			//ищем гл. "быть" или "стать"
-			if (m_Words[WordNo].HasAnalyticalBeRus() && iBe == -1)
+			bool isAuxVerb = m_Words[WordNo].HasAnalyticalBeRus() || (GetOpt()->m_Language == morphUkrainian && m_Words[WordNo].HasAnalyticalBeUkr());
+				LOGI << "BuildAnVrb: WordNo=" << WordNo << " word='" << m_Words[WordNo].m_strWord << "' lem='" << s_lem << "' HasBeRus=" << m_Words[WordNo].HasAnalyticalBeRus() << " HasBeUkr=" << (GetOpt()->m_Language == morphUkrainian ? m_Words[WordNo].HasAnalyticalBeUkr() : -1) << " isAux=" << isAuxVerb;
+				if (isAuxVerb && iBe == -1)
 			{
 				iBe = WordNo;
 				continue;
@@ -281,6 +283,21 @@ void CRusSentence::BuildAnalyticalVerbForms()
 					};
 
 					InitClauseType(GetClause(ClauseNo));
+
+					// For Ukrainian: if the clause root is FiniteVerb from
+					// an auxiliary (БУТИ/СТАТИ), upgrade to AnalyticVerb (10)
+					if (GetOpt()->m_Language == morphUkrainian) {
+						CClause& cl = GetClause(ClauseNo);
+						for (size_t ti = 0; ti < cl.m_vectorTypes.size(); ti++) {
+							if (cl.m_vectorTypes[ti].m_Type == 0 /*FiniteVerb*/) {
+								int rootWord = cl.m_vectorTypes[ti].m_Root.m_WordNo;
+								if (rootWord >= 0 && rootWord < (int)m_Words.size()
+									&& m_Words[rootWord].HasAnalyticalBeUkr()) {
+									cl.m_vectorTypes[ti].m_Type = 10; // AnalyticVerb
+								}
+							}
+						}
+					}
 					break;
 				}
 

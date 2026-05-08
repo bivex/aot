@@ -10,10 +10,15 @@
 bool	CRusSentence::IsInitialClauseType(EClauseType ClauseType) const
 {
 	if (GetOpt()->m_Language == morphUkrainian) {
-		if (ClauseType == VERB_PERS_T || ClauseType == ADVERB_PARTICIPLE_T || ClauseType == PARTICIPLE_SHORT_T || 
-		    ClauseType == ADJ_SHORT_T || ClauseType == PARTICIPLE_T || ClauseType == INFINITIVE_T || 
-		    ClauseType == INP_T || ClauseType == 7 /*Category State*/ || ClauseType == 14 /*Impersonal Verb*/ || 
-		    ClauseType == 17 /*Nominative*/ || ClauseType == 21 /*Vocative*/) {
+		if (ClauseType == VERB_PERS_T || ClauseType == ADVERB_PARTICIPLE_T || ClauseType == PARTICIPLE_SHORT_T ||
+		    ClauseType == ADJ_SHORT_T || ClauseType == PARTICIPLE_T || ClauseType == INFINITIVE_T ||
+		    ClauseType == INP_T || ClauseType == 7 /*Category State*/ || ClauseType == 14 /*Impersonal Verb*/ ||
+		    ClauseType == 17 /*Nominative*/ || ClauseType == 21 /*Vocative*/ ||
+		    ClauseType == 16 /*Ellipsis*/ || ClauseType == 4 /*Predicative*/ ||
+		    ClauseType == 9 /*PassivePredicate*/ || ClauseType == 20 /*Comparative*/ ||
+		    ClauseType == 18 /*Introductory*/ ||
+		    ClauseType == 5 /*NounPredicate*/ || ClauseType == 10 /*AnalyticVerb*/ ||
+		    ClauseType == 12 /*UndetachedAdjParticiple*/ || ClauseType == 19 /*Dash*/) {
 			return true;
 		}
 	}

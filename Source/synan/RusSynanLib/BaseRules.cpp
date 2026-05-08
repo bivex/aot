@@ -6,6 +6,7 @@
 #include "StdSynan.h"
 #include "RusWord.h"
 #include "RusSentence.h"
+#include "morph_dict/agramtab/UkrGramTab.h"
 
 
 bool	CRusSentence::CanBeRelativeAntecedent(const CSynHomonym& H) const
@@ -315,6 +316,22 @@ bool CRusSentence::RuleForDashClause(int iClauseNum)
 	CClause& newClause = UniteClauses(iPrev, iClauseNum, LeftClauseParams);
 
     if (GetOpt()->m_Language == morphUkrainian) {
+        // Check if word after dash is a noun in nominative -> NounPredicate (5)
+        int afterDash = DashWordNo + 1;
+        if (afterDash <= newClause.m_iLastWord) {
+            bool hasNounPred = false;
+            for (int h = 0; h < m_Words[afterDash].GetHomonymsCount(); h++) {
+                auto& hom = m_Words[afterDash].m_Homonyms[h];
+                if (hom.HasPos(uNOUN) && hom.HasGrammem(uNominativ)) {
+                    hasNounPred = true;
+                    break;
+                }
+            }
+            if (hasNounPred) {
+                newClause.ChangeAllClauseTypesToOneType(SClauseType(5 /*NounPredicate*/, DashWordNo, 0));
+                return true;
+            }
+        }
         newClause.ChangeAllClauseTypesToOneType(SClauseType(16 /*Ellipsis*/,DashWordNo, 0));
     } else {
 	    newClause.ChangeAllClauseTypesToOneType(SClauseType(DASH_T,DashWordNo, 0));		

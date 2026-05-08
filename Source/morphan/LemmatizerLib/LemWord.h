@@ -124,6 +124,7 @@ public:
     part_of_speech_mask_t GetPoses() const;
     uint64_t   GetGrammems() const;
     bool    HasAnalyticalBeRus() const;
+    bool    HasAnalyticalBeUkr() const;
 
 	void AddDescriptor(const std::string& some_string_label);
 	void DeleteHomonymByNotTerminalSymbol(const CInputSymbol& s);

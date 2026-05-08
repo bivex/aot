@@ -520,7 +520,22 @@ bool CLemWord::HasAnalyticalBeRus() const
 			return true;
 	}
 		
-	return false; 	
+	return false;
+}
+
+bool CLemWord::HasAnalyticalBeUkr() const
+{
+	if (IsInOborot()) return false;
+
+	for (int i = 0; i < GetHomonymsCount(); i++) {
+		auto h = GetHomonym(i);
+		if (   (h->HasPos(VERB) || h->HasPos(INFINITIVE))
+			&& (h->IsLemma("БУТИ") || h->IsLemma("СТАТИ"))
+			)
+			return true;
+	}
+
+	return false;
 }
 
 void CLemWord::AddDescriptor(const std::string& some_string_label)

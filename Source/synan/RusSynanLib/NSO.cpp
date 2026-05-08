@@ -5,6 +5,7 @@
 
 #include "StdSynan.h"
 #include "RusSentence.h"
+#include "morph_dict/agramtab/UkrGramTab.h"
 #include "groups/RusFormatCaller.h"
 
 
@@ -56,8 +57,13 @@ bool CRusSentence::RuleForFragNounGroup(int iClauseNum)
 
 	
 		int iPartAdj, iPartPartic;
-		iPartAdj = MainStartingAdj.GetHomonymByPOS(ADJ_FULL);
-		iPartPartic = MainStartingAdj.GetHomonymByPOS(PARTICIPLE);
+		if (GetOpt()->m_Language == morphUkrainian) {
+			iPartAdj = MainStartingAdj.GetHomonymByPOS(uADJ_FULL);
+			iPartPartic = MainStartingAdj.GetHomonymByPOS(uPARTICIPLE);
+		} else {
+			iPartAdj = MainStartingAdj.GetHomonymByPOS(ADJ_FULL);
+			iPartPartic = MainStartingAdj.GetHomonymByPOS(PARTICIPLE);
+		}
 
 		//  если у данной клаузы только один вариант вершины - причастие, которое  может стать  стать НСО
 		//  Например, "перечислив ряд, вовлеченных в движение  митьков",
@@ -174,7 +180,7 @@ bool CRusSentence::RuleForFragNounGroup(int iClauseNum)
 								MainStartingAdj.m_Homonyms[AdjPartNo].GetGramCodes().c_str()) 
 							)
 						{
-							SClauseType ClType(UNDETACHED_ADJ_PATIC, WordNo, 0);
+							SClauseType ClType(GetOpt()->m_Language == morphUkrainian ? 12 /*UndetachedAdjParticiple*/ : UNDETACHED_ADJ_PATIC, WordNo, 0);
 							if(CreateEnclosedNotStrongClause(iClauseNum, WordNo, ig_W1, ClType))
 								return true;
 						}
