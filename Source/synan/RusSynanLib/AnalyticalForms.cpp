@@ -173,6 +173,10 @@ void CRusSentence::BuildAnalyticalVerbForms()
 				&&	(FindFirstAuxVerb(WordNo) == -1)
 			)
 		{
+			if (m_Words[WordNo].GetHomonymsCount() == 0) {
+				fprintf(stderr, "BuildAnVrb: WordNo=%d word='%s' HAS NO HOMONYMS!\n", WordNo, m_Words[WordNo].m_strWord.c_str());
+				continue;
+			}
 			std::string s_lem = m_Words[WordNo].GetSynHomonym(0).GetLemma();
 			if (m_Words[WordNo].IsInOborot()) continue;
 			//ищем гл. "быть" или "стать"
@@ -281,15 +285,20 @@ void CRusSentence::BuildAnalyticalVerbForms()
 					m_Words[iBe].m_MainVerbs.push_back( v_AnalyticalFormVars[k].iWordNum );
 					{
 						std::string dump =  m_Words[iBe].m_strWord  + " " + m_Words[v_AnalyticalFormVars[k].iWordNum].m_strWord;
+						fprintf(stderr, "analytical form \"%s\" was created\n", dump.c_str()); fflush(stderr);
 						LOGV << "analytical form \"" << dump << "\" was created";
 					};
 
-					{ // удалить все омонимы, кроме глагола
+					{ // удалить все омонимы, кроме вспомогательного глагола
 						m_Words[iBe].SetHomonymsDel(false);
 
-						for (size_t HomNo=0; HomNo < m_Words[iBe].m_Homonyms.size(); HomNo++)
-							if (GetClauseTypeByAncodePattern(m_Words[iBe].m_Homonyms[HomNo]) == UnknownPartOfSpeech) 
+						for (size_t HomNo=0; HomNo < m_Words[iBe].m_Homonyms.size(); HomNo++) {
+							const CSynHomonym& H = m_Words[iBe].m_Homonyms[HomNo];
+							bool isProperAux = (H.IsLemma("БЫТЬ") || H.IsLemma("БУТИ") || H.IsLemma("СТАТЬ") || H.IsLemma("СТАТИ"));
+							if (!isProperAux) {
 								m_Words[iBe].m_Homonyms[HomNo].m_bDelete = true;
+							}
+						}
 
 						DeleteMarkedHomonymsWithClauses(iBe);
 					};
@@ -355,8 +364,8 @@ bool CRusSentence::IsAnalyticalVerbForm(int iVerbWrd, int iSWrd, int& VerbHomNo,
 	{
 		const CSynHomonym& VerbHom = m_Words[iVerbWrd].GetSynHomonym(VerbHomNo);
 
-		if (		VerbHom.IsLemma("БЫТЬ")
-			||	(		VerbHom.IsLemma("СТАТЬ")
+		if (		VerbHom.IsLemma("БЫТЬ") || VerbHom.IsLemma("БУТИ")
+			||	(		(VerbHom.IsLemma("СТАТЬ") || VerbHom.IsLemma("СТАТИ"))
 					&&	(		VerbHom.HasPos(VERB) 
 							||	VerbHom.HasPos(INFINITIVE)
 						) 

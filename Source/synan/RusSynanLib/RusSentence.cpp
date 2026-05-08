@@ -98,8 +98,9 @@ bool CRusSentence::RunSyntaxInClauses(ESynRulesSet type) {
 
 
         //я бы с удовольствием здесь for_each запустил, да, блин, передавать надо 4 параметра
+        fprintf(stderr, "RunSyntaxInClauses: clauses count = %d\n", GetClausesCount()); fflush(stderr);
         for (int i = 0; i < GetClausesCount(); i++) {
-
+            fprintf(stderr, "RunSyntaxInClauses: processing clause %d\n", i); fflush(stderr);
             GetClause(i).BuildGroups(FormatCaller, bRebuildAllGroups);
             FormatCaller.Reset();
         }
@@ -564,6 +565,7 @@ bool CRusSentence::IsProfession(const CSynHomonym &H) const {
 };
 
 bool CRusSentence::BuildClauses() {
+    fprintf(stderr, "BuildClauses started\n"); fflush(stderr);
     ProcessFio1Fio2();
 
     SolveAmbiguityUsingRuleForShortAdj();
@@ -583,27 +585,35 @@ bool CRusSentence::BuildClauses() {
     assert (GetClausesCount() == 0);
 
     // соединение предикатива нечего: "Вам не о чем волноваться"
+    fprintf(stderr, "BuildClauses: DisruptPronounPredik\n"); fflush(stderr);
     DisruptPronounPredik();
 
 
     // удаление префиксов ВИЦЕ- и ЭКС-
+    fprintf(stderr, "BuildClauses: CutPrefixEksAndVize\n"); fflush(stderr);
     CutPrefixEksAndVize();
 
 
     //	удаление омонимов вводных слов, если эти слова не выделены запятыми и пр.
 
+    fprintf(stderr, "BuildClauses: DetermineParenthesis\n"); fflush(stderr);
     DetermineParenthesis();
 
     //	удаление омонимов, частоты которых соотносятся 1/1000
 
+    fprintf(stderr, "BuildClauses: DeleteHomOneToThousand\n"); fflush(stderr);
     DeleteHomOneToThousand();
 
+    fprintf(stderr, "BuildClauses: FindGraPairs\n"); fflush(stderr);
     FindGraPairs();
 
+    fprintf(stderr, "BuildClauses: CloneHomonymsForOborots\n"); fflush(stderr);
     CloneHomonymsForOborots();
 
+    fprintf(stderr, "BuildClauses: AscribeSimplePrepositionInterpretations\n"); fflush(stderr);
     AscribeSimplePrepositionInterpretations(PREP);
 
+    fprintf(stderr, "BuildClauses: FindAllTermins\n"); fflush(stderr);
     FindAllTermins();
 
     bool SecondTryOfCoverageKillHomonyms = false;
@@ -613,33 +623,36 @@ bool CRusSentence::BuildClauses() {
 
     BuildInitialClausesLabel:
 
+    fprintf(stderr, "BuildClauses: before BuildInitialClauses\n"); fflush(stderr);
     TraceClauses();
 
     if (!BuildInitialClauses()) {
+        fprintf(stderr, "BuildClauses: BuildInitialClauses failed\n"); fflush(stderr);
         return false;
 
     };
 
     TraceClauses();
 
+    fprintf(stderr, "BuildClauses: DeleteSomeTypesInRelativeClauses\n"); fflush(stderr);
     DeleteSomeTypesInRelativeClauses();
 
 
     TraceClauses();
 
-    LOGV << "BuildAnalyticalVerbForms";
+    fprintf(stderr, "BuildClauses: BuildAnalyticalVerbForms\n"); fflush(stderr);
     BuildAnalyticalVerbForms();
 
 
-    LOGV << "TryToAddComparativeTypeToClause";
+    fprintf(stderr, "BuildClauses: TryToAddComparativeTypeToClause\n"); fflush(stderr);
     TryToAddComparativeTypeToClause();
 
-    LOGV << "TryToRebuildDashInClause";
+    fprintf(stderr, "BuildClauses: TryToRebuildDashInClause\n"); fflush(stderr);
     TraceClauses();
     TryToRebuildDashInClause();
     TraceClauses();
 
-    LOGV << "RunSyntaxInClause(RulesBeforeSimClauses)";
+    fprintf(stderr, "BuildClauses: RunSyntaxInClauses(RulesBeforeSimClauses)\n"); fflush(stderr);
     RunSyntaxInClauses(RulesBeforeSimClauses);
 
     // после первого вызова RunSyntaxInClause нужно удалить омонимы, которые противоречат найденным терминам

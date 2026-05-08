@@ -677,25 +677,26 @@ void CSentence::InitConjunctions(CClause* pClause)
 
 bool CSentence::BuildInitialClauses()
 {
-    
+    int n = (int)m_Words.size();
+    fprintf(stderr, "BuildInitialClauses started, words.size=%d\n", n); fflush(stderr);
 	CClauseCollection::Clear();
-    IsValid();
+    // IsValid();
 
 	m_bFirstInPairFound = false;
 
 	
-	int iFirstWord, iLastWord;
-	iFirstWord = 0;	
-	
-	int iStartSearch;
+	int iFirstWord = 0;	
+	int iStartSearch = 0;
 	int iPunctSignsCount = 0;	
 
-	
-
-	for(int WordNo = 0 ; WordNo < m_Words.size();  WordNo = iStartSearch)
+	for(int WordNo = 0 ; WordNo < n; )
 	{		
 		int iNextPunctCount = 0;
-		if	(		((iLastWord = IsClauseBorder(WordNo, iStartSearch,iNextPunctCount, iFirstWord)) != -1) 
+		fprintf(stderr, "BuildInitialClauses: loop WordNo=%d iFirstWord=%d\n", WordNo, iFirstWord); fflush(stderr);
+		int iLastWord = IsClauseBorder(WordNo, iStartSearch, iNextPunctCount, iFirstWord);
+		fprintf(stderr, "BuildInitialClauses: IsClauseBorder(WordNo=%d) returned iLastWord=%d iStartSearch=%d\n", WordNo, iLastWord, iStartSearch); fflush(stderr);
+
+		if	(		(iLastWord != -1) 
 				&&	(iLastWord >= iFirstWord)
 			)
 		{
@@ -704,6 +705,7 @@ bool CSentence::BuildInitialClauses()
 
 			//creating clause			
 			CClause clause(this, iFirstWord,iLastWord);
+			fprintf(stderr, "BuildInitClauses: added clause (%d, %d)\n", iFirstWord, iLastWord); fflush(stderr);
 			//assigning clause type
 			InitClauseType(clause);
 			int debug = clause.m_vectorTypes.size();
@@ -714,10 +716,15 @@ bool CSentence::BuildInitialClauses()
 			iFirstWord = iLastWord + 1;	
 		} 
 
-		
+        if (iStartSearch <= WordNo) {
+            fprintf(stderr, "BuildInitialClauses: iStartSearch (%d) <= WordNo (%d), incrementing to avoid infinite loop\n", iStartSearch, WordNo);
+            WordNo++;
+        } else {
+            WordNo = iStartSearch;
+        }
 	}
 
-
+	fprintf(stderr, "BuildInitialClauses finished, clauses count = %d\n", GetClausesCount()); fflush(stderr);
 	return true;
 }
 
