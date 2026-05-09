@@ -10,28 +10,20 @@ COborDic* NewOborDicEnglish (CSyntaxOpt* Opt)
 	return new CEngOborDic(Opt);
 };
 
-static const size_t CoordConjTypesCount = 21;
+static const size_t CoordConjTypesCount = 5;
 static const CCoordConjType CoordConjTypes[CoordConjTypesCount] = {
 	{"AND", false},
-    {"OR", false},
-	{"AS", false},
-	{"BECAUSE", false},
-	{"BEFORE", false},
-	{"IF", false},
-	{"SINCE", false},
-	{"SO", false},
-	{"THAT", false},
-	{"THOUGH", false},
-	{"UNLESS", false},
-	{"UNTIL", false},
-	{"WHEN", false},
-	{"WHILE", false},
-	{"WHO", false},
-	{"WHAT", false},
-	{"WHERE", false},
-	{"HOW", false},
-	{"WHETHER", false},
-	{"WHILST", false}
+	{"OR", false},
+	{"BUT", false},
+	{"YET", false},
+	{"SO", false}
+};
+
+static const size_t SubConjTypesCount = 14;
+static const std::string SubConjTypes[SubConjTypesCount] = {
+	"BECAUSE", "BEFORE", "IF", "SINCE", "THAT", "THOUGH",
+	"UNLESS", "UNTIL", "WHEN", "WHILE", "WHERE", "HOW",
+	"WHETHER", "WHILST"
 };
 
 CEngOborDic::CEngOborDic(const CSyntaxOpt* Opt) : COborDic(Opt)
@@ -40,6 +32,9 @@ CEngOborDic::CEngOborDic(const CSyntaxOpt* Opt) : COborDic(Opt)
 	for (size_t i=0; i < CoordConjTypesCount;i++)
 		m_SimpleCoordConj.push_back(CoordConjTypes[i]);
 
+	m_SimpleSubConj.clear();
+	for (size_t i=0; i < SubConjTypesCount;i++)
+		m_SimpleSubConj.push_back(SubConjTypes[i]);
 }
 
 /*

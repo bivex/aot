@@ -61,18 +61,17 @@ bool CEngSentence::RunSyntaxInClauses(ESynRulesSet rules)
 	{
 		if( m_pSyntaxOptions == NULL )
 			return false;
-		
+
 		for(int i = 0 ; i < GetClausesCount() ; i++ )
 		{
 			CClause& clause = GetClause(i);
 			clause.BuildSynVariants();
-			
+
 			for (auto& var : clause.m_SynVariants) {
 				clause.BuildSubjAndPredMember(var);
 			}
 		}
 
-		
 		return true;
 	}
 	catch(...)
@@ -136,7 +135,9 @@ bool CEngSentence::BuildClauses()
 
 	FindGraPairs();
 
-    // BuildGLRGroupsInSentence(); // Skip for now to avoid crash in prototype
+    // BuildGLRGroupsInSentence();
+    // Disabled: grammar items don't match English morphology symbols yet,
+    // causing assert on empty m_AutomatSymbolInterpetationUnion.
 
 	if(! BuildInitialClauses() )
 	{

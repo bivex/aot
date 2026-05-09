@@ -1,24 +1,71 @@
-%% ========== Minimal English Syntax Rules ==========
+%% ========== English Syntax Rules ==========
 %% Single root: SYN_GROUP
 
-%% NP building
+%% ========== Noun Phrase (NP) ==========
 [NP] -> [TOKEN grm="NOUN"];
 [NP] -> [TOKEN grm="PN"];
 [NP] -> [TOKEN grm="PRON"];
+[NP] -> [TOKEN grm="POSS"] [TOKEN grm="NOUN"];
 [NP] -> [TOKEN grm="ARTICLE"] [TOKEN grm="NOUN"];
 [NP] -> [TOKEN grm="ADJECTIVE"] [TOKEN grm="NOUN"];
 [NP] -> [TOKEN grm="ARTICLE"] [TOKEN grm="ADJECTIVE"] [TOKEN grm="NOUN"];
+[NP] -> [TOKEN grm="ARTICLE"] [TOKEN grm="POSS"] [TOKEN grm="NOUN"];
+[NP] -> [TOKEN grm="ARTICLE"] [TOKEN grm="ADJECTIVE"] [TOKEN grm="ADJECTIVE"] [TOKEN grm="NOUN"];
+[NP] -> [TOKEN grm="NUMERAL"] [TOKEN grm="NOUN"];
 
-%% PP
+%% ========== Prepositional Phrase (PP) ==========
 [PP] -> [TOKEN grm="PREP"] [NP];
 
-%% VP
+%% ========== Simple Verb Phrase (VP) ==========
 [VP] -> [TOKEN grm="VERB"];
 [VP] -> [TOKEN grm="VERB"] [NP];
+[VP] -> [TOKEN grm="VERB"] [NP] [PP];
+[VP] -> [TOKEN grm="VERB"] [PP];
+
+%% ========== Copula (VBE) constructions ==========
 [VP] -> [TOKEN grm="VBE"] [TOKEN grm="ADJECTIVE"];
 [VP] -> [TOKEN grm="VBE"] [NP];
-[VP] -> [TOKEN grm="VERB"] [NP] [PP];
+[VP] -> [TOKEN grm="VBE"] [PP];
+[VP] -> [TOKEN grm="VBE"] [TOKEN grm="ADVERB"] [TOKEN grm="ADJECTIVE"];
 
-%% Root
+%% ========== Progressive: "is running", "was eating" ==========
+[VP] -> [TOKEN grm="VBE"] [TOKEN grm="VERB" grm="ing"];
+[VP] -> [TOKEN grm="VBE"] [TOKEN grm="VERB" grm="ing"] [NP];
+[VP] -> [TOKEN grm="VBE"] [TOKEN grm="VERB" grm="ing"] [PP];
+
+%% ========== Passive: "was broken", "is eaten" ==========
+[VP] -> [TOKEN grm="VBE"] [TOKEN grm="VERB" grm="pp"];
+[VP] -> [TOKEN grm="VBE"] [TOKEN grm="VERB" grm="pp"] [NP];
+[VP] -> [TOKEN grm="VBE"] [TOKEN grm="VERB" grm="pp"] [PP];
+[VP] -> [TOKEN grm="VBE"] [TOKEN grm="VERB" grm="pp"] [TOKEN grm="PREP"] [NP];
+
+%% ========== Perfect: "has broken", "have eaten" ==========
+[VP] -> [TOKEN grm="VBE"] [TOKEN grm="VERB" grm="pp"];
+[VP] -> [TOKEN grm="VBE"] [TOKEN grm="VERB" grm="pp"] [NP];
+
+%% ========== Modal: "can run", "must go", "will eat" ==========
+[VP] -> [TOKEN grm="MOD"] [TOKEN grm="VERB"];
+[VP] -> [TOKEN grm="MOD"] [TOKEN grm="VERB"] [NP];
+[VP] -> [TOKEN grm="MOD"] [TOKEN grm="VERB"] [PP];
+[VP] -> [TOKEN grm="MOD"] [TOKEN grm="VBE"] [TOKEN grm="VERB" grm="ing"];
+[VP] -> [TOKEN grm="MOD"] [TOKEN grm="VBE"] [TOKEN grm="VERB" grm="pp"];
+[VP] -> [TOKEN grm="MOD"] [TOKEN grm="VBE"] [TOKEN grm="ADJECTIVE"];
+[VP] -> [TOKEN grm="MOD"] [TOKEN grm="VBE"] [NP];
+
+%% ========== Perfect Progressive: "has been running" ==========
+[VP] -> [TOKEN grm="VBE"] [TOKEN grm="VERB" grm="pp"] [TOKEN grm="VERB" grm="ing"];
+[VP] -> [TOKEN grm="VBE"] [TOKEN grm="VERB" grm="pp"] [TOKEN grm="VERB" grm="ing"] [NP];
+
+%% ========== Passive Progressive: "is being eaten" ==========
+[VP] -> [TOKEN grm="VBE"] [TOKEN grm="VERB" grm="ing"] [TOKEN grm="VERB" grm="pp"];
+
+%% ========== Adverbial in VP ==========
+[VP] -> [TOKEN grm="VERB"] [TOKEN grm="ADVERB"];
+[VP] -> [TOKEN grm="VERB"] [TOKEN grm="ADVERB"] [NP];
+[VP] -> [TOKEN grm="ADVERB"] [TOKEN grm="VERB"] [NP];
+
+%% ========== Subject-Predicate (Root) ==========
 [SP] -> [NP] [VP];
+
+%% ========== Root ==========
 [SYN_GROUP] -> [NP] | [VP] | [PP] | [TOKEN grm="ADVERB"] | [SP];

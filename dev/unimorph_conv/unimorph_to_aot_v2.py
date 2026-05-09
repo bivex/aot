@@ -48,12 +48,16 @@ POS_ALLOWED_TAGS = {
 }
 
 def get_stem(lemma, forms):
-    if not forms: return lemma
+    """Find longest common prefix between lemma and all forms.
+    Returns (stem, is_irregular) where is_irregular=True if stem is empty
+    or shorter than 2 chars (indicating suppletive paradigm like go/went)."""
+    if not forms: return lemma, False
     stem = lemma
     for word, _ in forms:
         while not word.startswith(stem) and stem:
             stem = stem[:-1]
-    return stem
+    is_irregular = len(stem) < 2
+    return stem, is_irregular
 
 def clean_text(t):
     # Filter out any character not in the allowed alphabet for English
@@ -92,9 +96,13 @@ def get_gramcode(pos, tags, gram_to_code, gramtab, next_code_idx_ref):
     if key not in gram_to_code:
         # Generate 2-letter gramcode (lowercase for English 'aa')
         idx = next_code_idx_ref[0]
-        c1 = chr(ord('a') + (idx // 26))
-        c2 = chr(ord('a') + (idx % 26))
-        code = c1 + c2
+        if idx >= 676:
+            print(f"WARNING: gramcode space exhausted at {idx} entries", file=sys.stderr)
+            code = f"x{idx}"
+        else:
+            c1 = chr(ord('a') + (idx // 26))
+            c2 = chr(ord('a') + (idx % 26))
+            code = c1 + c2
         next_code_idx_ref[0] += 1
         gram_to_code[key] = code
         gramtab["gramcodes"][code] = {
@@ -166,15 +174,15 @@ def convert():
         
         # Ensure the first form is the lemma if possible
         current_forms_processed.sort(key=lambda x: (x[0] != lemma, x[0]))
-        
-        stem = get_stem(lemma, current_forms_processed)
+
+        stem, is_irregular = get_stem(lemma, current_forms_processed)
         paradigm = []
         for w, gcode in current_forms_processed:
             paradigm.append({
-                "flexia": w[len(stem):],
+                "flexia": w[len(stem):] if not is_irregular else w,
                 "gramcode": gcode
             })
-        
+
         p_key = json.dumps(paradigm, sort_keys=True)
         if p_key not in paradigm_to_id:
             p_id = len(flexia_models)
@@ -182,9 +190,14 @@ def convert():
             flexia_models.append({"endings": paradigm})
         else:
             p_id = paradigm_to_id[p_key]
-            
-        first_flexia = paradigm[0]['flexia'] if paradigm else ''
-        full_lemma = stem + first_flexia
+
+        # For irregular paradigms, stem is the lemma itself with empty prefix
+        # For regular paradigms, reconstruct lemma from stem + first flexia
+        if is_irregular:
+            full_lemma = lemma
+        else:
+            first_flexia = paradigm[0]['flexia'] if paradigm else ''
+            full_lemma = stem + first_flexia
         lemmas_list.append({
             "l": full_lemma,
             "f": p_id,
