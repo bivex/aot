@@ -47,6 +47,15 @@ function getPosFromGram(g) {
         'ПРИЧАСТИЕ': 'ADJECTIVE', 'ДЕЕПРИЧАСТИЕ': 'ADVERB',
         'КР_ПРИЛ': 'ADJECTIVE', 'КР_ПРИЧАСТИЕ': 'VERB', 'ИНФИНИТИВ': 'VERB',
         'ПРЕДК': 'ADVERB', 'ПОСЛ': 'PREP', 'Н_ПРЕДЛ': 'PREP',
+        // Ukrainian/Latin mappings
+        'N': 'NOUN', 'A': 'ADJECTIVE', 'V': 'VERB', 'ADV': 'ADVERB',
+        'PRON': 'PRON', 'PA': 'PRON', 'P_PRED': 'PRON',
+        'PREP': 'PREP', 'POSL': 'PREP', 'CONJ': 'CONJ', 'PARTICLE': 'PART',
+        'INT': 'INT', 'NUM': 'NUMERAL', 'ORD_NUM': 'ORDNUM',
+        'ADJ_SHORT': 'ADJECTIVE', 'PARTICIPLE': 'ADJECTIVE',
+        'ADV_PARTICIPLE': 'ADVERB', 'PARTICIPLE_SHORT': 'VERB',
+        'INFINITIVE': 'VERB', 'PRED': 'ADVERB', 'INP': 'ADVERB',
+        'COLLOC': 'UNKNOWN', 'VBE': 'VBE',
         'PUNC': 'UNKNOWN', 'PUNCT': 'UNKNOWN', 'SENT': 'UNKNOWN'
     };
     return map[p] || p;
@@ -347,9 +356,9 @@ protoClause.drawWordPanels = function() {
             var posMap = {
                 'Ukrainian': {
                     'NOUN':'іменник','PN':'власне ім\'я','PRON':'займенник','VERB':'дієслово','VBE':'дієслово-зв\'язок',
-                    'MOD':'модальник','ADJECTIVE':'прикметник','PN_ADJ':'власний прикметник','ORDNUM':'порядковий числівник',
+                    'MOD':'модальник','ADJECTIVE':'прикметник','PN_ADJ':'притяжальний прикметник','ORDNUM':'порядковий числівник',
                     'ADVERB':'прислівник','ARTICLE':'артикль','PREP':'прийменник','CONJ':'сполучник','PART':'частка',
-                    'POSS':'притягальний займенник','INT':'міжметр','NUMERAL':'числівник','UNKNOWN':''
+                    'POSS':'притягальний займенник','INT':'вигук','NUMERAL':'числівник','UNKNOWN':''
                 },
                 'Russian': {
                     'NOUN':'сущ.','PN':'имя собств.','PRON':'мест.','VERB':'глагол','VBE':'глагол-связка',
@@ -619,9 +628,9 @@ function drawLegend() {
         posOrder = ['NOUN','PN','PRON','VERB','VBE','MOD','ADJECTIVE','PN_ADJ','ORDNUM','ADVERB','ARTICLE','PREP','CONJ','PART','POSS','INT','NUMERAL','UNKNOWN'];
         posLabels = {
             'NOUN':'іменник','PN':'власне ім\'я','PRON':'займенник','VERB':'дієслово','VBE':'дієслово-зв\'язок',
-            'MOD':'модальник','ADJECTIVE':'прикметник','PN_ADJ':'власний прикметник','ORDNUM':'порядковий числівник',
+            'MOD':'модальник','ADJECTIVE':'прикметник','PN_ADJ':'притяжальний прикметник','ORDNUM':'порядковий числівник',
             'ADVERB':'прислівник','ARTICLE':'артикль','PREP':'прийменник','CONJ':'сполучник','PART':'частка',
-            'POSS':'притягальний займенник','INT':'міжметр','NUMERAL':'числівник','UNKNOWN':'???'
+            'POSS':'притягальний займенник','INT':'вигук','NUMERAL':'числівник','UNKNOWN':'???'
         };
     } else if (CURRENT_LANG === 'Russian') {
         posOrder = ['NOUN','PN','PRON','VERB','VBE','MOD','ADJECTIVE','PN_ADJ','ORDNUM','ADVERB','ARTICLE','PREP','CONJ','PART','POSS','INT','NUMERAL','UNKNOWN'];
@@ -699,6 +708,7 @@ function drawLegend() {
 
 function syntax_request() {
     var langua = document.getElementById("Language").value;
+    CURRENT_LANG = langua;
     var query  = document.getElementById("InputText").value.trim();
     if (!query || query.length === 0) { alert('Please enter text to analyze'); return; }
 
