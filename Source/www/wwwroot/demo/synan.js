@@ -3,21 +3,48 @@ import { SynanDaemonUrl } from './common.js';
 var TopClauses = [];
 var cursor;
 
-var FONT_COLOR = '#1e293b',
-    BG_COLOR = 'white',
-    GROUP_ARC_COLOR = '#6366f1',
-    NONGROUP_ARC_COLOR = '#f43f5e',
-    SUBJ_COLOR = '#10b981',
-    PREDIC_COLOR = '#f59e0b',
-    FONT = 'Arial',
-    ARC_FONT = 'Arial',
-    FONT_SIZE = 20,
-    ARC_FONT_SIZE = 12,
-    SPACE_SIZE = 10,
-    LEFT_SPACE = 2,
-    TOP_SPACE = 30,
-    ARC_HEIGHT = 40;
+// ── Colours ──────────────────────────────────────────────────────────
+var GROUP_COLOR  = '#6366f1';
+var LINK_COLOR   = '#f43f5e';
+var SUBJ_COLOR   = '#10b981';
+var PREDIC_COLOR = '#f59e0b';
+var FONT = 'Arial';
 
+// ── Layout ───────────────────────────────────────────────────────────
+var FONT_SIZE     = 18;
+var SMALL_FONT    = 10;
+var SPACE_SIZE    = 14;
+var LEFT_SPACE    = 16;
+var WORD_Y        = 36;       // baseline for words
+var POS_BELOW     = 16;       // POS text offset below word baseline
+var BRACKET_BASE  = 20;       // first bracket row below POS text
+var BRACKET_ROW   = 26;       // vertical spacing per bracket level
+var TICK          = 8;        // bracket end-tick height
+
+var POS_COLORS = {
+    NOUN:'#2563eb', PN:'#3b82f6', PRON:'#60a5fa',
+    VERB:'#dc2626', VBE:'#e11d48', MOD:'#f97316',
+    ADJECTIVE:'#16a34a', PN_ADJ:'#22c55e', ORDNUM:'#4ade80',
+    ADVERB:'#7c3aed',
+    ARTICLE:'#6b7280', PREP:'#0d9488', CONJ:'#a16207',
+    PART:'#d946ef', INT:'#f43f5e', NUMERAL:'#ca8a04',
+    POSS:'#14b8a6',
+    UNKNOWN:'#9ca3af'
+};
+
+function getPosFromGram(g) { return g ? (g.split(/[\s;,]/)[0] || 'UNKNOWN') : 'UNKNOWN'; }
+function getPosColor(p)    { return POS_COLORS[p] || POS_COLORS.UNKNOWN; }
+
+function roundRect(c, x, y, w, h, r) {
+    c.beginPath();
+    c.moveTo(x+r,y); c.lineTo(x+w-r,y);
+    c.quadraticCurveTo(x+w,y,x+w,y+r); c.lineTo(x+w,y+h-r);
+    c.quadraticCurveTo(x+w,y+h,x+w-r,y+h); c.lineTo(x+r,y+h);
+    c.quadraticCurveTo(x,y+h,x,y+h-r); c.lineTo(x,y+r);
+    c.quadraticCurveTo(x,y,x+r,y); c.closePath();
+}
+
+// ── Canvas ───────────────────────────────────────────────────────────
 var mainCanvas, longCanvas, ctx, ctxMain;
 
 function initCanvas() {
@@ -26,8 +53,11 @@ function initCanvas() {
     ctx = longCanvas.getContext("2d");
     ctxMain = mainCanvas.getContext("2d");
 }
-
 initCanvas();
+
+// ═════════════════════════════════════════════════════════════════════
+//  Data classes
+// ═════════════════════════════════════════════════════════════════════
 
 class CMorphVariant {
     constructor(synUnits, arcs, subjArcs) {
@@ -36,231 +66,154 @@ class CMorphVariant {
         this.subjArcs = subjArcs;
         this.compareTo = function(var2){
             for (var i = 0; i < var2.synUnits.length; i++) {
-                if (this.synUnits[i].homonymNo < var2.synUnits[i].homonymNo)
-                    return -1;
-                if (this.synUnits[i].homonymNo > var2.synUnits[i].homonymNo)
-                    return 1;
+                if (this.synUnits[i].homonymNo < var2.synUnits[i].homonymNo) return -1;
+                if (this.synUnits[i].homonymNo > var2.synUnits[i].homonymNo) return 1;
             }
             return 0;
         };
-
-        this.equals = function(Var) {
-            return (this.compareTo(Var) == 0);
-        };
-    };
+        this.equals = function(Var) { return this.compareTo(Var) == 0; };
+    }
 }
+
+class CSynUnit {
+    constructor(str) {
+        if (str != 'emtpy') {
+            this.homonymNo = str.homNo;
+            this.strGram = str.grm;
+        }
+    }
+}
+
+class Homonym {
+    constructor(str) { this.lemma = str; this.strCurrentGram = ''; }
+}
+
+class WordPanel {
+    constructor(word) {
+        this.x = 0; this.y = 0; this.width = 0; this.centerX = 0;
+        this.outerX = 0; this.outerY = 0;
+        this.activeHomonym = 0;
+        this.word = word.str;
+        this.homonyms = [];
+        for (var i in word.homonyms)
+            this.homonyms.push(new Homonym(word.homonyms[i]));
+    }
+}
+
+// ── WordArc (bracket-style) ──────────────────────────────────────────
 
 class WordArc {
     constructor(group) {
         this.childArcs = [];
-        this.firstWord = 0;
-        this.lastWord = 0;
-        this.height = 0;
-        this.groupArc = true;
-        this.isSubj = false;
-        this.parentGroupLeg = {};
         this.firstWord = group.start;
-        this.lastWord = group.last;
-        this.strName = group.descr;
-        this.groupArc = group.isGroup;
-        this.isSubj = group.isSubj;
-        this.getHeight = function() {
-            if(this.height == 0)
-                this.height = this.calculateHeight();
-            return this.height;
+        this.lastWord  = group.last;
+        this.strName   = (group.descr || '').replace(/\0/g,'').trim();
+        this.groupArc  = group.isGroup;
+        this.isSubj    = group.isSubj;
+        this.depth     = 0;
+
+        this.calcDepths = function(d) {
+            this.depth = d;
+            for (var i in this.childArcs)
+                this.childArcs[i].calcDepths(d + 1);
         };
 
-        this.calculateHeight = function() {
-            var height = 0;
-            for(var i in this.childArcs) {
-                var ii = this.childArcs[i].calculateHeight();
-                if(ii > height)
-                    height = ii;
+        this.getMaxDepth = function() {
+            var m = this.depth;
+            for (var i in this.childArcs) {
+                var c = this.childArcs[i].getMaxDepth();
+                if (c > m) m = c;
             }
-            return height + ARC_HEIGHT;
+            return m;
         };
 
-        this.drawOneLineArc = function(Clause, leftPoint, rightPoint) {
-            var WordPannelLeft = Clause.WordPanels[this.firstWord];
-            var x1 = leftPoint.x;
-            var y1 = leftPoint.y;
-            var x2 = rightPoint.x;
-            var y2 = rightPoint.y;
-            var yTop = WordPannelLeft.y - this.height;
-            var midX = (x1 + x2) / 2;
-            var cpOffset = this.height * 0.6;
-
-            ctx.beginPath();
-            ctx.moveTo(x1, y1);
-            ctx.bezierCurveTo(x1, y1 - cpOffset, midX, yTop - cpOffset * 0.3, midX, yTop);
-            ctx.bezierCurveTo(midX, yTop - cpOffset * 0.3, x2, y2 - cpOffset, x2, y2);
-            ctx.stroke();
-
-            this.parentGroupLeg.x = midX;
-            this.parentGroupLeg.y = yTop;
+        this.getHeight = function() {
+            var h = 0;
+            for (var i in this.childArcs) {
+                var ch = this.childArcs[i].getHeight();
+                if (ch > h) h = ch;
+            }
+            return h + BRACKET_ROW;
         };
 
         this.draw = function(Clause) {
+            // draw children first (closer to words)
             for (var i in this.childArcs)
                 this.childArcs[i].draw(Clause);
 
-            this.height = this.getHeight();
-            var leftPoint = this.getLeftLegPoint(Clause);
-            var rightPoint = this.getRightLegPoint(Clause);
+            var lp = Clause.WordPanels[this.firstWord];
+            var rp = Clause.WordPanels[this.lastWord];
+            if (!lp || !rp) return;
 
-            var arcColor = this.groupArc ? GROUP_ARC_COLOR : NONGROUP_ARC_COLOR;
-            ctx.strokeStyle = arcColor;
-            ctx.lineWidth = this.groupArc ? 2 : 1.5;
+            var x1 = lp.centerX;
+            var x2 = rp.centerX;
+            var y  = WORD_Y + POS_BELOW + SMALL_FONT + BRACKET_BASE + this.depth * BRACKET_ROW;
 
-            if (!this.groupArc) {
-                ctx.setLineDash([4, 3]);
-            } else {
-                ctx.setLineDash([]);
-            }
+            var color = this.groupArc ? GROUP_COLOR : LINK_COLOR;
+            ctx.strokeStyle = color;
+            ctx.lineWidth   = this.groupArc ? 2 : 1.5;
 
-            this.drawOneLineArc(Clause, leftPoint, rightPoint);
+            if (!this.groupArc) ctx.setLineDash([4,3]);
+
+            // horizontal span
+            ctx.beginPath();
+            ctx.moveTo(x1, y);
+            ctx.lineTo(x2, y);
+            ctx.stroke();
+
+            // left tick
+            ctx.beginPath();
+            ctx.moveTo(x1, y);
+            ctx.lineTo(x1, y - TICK);
+            ctx.stroke();
+
+            // right tick
+            ctx.beginPath();
+            ctx.moveTo(x2, y);
+            ctx.lineTo(x2, y - TICK);
+            ctx.stroke();
+
             ctx.setLineDash([]);
 
-            // Connection dots at endpoints
-            var dotRadius = 3;
-            ctx.fillStyle = arcColor;
-            ctx.beginPath();
-            ctx.arc(leftPoint.x, leftPoint.y, dotRadius, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.beginPath();
-            ctx.arc(rightPoint.x, rightPoint.y, dotRadius, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Label with background pill
-            var label = this.strName.replace(/\0/g, '').trim();
-            if (label) {
-                ctx.font = ARC_FONT_SIZE + 'px ' + ARC_FONT;
-                var textWidth = ctx.measureText(label).width;
-                var padX = 5, padY = 3;
-                var lx = this.parentGroupLeg.x - textWidth / 2;
-                var ly = this.parentGroupLeg.y - ARC_FONT_SIZE * 0.3;
-
-                ctx.fillStyle = this.groupArc ? 'rgba(99,102,241,0.12)' : 'rgba(244,63,94,0.12)';
+            // dots at tick tops
+            ctx.fillStyle = color;
+            [x1, x2].forEach(function(px) {
                 ctx.beginPath();
-                var rx = lx - padX, ry = ly - ARC_FONT_SIZE - padY;
-                var rw = textWidth + padX * 2, rh = ARC_FONT_SIZE + padY * 2;
-                var r = 4;
-                ctx.moveTo(rx + r, ry);
-                ctx.lineTo(rx + rw - r, ry);
-                ctx.quadraticCurveTo(rx + rw, ry, rx + rw, ry + r);
-                ctx.lineTo(rx + rw, ry + rh - r);
-                ctx.quadraticCurveTo(rx + rw, ry + rh, rx + rw - r, ry + rh);
-                ctx.lineTo(rx + r, ry + rh);
-                ctx.quadraticCurveTo(rx, ry + rh, rx, ry + rh - r);
-                ctx.lineTo(rx, ry + r);
-                ctx.quadraticCurveTo(rx, ry, rx + r, ry);
-                ctx.closePath();
+                ctx.arc(px, y - TICK, 2.5, 0, Math.PI*2);
                 ctx.fill();
+            });
 
-                ctx.strokeStyle = arcColor;
+            // label pill
+            if (this.strName) {
+                ctx.font = 'bold ' + SMALL_FONT + 'px ' + FONT;
+                var tw = ctx.measureText(this.strName).width;
+                var mid = (x1 + x2) / 2;
+                var lx = mid - tw/2;
+                var ly = y + SMALL_FONT * 0.35;
+                var px = 6, py = 2;
+
+                ctx.fillStyle = this.groupArc
+                    ? 'rgba(99,102,241,0.10)'
+                    : 'rgba(244,63,94,0.10)';
+                roundRect(ctx, lx-px, ly-SMALL_FONT-py, tw+px*2, SMALL_FONT+py*2, 4);
+                ctx.fill();
+                ctx.strokeStyle = color + '44';
                 ctx.lineWidth = 1;
                 ctx.stroke();
 
-                ctx.fillStyle = arcColor;
-                ctx.font = 'bold ' + ARC_FONT_SIZE + 'px ' + ARC_FONT;
-                ctx.fillText(label, lx, ly);
+                ctx.fillStyle = color;
+                ctx.font = 'bold ' + SMALL_FONT + 'px ' + FONT;
+                ctx.fillText(this.strName, lx, ly);
             }
 
-            // Reset
             ctx.lineWidth = 1;
         };
-
-        this.getLeftLegPoint = function(Clause) {
-            var WordPannelLeft = Clause.WordPanels[this.firstWord];
-
-            var leftPoint = {};
-            var bSet = false;
-            if(this.childArcs.length > 0) {
-                var wordArcLeft = this.childArcs[0];
-                //���������� �����-�� �������
-                if ( (wordArcLeft.firstWord == this.firstWord) &&
-                    ((wordArcLeft.groupArc && this.groupArc) ||
-                    (!wordArcLeft.groupArc && !this.groupArc)||
-                    (!wordArcLeft.groupArc && this.groupArc)))
-                {
-                    leftPoint = wordArcLeft.parentGroupLeg;
-                    bSet = true;
-                }
-            }
-
-            if (!bSet) {
-                if(this.groupArc) {
-                    leftPoint.x = WordPannelLeft.x + WordPannelLeft.width/2;
-                    leftPoint.y = WordPannelLeft.y;
-                } else {
-                    leftPoint.x = WordPannelLeft.x;
-                    leftPoint.y = WordPannelLeft.y;
-                }
-            }
-            return leftPoint;
-        };
-
-        this.getRightLegPoint = function(Clause) {
-            var rightPoint = {};
-
-            var WordPannelRight = Clause.WordPanels[this.lastWord];
-
-            var bSet = false;
-            if(this.childArcs.length >= 1) {
-                var wordArcRight = this.childArcs[this.childArcs.length - 1];
-                if ( (wordArcRight.lastWord == this.lastWord) &&
-                    ((wordArcRight.groupArc && this.groupArc) ||
-                    (!wordArcRight.groupArc && !this.groupArc)||
-                    ( !wordArcRight.groupArc && this.groupArc)))
-                {
-                    rightPoint = wordArcRight.parentGroupLeg;
-                    bSet = true;
-                }
-            }
-
-            if(!bSet) {
-                if(this.groupArc) {
-                    rightPoint.x = WordPannelRight.x + WordPannelRight.width/2;
-                    rightPoint.y = WordPannelRight.y;
-                } else {
-                    rightPoint.x = WordPannelRight.x + WordPannelRight.width;
-                    rightPoint.y = WordPannelRight.y;
-                }
-            }
-            return rightPoint;
-        }
-    };
-};
-
-class CSynUnit {
-    constructor (str) {
-        if (str != 'emtpy'){
-            this.homonymNo = str.homNo;
-            this.strGram = str.grm;
-        }
-    };
+    }
 }
 
-class Homonym {
-    constructor(str) {
-        this.lemma = str;
-        this.strCurrentGram = '';
-    };
-};
-
-class WordPanel {
-    constructor(word) {
-        this.x = 0;
-        this.y = 0;
-        this.width = 0;
-        this.activeHomonym = 0;
-        this.word = word.str;
-        this.homonyms = [];
-        for (var i in word.homonyms) {
-            this.homonyms.push(new Homonym(word.homonyms[i]));
-        }
-    };
-}  
+// ═════════════════════════════════════════════════════════════════════
+//  TopClause
+// ═════════════════════════════════════════════════════════════════════
 
 class TopClause {
     constructor(Info) {
@@ -272,12 +225,11 @@ class TopClause {
 
         this.getCurArcs = function() {
             var CurrVar = this.getActiveHomonymNumbers();
-            for(var i = 0; i < this.MorphVariants.length; i++) {
-                var Var = this.MorphVariants[i];
-                if( Var.equals(CurrVar) ) {
+            for (var i = 0; i < this.MorphVariants.length; i++) {
+                if (this.MorphVariants[i].equals(CurrVar)) {
                     this.currentMorphVariant = i;
                     this.setActiveHomonyms(i);
-                    return Var.arcs;
+                    return this.MorphVariants[i].arcs;
                 }
             }
             this.currentMorphVariant = -1;
@@ -285,154 +237,34 @@ class TopClause {
         };
 
         this.getActiveHomonymNumbers = function() {
-            var WordsCount = this.WordPanels.length;
             var arr = [];
-            for (var i = 0; i < WordsCount; i++) {
-                var Panel = this.WordPanels[i];
+            for (var i = 0; i < this.WordPanels.length; i++) {
                 var U = new CSynUnit('empty');
-                U.homonymNo = Panel.activeHomonym;
+                U.homonymNo = this.WordPanels[i].activeHomonym;
                 arr.push(U);
             }
             return new CMorphVariant(arr, [], []);
         };
-
-        this.drawWordPanels = function(height) {
-            ctx.fillStyle = FONT_COLOR;
-            for (var i in this.WordPanels) {
-                var panel = this.WordPanels[i];
-                if (panel.homonyms.length > 1)  ctx.font = 'bold ' + FONT_SIZE + 'px ' + FONT;
-                else                            ctx.font = FONT_SIZE + 'px ' + FONT;
-                panel.width = ctx.measureText(panel.word).width;
-                var prevLineNo = Math.floor(cursor / ctxMain.canvas.width);
-                var lineNo = Math.floor((panel.width + cursor) / ctxMain.canvas.width);
-                if (lineNo > prevLineNo) {
-                    cursor = ctxMain.canvas.width * lineNo + LEFT_SPACE;
-                }
-                panel.x = cursor;
-                panel.y = height;
-                panel.outerX = cursor - ctxMain.canvas.width * lineNo;
-                panel.outerY = height + ctx.canvas.height * lineNo;
-                ctx.fillText(panel.word, panel.x, panel.y + FONT_SIZE);
-                cursor += panel.width + SPACE_SIZE;
-            }
-        };
-
-        this.drawSubjPredic = function () {
-            if (this.currentMorphVariant < 0) return;
-            var homs = this.MorphVariants[this.currentMorphVariant];
-            for(var i = 0; i < homs.subjArcs.length; i++) {
-                var arc = homs.subjArcs[i];
-                var panel1 = this.WordPanels[arc.firstWord];
-                var panel2 = this.WordPanels[arc.lastWord];
-                this.drawSubj(panel1);
-                this.drawPredic(panel2);
-            }
-        };
-
-        this.drawSubj = function(panel) {
-            var y = panel.y + FONT_SIZE * 1.2;
-            ctx.strokeStyle = SUBJ_COLOR;
-            ctx.lineWidth = 2.5;
-            ctx.beginPath();
-            ctx.moveTo(panel.x - 2, y);
-            ctx.lineTo(panel.x + panel.width + 2, y);
-            ctx.stroke();
-            // Small "S" label
-            ctx.font = 'bold 10px ' + ARC_FONT;
-            ctx.fillStyle = SUBJ_COLOR;
-            ctx.fillText('S', panel.x + panel.width + 5, y + 4);
-            ctx.lineWidth = 1;
-        };
-
-        this.drawPredic = function(panel) {
-            var y1 = panel.y + FONT_SIZE * 1.2;
-            var y2 = panel.y + FONT_SIZE * 1.45;
-            ctx.strokeStyle = PREDIC_COLOR;
-            ctx.lineWidth = 2.5;
-            ctx.beginPath();
-            ctx.moveTo(panel.x - 2, y1);
-            ctx.lineTo(panel.x + panel.width + 2, y1);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(panel.x - 2, y2);
-            ctx.lineTo(panel.x + panel.width + 2, y2);
-            ctx.stroke();
-            // Small "P" label
-            ctx.font = 'bold 10px ' + ARC_FONT;
-            ctx.fillStyle = PREDIC_COLOR;
-            ctx.fillText('P', panel.x + panel.width + 5, y2 + 4);
-            ctx.lineWidth = 1;
-        };
-
-        this.drawArcs = function() {
-            var arcs = this.getCurArcs();
-            for (var i in arcs) {
-                arcs[i].draw(this);
-            }
-        };
-
-        this.addPopups = function() {
-            for (var i in this.WordPanels) {
-                var panel = this.WordPanels[i];
-                var popDiv = document.createElement("div");
-                popDiv.style.position = 'absolute';
-                popDiv.style.top = panel.outerY;
-                popDiv.style.left = panel.outerX;
-                popDiv.style.height = FONT_SIZE*1.2 + 'px';
-                popDiv.style.width = panel.width + 'px';
-                popDiv.title = panel.homonyms[panel.activeHomonym].lemma + ' ' + panel.homonyms[panel.activeHomonym].strCurrentGram;
-                popDiv.className = 'synanWordPanel';
-                if (panel.homonyms.length > 1) {
-                    var menuDiv = document.createElement("div");
-                    menuDiv.className = 'synanDropdownContent';
-                    for (var j in panel.homonyms) {
-                        var menuEl = document.createElement("a");
-                        menuEl.innerHTML = panel.homonyms[j].lemma;
-                        menuEl.setAttribute('ActionCommand', j);
-                        menuEl.setAttribute('wordPanelNo', i);
-                        var Clause = this;
-                        menuEl.addEventListener("click", function(){
-                            var homNum = this.getAttribute('ActionCommand');
-                            var panelNo = this.getAttribute('wordPanelNo');
-                            Clause.WordPanels[panelNo].activeHomonym = homNum;
-                            drawAll();
-                        });
-                        menuDiv.appendChild(menuEl);
-                    }
-                    popDiv.appendChild(menuDiv);
-                    popDiv.style.cursor = 'pointer';
-                    popDiv.addEventListener("click", function(){
-                        this.getElementsByClassName('synanDropdownContent')[0].style.display = 'block';
-                    });
-                    popDiv.className += ' panelDroppable';
-                }
-                var canWrap = document.getElementById('canvasWrapper');
-                canWrap.appendChild(popDiv);
-            }
-        };
-    };
+    }
 }
 
 var protoClause = TopClause.prototype;
 
 protoClause.parseWords = function(words) {
-    for (var i in words) {
+    for (var i in words)
         this.WordPanels.push(new WordPanel(words[i]));
-    }
 };
 
 protoClause.parseVariants = function(variants) {
-    for (var i in variants) {
+    for (var i in variants)
         this.parseOneVariant(variants[i]);
-    }
-    if( this.MorphVariants.length > 0 )
+    if (this.MorphVariants.length > 0)
         this.setActiveHomonyms(0);
 };
 
 protoClause.setActiveHomonyms = function(VarNo) {
     var hom = this.MorphVariants[VarNo];
-    for(var i = 0 ; i < hom.synUnits.length ; i++ )
-    {
+    for (var i = 0; i < hom.synUnits.length; i++) {
         var panel = this.WordPanels[i];
         panel.activeHomonym = hom.synUnits[i].homonymNo;
         panel.homonyms[panel.activeHomonym].strCurrentGram = hom.synUnits[i].strGram;
@@ -445,20 +277,18 @@ protoClause.parseOneVariant = function(variant) {
         subjArcs = [];
     for (var i in variant.groups) {
         var arc = new WordArc(variant.groups[i]);
-        if (arc.isSubj) {
-            subjArcs.push(arc);
-        } else {
-            arcs.push(arc);
-        }
+        if (arc.isSubj) subjArcs.push(arc);
+        else            arcs.push(arc);
     }
     arcs = this.orderArcs(arcs);
+    // assign depths
+    for (var i in arcs) arcs[i].calcDepths(0);
+    for (var i in subjArcs) subjArcs[i].calcDepths(0);
     this.MorphVariants.push(new CMorphVariant(homs, arcs, subjArcs));
 };
 
 protoClause.readUnits = function(str) {
-    var wordsCount = this.WordPanels.length,
-        ii = 0,
-        arr = [];
+    var wordsCount = this.WordPanels.length, ii = 0, arr = [];
     while ((ii < wordsCount) && (str[ii])) {
         arr.push(new CSynUnit(str[ii]));
         ii++;
@@ -467,10 +297,9 @@ protoClause.readUnits = function(str) {
 };
 
 protoClause.orderArcsRec = function(arcs, parentArc, iCur) {
-    for(var i = iCur; i < arcs.length;) {
+    for (var i = iCur; i < arcs.length;) {
         var arc = arcs[i];
-        if(+arc.firstWord > +parentArc.lastWord)
-            return i;
+        if (+arc.firstWord > +parentArc.lastWord) return i;
         i = this.orderArcsRec(arcs, arc, i + 1);
         parentArc.childArcs.push(arc);
     }
@@ -479,7 +308,7 @@ protoClause.orderArcsRec = function(arcs, parentArc, iCur) {
 
 protoClause.orderArcs = function(arcs) {
     var ordered = [];
-    for(var i = 0; i < arcs.length;) {
+    for (var i = 0; i < arcs.length;) {
         var arc = arcs[i];
         i = this.orderArcsRec(arcs, arc, i + 1);
         ordered.push(arc);
@@ -487,66 +316,202 @@ protoClause.orderArcs = function(arcs) {
     return ordered;
 };
 
-function parseSynanJson(synanJson) {
-    TopClauses = []
-    for (var s in synanJson) {
-        for (var c in synanJson[s]) {
-            TopClauses.push(new TopClause(synanJson[s][c]));
-        }
+// ── Drawing ──────────────────────────────────────────────────────────
+
+protoClause.drawWordPanels = function() {
+    for (var i in this.WordPanels) {
+        var panel = this.WordPanels[i];
+        var pos = getPosFromGram(panel.homonyms[panel.activeHomonym].strCurrentGram);
+        var col = getPosColor(pos);
+
+        ctx.font = (panel.homonyms.length > 1 ? 'bold ' : '') + FONT_SIZE + 'px ' + FONT;
+        panel.width = ctx.measureText(panel.word).width;
+
+        var prevLineNo = Math.floor(cursor / ctxMain.canvas.width);
+        var lineNo     = Math.floor((panel.width + cursor) / ctxMain.canvas.width);
+        if (lineNo > prevLineNo) cursor = ctxMain.canvas.width * lineNo + LEFT_SPACE;
+
+        panel.x = cursor;
+        panel.y = WORD_Y;
+        panel.centerX = cursor + panel.width / 2;
+        panel.outerX = cursor - ctxMain.canvas.width * lineNo;
+        panel.outerY = WORD_Y + ctx.canvas.height * lineNo;
+
+        // word
+        ctx.fillStyle = col;
+        ctx.fillText(panel.word, panel.x, panel.y);
+
+
+
+        // restore font
+        ctx.font = (panel.homonyms.length > 1 ? 'bold ' : '') + FONT_SIZE + 'px ' + FONT;
+
+        cursor += panel.width + SPACE_SIZE;
     }
+};
+
+protoClause.drawSubjPredic = function() {
+    if (this.currentMorphVariant < 0) return;
+    var homs = this.MorphVariants[this.currentMorphVariant];
+    for (var i = 0; i < homs.subjArcs.length; i++) {
+        var arc = homs.subjArcs[i];
+        var p1 = this.WordPanels[arc.firstWord];
+        var p2 = this.WordPanels[arc.lastWord];
+        if (!p1 || !p2) continue;
+
+        // subject badge
+        var sy = p1.y - FONT_SIZE * 0.3;
+        ctx.font = 'bold 9px ' + FONT;
+        ctx.fillStyle = SUBJ_COLOR;
+        ctx.beginPath();
+        ctx.arc(p1.centerX, sy, 6, 0, Math.PI*2);
+        ctx.fill();
+        ctx.fillStyle = '#fff';
+        ctx.fillText('S', p1.centerX - 3, sy + 3);
+
+        // predicate badge
+        var py2 = p2.y - FONT_SIZE * 0.3;
+        ctx.fillStyle = PREDIC_COLOR;
+        ctx.beginPath();
+        ctx.arc(p2.centerX, py2, 6, 0, Math.PI*2);
+        ctx.fill();
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 9px ' + FONT;
+        ctx.fillText('P', p2.centerX - 3, py2 + 3);
+
+        // arrow from subject to predicate
+        var arrowY = WORD_Y + POS_BELOW + SMALL_FONT + 4;
+        var ax1 = p1.centerX + 8;
+        var ax2 = p2.centerX - 8;
+
+        ctx.strokeStyle = SUBJ_COLOR + '88';
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([3,3]);
+        ctx.beginPath();
+        ctx.moveTo(ax1, arrowY);
+        ctx.lineTo(ax2, arrowY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // arrowhead
+        ctx.fillStyle = SUBJ_COLOR + '88';
+        ctx.beginPath();
+        ctx.moveTo(ax2, arrowY);
+        ctx.lineTo(ax2 - 5, arrowY - 3);
+        ctx.lineTo(ax2 - 5, arrowY + 3);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.lineWidth = 1;
+    }
+};
+
+protoClause.drawArcs = function() {
+    var arcs = this.getCurArcs();
+    for (var i in arcs)
+        arcs[i].draw(this);
+};
+
+protoClause.addPopups = function() {
+    for (var i in this.WordPanels) {
+        var panel = this.WordPanels[i];
+        var popDiv = document.createElement("div");
+        popDiv.style.position = 'absolute';
+        popDiv.style.top  = panel.outerY - FONT_SIZE;
+        popDiv.style.left = panel.outerX;
+        popDiv.style.height = FONT_SIZE*1.2 + 'px';
+        popDiv.style.width  = panel.width + 'px';
+        popDiv.title = panel.word + ' → ' +
+            panel.homonyms[panel.activeHomonym].lemma + ' ' +
+            panel.homonyms[panel.activeHomonym].strCurrentGram;
+        popDiv.className = 'synanWordPanel';
+        if (panel.homonyms.length > 1) {
+            var menuDiv = document.createElement("div");
+            menuDiv.className = 'synanDropdownContent';
+            for (var j in panel.homonyms) {
+                var menuEl = document.createElement("a");
+                menuEl.innerHTML = panel.homonyms[j].lemma;
+                menuEl.setAttribute('ActionCommand', j);
+                menuEl.setAttribute('wordPanelNo', i);
+                var Clause = this;
+                menuEl.addEventListener("click", function(){
+                    var homNum = this.getAttribute('ActionCommand');
+                    var panelNo = this.getAttribute('wordPanelNo');
+                    Clause.WordPanels[panelNo].activeHomonym = homNum;
+                    drawAll();
+                });
+                menuDiv.appendChild(menuEl);
+            }
+            popDiv.appendChild(menuDiv);
+            popDiv.style.cursor = 'pointer';
+            popDiv.addEventListener("click", function(){
+                this.getElementsByClassName('synanDropdownContent')[0].style.display = 'block';
+            });
+            popDiv.className += ' panelDroppable';
+        }
+        document.getElementById('canvasWrapper').appendChild(popDiv);
+    }
+};
+
+// ═════════════════════════════════════════════════════════════════════
+//  Layout helpers
+// ═════════════════════════════════════════════════════════════════════
+
+function parseSynanJson(synanJson) {
+    TopClauses = [];
+    for (var s in synanJson)
+        for (var c in synanJson[s])
+            TopClauses.push(new TopClause(synanJson[s][c]));
 }
 
-
-function calcMaxArcHeight() {
-    var height = 0;
-    for (var ClauseNo in TopClauses) {
-        var arcs = TopClauses[ClauseNo].getCurArcs();
-        arcs = arcs.sort(function(a,b){return b.childArcs.length - a.childArcs.length});
-        for(var i in arcs) {
-            var curHeight = arcs[i].getHeight();
-            if(curHeight > height)
-                height = curHeight;
+function calcMaxDepth() {
+    var max = 0;
+    for (var i in TopClauses) {
+        var arcs = TopClauses[i].getCurArcs();
+        for (var j in arcs) {
+            var d = arcs[j].getMaxDepth();
+            if (d > max) max = d;
         }
     }
-    return height;
-};
+    return max;
+}
 
 function calcWordsLength() {
     var length = LEFT_SPACE;
     for (var i in TopClauses) {
         var Clause = TopClauses[i];
         for (var j in Clause.WordPanels) {
-            if (Clause.WordPanels[j].homonyms.length > 1)  ctx.font = 'bold ' + FONT_SIZE + 'px ' + FONT;
-            else                                            ctx.font = FONT_SIZE + 'px ' + FONT;
+            ctx.font = (Clause.WordPanels[j].homonyms.length > 1 ? 'bold ' : '') + FONT_SIZE + 'px ' + FONT;
             var prevLineNo = Math.floor(length / ctxMain.canvas.width);
-            var lineNo = Math.floor((ctx.measureText(Clause.WordPanels[j].word).width + length) / ctxMain.canvas.width);
-            if (lineNo > prevLineNo) {
+            var lineNo     = Math.floor((ctx.measureText(Clause.WordPanels[j].word).width + length) / ctxMain.canvas.width);
+            if (lineNo > prevLineNo)
                 length = ctxMain.canvas.width * lineNo + LEFT_SPACE;
-            }
             length += ctx.measureText(Clause.WordPanels[j].word).width + SPACE_SIZE;
         }
     }
     return length;
-};
+}
 
 function wrapAll() {
     var linesNo = Math.ceil(ctx.canvas.width / ctxMain.canvas.width);
     ctxMain.canvas.height = linesNo * ctx.canvas.height;
-    ctxMain.clearRect(0,0,ctxMain.canvas.width,ctxMain.canvas.height);
+    ctxMain.clearRect(0, 0, ctxMain.canvas.width, ctxMain.canvas.height);
     for (var i = 0; i < linesNo; i++) {
-        ctxMain.drawImage(ctx.canvas, ctxMain.canvas.width*i, 0, ctxMain.canvas.width, ctx.canvas.height, 0, ctx.canvas.height * i, ctxMain.canvas.width, ctx.canvas.height);
+        ctxMain.drawImage(ctx.canvas,
+            ctxMain.canvas.width*i, 0, ctxMain.canvas.width, ctx.canvas.height,
+            0, ctx.canvas.height * i, ctxMain.canvas.width, ctx.canvas.height);
     }
-};
+}
 
 function removePopups() {
     var wrapper = document.getElementById('canvasWrapper');
     var popDiv = wrapper.getElementsByClassName("synanWordPanel");
-    while (popDiv.length > 0){                                      //������ ���, ����� �� ��������
+    while (popDiv.length > 0) {
         for (var i = 0; i < popDiv.length; i++)
             popDiv[i].parentNode.removeChild(popDiv[i]);
         popDiv = wrapper.getElementsByClassName("synanWordPanel");
     }
-};
+}
 
 function addPopups() {
     for (var i in TopClauses)
@@ -557,8 +522,12 @@ function addPopups() {
             for (var i = 0; i < dropdowns.length; i++)
                 dropdowns[i].style.display = 'none';
         }
-    }
-};
+    };
+}
+
+// ═════════════════════════════════════════════════════════════════════
+//  Main draw
+// ═════════════════════════════════════════════════════════════════════
 
 function drawAll() {
     removePopups();
@@ -566,153 +535,123 @@ function drawAll() {
     var wrapper = document.getElementById('canvasWrapper');
     if (wrapper) {
         var style = getComputedStyle(wrapper);
-        var paddingX = (parseFloat(style.paddingLeft) || 0) + (parseFloat(style.paddingRight) || 0);
-        var availableWidth = wrapper.clientWidth - paddingX;
-        if (availableWidth > 0) {
-            ctxMain.canvas.width = availableWidth;
-        }
+        var paddingX = (parseFloat(style.paddingLeft)||0) + (parseFloat(style.paddingRight)||0);
+        var w = wrapper.clientWidth - paddingX;
+        if (w > 0) ctxMain.canvas.width = w;
     }
 
-    var height = calcMaxArcHeight() + TOP_SPACE;
-    var width = calcWordsLength();
-    ctx.canvas.height = height + FONT_SIZE*1.6;
-    ctx.canvas.width = width;
-    ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
+    var maxDepth = calcMaxDepth();
+    var canvasH = WORD_Y + POS_BELOW + SMALL_FONT + BRACKET_BASE + (maxDepth + 1) * BRACKET_ROW + 16;
+    var canvasW = calcWordsLength();
+
+    ctx.canvas.height = canvasH;
+    ctx.canvas.width  = canvasW;
+    ctx.clearRect(0, 0, canvasW, canvasH);
     cursor = LEFT_SPACE;
+
     for (var i in TopClauses) {
-        TopClauses[i].drawWordPanels(height);
+        TopClauses[i].drawWordPanels();
         TopClauses[i].drawArcs();
         TopClauses[i].drawSubjPredic();
     }
+
     wrapAll();
     addPopups();
     drawLegend();
 }
 
+// ═════════════════════════════════════════════════════════════════════
+//  Legend
+// ═════════════════════════════════════════════════════════════════════
+
 function drawLegend() {
     var langua = document.getElementById("Language").value;
-    var x = 12, y = ctxMain.canvas.height - 10;
+    var x = 12, y = ctxMain.canvas.height - 8;
     var lineLen = 20, gap = 18, lineH = 16;
-    ctxMain.font = '11px Arial';
+
+    ctxMain.font = '11px ' + FONT;
     ctxMain.lineWidth = 1;
 
-    var labels = {
-        group: '— группа',
-        link: '- - связь',
-        subj: 'S подлежащее',
-        predic: 'P сказуемое'
-    };
+    var labels;
+    if (langua === 'English')
+        labels = { group:'— group', link:'- - link', subj:'S subject', predic:'P predicate' };
+    else if (langua === 'German')
+        labels = { group:'— Gruppe', link:'- - Verbindung', subj:'S Subjekt', predic:'P Prädikat' };
+    else if (langua === 'Ukrainian')
+        labels = { group:'— група', link:'- - зв\'язок', subj:'S підмет', predic:'P присудок' };
+    else
+        labels = { group:'— группа', link:'- - связь', subj:'S подлежащее', predic:'P сказуемое' };
 
-    if (langua === 'English') {
-        labels = {
-            group: '— group',
-            link: '- - link',
-            subj: 'S subject',
-            predic: 'P predicate'
-        };
-    } else if (langua === 'German') {
-        labels = {
-            group: '— Gruppe',
-            link: '- - Verbindung',
-            subj: 'S Subjekt',
-            predic: 'P Prädikat'
-        };
-    } else if (langua === 'Ukrainian') {
-        labels = {
-            group: '— група',
-            link: '- - зв\'язок',
-            subj: 'S підмет',
-            predic: 'P присудок'
-        };
+    // ── POS colour row ──
+    var posOrder = ['NOUN','PN','PRON','VERB','VBE','MOD','ADJECTIVE','ADVERB','ARTICLE','PREP','CONJ','PART'];
+    var posRowY = y;
+    var posRowX = x;
+    for (var pi = 0; pi < posOrder.length; pi++) {
+        var pp = posOrder[pi];
+        var pc = getPosColor(pp);
+        ctxMain.font = 'bold 10px ' + FONT;
+        var tw = ctxMain.measureText(pp).width + 8;
+        if (posRowX + tw > ctxMain.canvas.width - 10) break;
+        ctxMain.fillStyle = pc;
+        ctxMain.beginPath();
+        ctxMain.arc(posRowX + 4, posRowY - 4, 4, 0, Math.PI*2);
+        ctxMain.fill();
+        ctxMain.fillText(pp, posRowX + 12, posRowY);
+        posRowX += tw + 10;
     }
 
-    // Group arc
-    y -= lineH;
-    ctxMain.strokeStyle = GROUP_ARC_COLOR;
-    ctxMain.setLineDash([]);
-    ctxMain.beginPath();
-    ctxMain.moveTo(x, y + 6);
-    ctxMain.lineTo(x + lineLen, y + 6);
-    ctxMain.stroke();
-    ctxMain.fillStyle = GROUP_ARC_COLOR;
-    ctxMain.fillText(labels.group, x + lineLen + 4, y + 10);
+    y -= lineH + 4;
 
-    // Non-group arc
+    // group
     y -= lineH;
-    ctxMain.strokeStyle = NONGROUP_ARC_COLOR;
-    ctxMain.setLineDash([4, 3]);
-    ctxMain.beginPath();
-    ctxMain.moveTo(x, y + 6);
-    ctxMain.lineTo(x + lineLen, y + 6);
-    ctxMain.stroke();
-    ctxMain.fillStyle = NONGROUP_ARC_COLOR;
-    ctxMain.fillText(labels.link, x + lineLen + 4, y + 10);
+    ctxMain.strokeStyle = GROUP_COLOR; ctxMain.setLineDash([]);
+    ctxMain.beginPath(); ctxMain.moveTo(x,y+6); ctxMain.lineTo(x+lineLen,y+6); ctxMain.stroke();
+    ctxMain.fillStyle = GROUP_COLOR; ctxMain.font = '11px '+FONT;
+    ctxMain.fillText(labels.group, x+lineLen+4, y+10);
 
-    // Subject
+    // link
     y -= lineH;
-    ctxMain.strokeStyle = SUBJ_COLOR;
-    ctxMain.setLineDash([]);
-    ctxMain.lineWidth = 2.5;
-    ctxMain.beginPath();
-    ctxMain.moveTo(x, y + 6);
-    ctxMain.lineTo(x + lineLen, y + 6);
-    ctxMain.stroke();
-    ctxMain.fillStyle = SUBJ_COLOR;
-    ctxMain.fillText(labels.subj, x + lineLen + 4, y + 10);
+    ctxMain.strokeStyle = LINK_COLOR; ctxMain.setLineDash([4,3]);
+    ctxMain.beginPath(); ctxMain.moveTo(x,y+6); ctxMain.lineTo(x+lineLen,y+6); ctxMain.stroke();
+    ctxMain.fillStyle = LINK_COLOR;
+    ctxMain.fillText(labels.link, x+lineLen+4, y+10);
 
-    // Predicate
+    // subject
+    y -= lineH;
+    ctxMain.strokeStyle = SUBJ_COLOR; ctxMain.setLineDash([]); ctxMain.lineWidth = 2.5;
+    ctxMain.beginPath(); ctxMain.moveTo(x,y+6); ctxMain.lineTo(x+lineLen,y+6); ctxMain.stroke();
+    ctxMain.fillStyle = SUBJ_COLOR; ctxMain.font = '11px '+FONT;
+    ctxMain.fillText(labels.subj, x+lineLen+4, y+10);
+
+    // predicate
     y -= lineH;
     ctxMain.strokeStyle = PREDIC_COLOR;
-    ctxMain.beginPath();
-    ctxMain.moveTo(x, y + 4);
-    ctxMain.lineTo(x + lineLen, y + 4);
-    ctxMain.stroke();
-    ctxMain.beginPath();
-    ctxMain.moveTo(x, y + 8);
-    ctxMain.lineTo(x + lineLen, y + 8);
-    ctxMain.stroke();
+    ctxMain.beginPath(); ctxMain.moveTo(x,y+4); ctxMain.lineTo(x+lineLen,y+4); ctxMain.stroke();
+    ctxMain.beginPath(); ctxMain.moveTo(x,y+8); ctxMain.lineTo(x+lineLen,y+8); ctxMain.stroke();
     ctxMain.fillStyle = PREDIC_COLOR;
-    ctxMain.fillText(labels.predic, x + lineLen + 4, y + 10);
+    ctxMain.fillText(labels.predic, x+lineLen+4, y+10);
 
-    ctxMain.setLineDash([]);
-    ctxMain.lineWidth = 1;
+    ctxMain.setLineDash([]); ctxMain.lineWidth = 1;
 }
 
-
+// ═════════════════════════════════════════════════════════════════════
+//  Request
+// ═════════════════════════════════════════════════════════════════════
 
 function syntax_request() {
     var langua = document.getElementById("Language").value;
-    var query = document.getElementById("InputText").value.trim();
-    
-    if (!query || query.length === 0) {
-        alert('Please enter text to analyze');
-        return;
-    }
+    var query  = document.getElementById("InputText").value.trim();
+    if (!query || query.length === 0) { alert('Please enter text to analyze'); return; }
 
     var url = SynanDaemonUrl + "&action=syntax&langua=" + encodeURIComponent(langua);
-
-    fetch(url, {
-        method: 'POST',
-        body: query
-    })
-        .then(function(response) {
-            if (!response.ok) {
-                throw new Error('Server returned ' + response.status);
-            }
-            return response.json();
+    fetch(url, { method: 'POST', body: query })
+        .then(function(r) {
+            if (!r.ok) throw new Error('Server returned ' + r.status);
+            return r.json();
         })
-        .then(function(synanJson) {
-            parseSynanJson(synanJson);
-            drawAll();
-        })
-        .catch(function(err) {
-            console.error('Syntax request failed:', err);
-            alert('Error: ' + err.message);
-        });
+        .then(function(json) { parseSynanJson(json); drawAll(); })
+        .catch(function(e) { console.error('Syntax request failed:', e); alert('Error: ' + e.message); });
 }
 
 window.syntax_request = syntax_request;
-window.reinitCanvas = function() {
-    initCanvas();
-    TopClauses = [];
-};
+window.reinitCanvas = function() { initCanvas(); TopClauses = []; };
