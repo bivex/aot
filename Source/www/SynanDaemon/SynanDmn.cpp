@@ -34,6 +34,9 @@ std::string TSynanHttpServer::ProcessMorphology(TDaemonParsedRequest &request) {
     bool withParadigms = evhttp_find_header(&request.headers, "withparadigms") != nullptr;
     const CMorphanHolder &h  = GetMHolder(request.Langua);
     std::string wordForm = request.Query;
+    if (request.Langua == morphEnglish) {
+        MakeUpperUtf8(wordForm);
+    }
     return h.LemmatizeJson(wordForm, withParadigms);
 };
 
@@ -53,7 +56,12 @@ std::string TSynanHttpServer::ProcessSyntax(TDaemonParsedRequest &request) {
     if (P == nullptr) {
         return "[]";
     }
-    return BuildJson(P, request.Query);
+
+    std::string query = request.Query;
+    if (request.Langua == morphEnglish) {
+        MakeUpperUtf8(query);
+    }
+    return BuildJson(P, query);
 };
 
 

@@ -197,25 +197,6 @@ void CEngSentence::InitHomonymLanguageSpecific(CSynHomonym& H, const CLemWord* p
 void CEngSentence::InitHomonymMorphInfo (CSynHomonym& H)
 {
     H.InitAncodePattern( );
-
-    std::string lemma = H.GetLemma();
-	std::string upperLemma = lemma;
-	MakeUpperUtf8(upperLemma);
-
-    // Workaround for broken English morphology: hardcode common verbs
-    if (upperLemma == "SAT" || upperLemma == "READ" || upperLemma == "IS" || upperLemma == "WAS" || 
-        upperLemma == "SITS" || upperLemma == "SIT" || upperLemma == "AM" || upperLemma == "ARE" ||
-        upperLemma == "WERE" || upperLemma == "BE" || upperLemma == "BEEN" || upperLemma == "BEING" ||
-        upperLemma == "HAVE" || upperLemma == "HAS" || upperLemma == "HAD" || upperLemma == "DO" ||
-        upperLemma == "DOES" || upperLemma == "DID" || upperLemma == "GO" || upperLemma == "WENT" ||
-        upperLemma == "GONE" || upperLemma == "CAT" || upperLemma == "CATS") {
-        
-        if (upperLemma == "CAT" || upperLemma == "CATS") {
-             H.m_iPoses |= (1 << eNOUN);
-        } else {
-             H.m_iPoses |= (1 << eVERB);
-        }
-    }
 }
 
 
