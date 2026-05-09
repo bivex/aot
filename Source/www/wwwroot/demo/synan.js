@@ -1,7 +1,10 @@
-import { SynanDaemonUrl } from './common.js';
+// var SynanDaemonUrl = 'http://localhost:8089?dummy=1';
+// var SemanDaemonUrl = 'http://localhost:17018?dummy=1';
+var SynanDaemonUrl = 'http://localhost:8089?dummy=1';
 
 var TopClauses = [];
 var cursor;
+var CURRENT_LANG = 'English'; // global for current language
 
 // ── Colours ──────────────────────────────────────────────────────────
 var GROUP_COLOR  = '#6366f1';
@@ -15,10 +18,11 @@ var FONT_SIZE     = 18;
 var SMALL_FONT    = 10;
 var SPACE_SIZE    = 14;
 var LEFT_SPACE    = 16;
-var WORD_Y        = 36;       // baseline for words
-var POS_BELOW     = 16;       // POS text offset below word baseline
-var BRACKET_BASE  = 20;       // first bracket row below POS text
-var BRACKET_ROW   = 26;       // vertical spacing per bracket level
+var WORD_Y        = 40;       // baseline for words
+var POS_BELOW_UKR = 26;       // POS offset for Ukrainian
+var POS_BELOW_RUS = 22;       // POS offset for Russian (tighter)
+var BRACKET_BASE  = 30;       // first bracket row below POS/text
+var BRACKET_ROW   = 22;       // vertical spacing per bracket level
 var TICK          = 8;        // bracket end-tick height
 
 var POS_COLORS = {
@@ -32,7 +36,22 @@ var POS_COLORS = {
     UNKNOWN:'#9ca3af'
 };
 
-function getPosFromGram(g) { return g ? (g.split(/[\s;,]/)[0] || 'UNKNOWN') : 'UNKNOWN'; }
+function getPosFromGram(g) { 
+    if (!g) return 'UNKNOWN';
+    var p = (g.split(/[\s;,]/)[0] || 'UNKNOWN').toUpperCase();
+    var map = {
+        'С': 'NOUN', 'П': 'ADJECTIVE', 'Г': 'VERB', 'Н': 'ADVERB',
+        'МС': 'PRON', 'МС-П': 'PRON', 'МС-ПРЕДК': 'PRON',
+        'ПРЕДЛ': 'PREP', 'СОЮЗ': 'CONJ', 'СОЧ_СОЮЗ': 'CONJ', 'ПОД_СОЮЗ': 'CONJ',
+        'ЧАСТ': 'PART', 'МЕЖД': 'INT', 'ЧИСЛ': 'NUMERAL',
+        'ПРИЧАСТИЕ': 'ADJECTIVE', 'ДЕЕПРИЧАСТИЕ': 'ADVERB',
+        'КР_ПРИЛ': 'ADJECTIVE', 'КР_ПРИЧАСТИЕ': 'VERB', 'ИНФИНИТИВ': 'VERB',
+        'ПРЕДК': 'ADVERB', 'ПОСЛ': 'PREP', 'Н_ПРЕДЛ': 'PREP',
+        'PUNC': 'UNKNOWN', 'PUNCT': 'UNKNOWN', 'SENT': 'UNKNOWN'
+    };
+    return map[p] || p;
+}
+
 function getPosColor(p)    { return POS_COLORS[p] || POS_COLORS.UNKNOWN; }
 
 function roundRect(c, x, y, w, h, r) {
@@ -104,7 +123,6 @@ class WordPanel {
 
 class WordArc {
     constructor(group) {
-        this.childArcs = [];
         this.firstWord = group.start;
         this.lastWord  = group.last;
         this.strName   = (group.descr || '').replace(/\0/g,'').trim();
@@ -112,42 +130,14 @@ class WordArc {
         this.isSubj    = group.isSubj;
         this.depth     = 0;
 
-        this.calcDepths = function(d) {
-            this.depth = d;
-            for (var i in this.childArcs)
-                this.childArcs[i].calcDepths(d + 1);
-        };
-
-        this.getMaxDepth = function() {
-            var m = this.depth;
-            for (var i in this.childArcs) {
-                var c = this.childArcs[i].getMaxDepth();
-                if (c > m) m = c;
-            }
-            return m;
-        };
-
-        this.getHeight = function() {
-            var h = 0;
-            for (var i in this.childArcs) {
-                var ch = this.childArcs[i].getHeight();
-                if (ch > h) h = ch;
-            }
-            return h + BRACKET_ROW;
-        };
-
         this.draw = function(Clause) {
-            // draw children first (closer to words)
-            for (var i in this.childArcs)
-                this.childArcs[i].draw(Clause);
-
             var lp = Clause.WordPanels[this.firstWord];
             var rp = Clause.WordPanels[this.lastWord];
             if (!lp || !rp) return;
 
             var x1 = lp.centerX;
             var x2 = rp.centerX;
-            var y  = WORD_Y + POS_BELOW + SMALL_FONT + BRACKET_BASE + this.depth * BRACKET_ROW;
+            var y  = WORD_Y + POS_BELOW_UKR + SMALL_FONT + BRACKET_BASE + this.depth * BRACKET_ROW;
 
             var color = this.groupArc ? GROUP_COLOR : LINK_COLOR;
             ctx.strokeStyle = color;
@@ -210,7 +200,6 @@ class WordArc {
         };
     }
 }
-
 // ═════════════════════════════════════════════════════════════════════
 //  TopClause
 // ═════════════════════════════════════════════════════════════════════
@@ -280,11 +269,42 @@ protoClause.parseOneVariant = function(variant) {
         if (arc.isSubj) subjArcs.push(arc);
         else            arcs.push(arc);
     }
-    arcs = this.orderArcs(arcs);
-    // assign depths
-    for (var i in arcs) arcs[i].calcDepths(0);
-    for (var i in subjArcs) subjArcs[i].calcDepths(0);
+    this.assignDepths(arcs);
+    this.assignDepths(subjArcs);
     this.MorphVariants.push(new CMorphVariant(homs, arcs, subjArcs));
+};
+
+protoClause.assignDepths = function(arcs) {
+    if (!arcs || arcs.length === 0) return;
+    // sort by start, then by length (desc)
+    arcs.sort((a, b) => a.firstWord - b.firstWord || b.lastWord - a.lastWord);
+
+    var levels = []; // each level is an array of {start, end} intervals
+    for (var i = 0; i < arcs.length; i++) {
+        var a = arcs[i];
+        var assigned = false;
+        for (var l = 0; l < levels.length; l++) {
+            var canFit = true;
+            for (var j = 0; j < levels[l].length; j++) {
+                var interval = levels[l][j];
+                // overlap if NOT (a.lastWord < interval.start OR a.firstWord > interval.end)
+                if (!(a.lastWord < interval.start || a.firstWord > interval.end)) {
+                    canFit = false;
+                    break;
+                }
+            }
+            if (canFit) {
+                a.depth = l;
+                levels[l].push({start: a.firstWord, end: a.lastWord});
+                assigned = true;
+                break;
+            }
+        }
+        if (!assigned) {
+            a.depth = levels.length;
+            levels.push([{start: a.firstWord, end: a.lastWord}]);
+        }
+    }
 };
 
 protoClause.readUnits = function(str) {
@@ -294,26 +314,6 @@ protoClause.readUnits = function(str) {
         ii++;
     }
     return arr;
-};
-
-protoClause.orderArcsRec = function(arcs, parentArc, iCur) {
-    for (var i = iCur; i < arcs.length;) {
-        var arc = arcs[i];
-        if (+arc.firstWord > +parentArc.lastWord) return i;
-        i = this.orderArcsRec(arcs, arc, i + 1);
-        parentArc.childArcs.push(arc);
-    }
-    return arcs.length;
-};
-
-protoClause.orderArcs = function(arcs) {
-    var ordered = [];
-    for (var i = 0; i < arcs.length;) {
-        var arc = arcs[i];
-        i = this.orderArcsRec(arcs, arc, i + 1);
-        ordered.push(arc);
-    }
-    return ordered;
 };
 
 // ── Drawing ──────────────────────────────────────────────────────────
@@ -341,7 +341,35 @@ protoClause.drawWordPanels = function() {
         ctx.fillStyle = col;
         ctx.fillText(panel.word, panel.x, panel.y);
 
-
+        // POS label below (Ukrainian or Russian only)
+        var showPos = (CURRENT_LANG === 'Ukrainian' || CURRENT_LANG === 'Russian');
+        if (showPos) {
+            var posMap = {
+                'Ukrainian': {
+                    'NOUN':'іменник','PN':'власне ім\'я','PRON':'займенник','VERB':'дієслово','VBE':'дієслово-зв\'язок',
+                    'MOD':'модальник','ADJECTIVE':'прикметник','PN_ADJ':'власний прикметник','ORDNUM':'порядковий числівник',
+                    'ADVERB':'прислівник','ARTICLE':'артикль','PREP':'прийменник','CONJ':'сполучник','PART':'частка',
+                    'POSS':'притягальний займенник','INT':'міжметр','NUMERAL':'числівник','UNKNOWN':''
+                },
+                'Russian': {
+                    'NOUN':'сущ.','PN':'имя собств.','PRON':'мест.','VERB':'глагол','VBE':'глагол-связка',
+                    'MOD':'модальный','ADJECTIVE':'прил.','PN_ADJ':'притяж. прил.','ORDNUM':'поряд. числ.',
+                    'ADVERB':'нареч.','ARTICLE':'артикль','PREP':'предлог','CONJ':'союз','PART':'частица',
+                    'POSS':'притяж. мест.','INT':'междом.','NUMERAL':'числ.','UNKNOWN':''
+                }
+            };
+            var labelMap = posMap[CURRENT_LANG] || posMap['Russian'];
+            var label = labelMap[pos] || (pos === 'UNKNOWN' ? '' : pos);
+            
+            if (label) {
+                var posFontSize = (CURRENT_LANG === 'Russian') ? 8 : 9;
+                var posYOffset  = (CURRENT_LANG === 'Ukrainian') ? POS_BELOW_UKR : POS_BELOW_RUS;
+                ctx.font = posFontSize + 'px ' + FONT;
+                ctx.fillStyle = col + 'aa';
+                var pw = ctx.measureText(label).width;
+                ctx.fillText(label, panel.x + (panel.width - pw) / 2, panel.y + posYOffset);
+            }
+        }
 
         // restore font
         ctx.font = (panel.homonyms.length > 1 ? 'bold ' : '') + FONT_SIZE + 'px ' + FONT;
@@ -360,7 +388,7 @@ protoClause.drawSubjPredic = function() {
         if (!p1 || !p2) continue;
 
         // subject badge
-        var sy = p1.y - FONT_SIZE * 0.3;
+        var sy = p1.y + ((CURRENT_LANG === 'Ukrainian') ? POS_BELOW_UKR : POS_BELOW_RUS) + 6;
         ctx.font = 'bold 9px ' + FONT;
         ctx.fillStyle = SUBJ_COLOR;
         ctx.beginPath();
@@ -370,7 +398,7 @@ protoClause.drawSubjPredic = function() {
         ctx.fillText('S', p1.centerX - 3, sy + 3);
 
         // predicate badge
-        var py2 = p2.y - FONT_SIZE * 0.3;
+        var py2 = p2.y + ((CURRENT_LANG === 'Ukrainian') ? POS_BELOW_UKR : POS_BELOW_RUS) + 6;
         ctx.fillStyle = PREDIC_COLOR;
         ctx.beginPath();
         ctx.arc(p2.centerX, py2, 6, 0, Math.PI*2);
@@ -380,7 +408,7 @@ protoClause.drawSubjPredic = function() {
         ctx.fillText('P', p2.centerX - 3, py2 + 3);
 
         // arrow from subject to predicate
-        var arrowY = WORD_Y + POS_BELOW + SMALL_FONT + 4;
+        var arrowY = sy;
         var ax1 = p1.centerX + 8;
         var ax2 = p2.centerX - 8;
 
@@ -469,7 +497,7 @@ function calcMaxDepth() {
     for (var i in TopClauses) {
         var arcs = TopClauses[i].getCurArcs();
         for (var j in arcs) {
-            var d = arcs[j].getMaxDepth();
+            var d = arcs[j].depth;
             if (d > max) max = d;
         }
     }
@@ -540,8 +568,12 @@ function drawAll() {
         if (w > 0) ctxMain.canvas.width = w;
     }
 
+    // Set current language globally for drawing
+    CURRENT_LANG = document.getElementById("Language").value;
+
     var maxDepth = calcMaxDepth();
-    var canvasH = WORD_Y + POS_BELOW + SMALL_FONT + BRACKET_BASE + (maxDepth + 1) * BRACKET_ROW + 16;
+    // Use maximum POS offset (Ukrainian) to ensure enough space
+    var canvasH = WORD_Y + POS_BELOW_UKR + SMALL_FONT + BRACKET_BASE + (maxDepth + 1) * BRACKET_ROW + 16;
     var canvasW = calcWordsLength();
 
     ctx.canvas.height = canvasH;
@@ -565,7 +597,6 @@ function drawAll() {
 // ═════════════════════════════════════════════════════════════════════
 
 function drawLegend() {
-    var langua = document.getElementById("Language").value;
     var x = 12, y = ctxMain.canvas.height - 8;
     var lineLen = 20, gap = 18, lineH = 16;
 
@@ -573,34 +604,62 @@ function drawLegend() {
     ctxMain.lineWidth = 1;
 
     var labels;
-    if (langua === 'English')
+    if (CURRENT_LANG === 'English')
         labels = { group:'— group', link:'- - link', subj:'S subject', predic:'P predicate' };
-    else if (langua === 'German')
+    else if (CURRENT_LANG === 'German')
         labels = { group:'— Gruppe', link:'- - Verbindung', subj:'S Subjekt', predic:'P Prädikat' };
-    else if (langua === 'Ukrainian')
+    else if (CURRENT_LANG === 'Ukrainian')
         labels = { group:'— група', link:'- - зв\'язок', subj:'S підмет', predic:'P присудок' };
     else
         labels = { group:'— группа', link:'- - связь', subj:'S подлежащее', predic:'P сказуемое' };
 
-    // ── POS colour row ──
-    var posOrder = ['NOUN','PN','PRON','VERB','VBE','MOD','ADJECTIVE','ADVERB','ARTICLE','PREP','CONJ','PART'];
+    // ── POS colours row ── (with translation)
+    var posOrder, posLabels;
+    if (CURRENT_LANG === 'Ukrainian') {
+        posOrder = ['NOUN','PN','PRON','VERB','VBE','MOD','ADJECTIVE','PN_ADJ','ORDNUM','ADVERB','ARTICLE','PREP','CONJ','PART','POSS','INT','NUMERAL','UNKNOWN'];
+        posLabels = {
+            'NOUN':'іменник','PN':'власне ім\'я','PRON':'займенник','VERB':'дієслово','VBE':'дієслово-зв\'язок',
+            'MOD':'модальник','ADJECTIVE':'прикметник','PN_ADJ':'власний прикметник','ORDNUM':'порядковий числівник',
+            'ADVERB':'прислівник','ARTICLE':'артикль','PREP':'прийменник','CONJ':'сполучник','PART':'частка',
+            'POSS':'притягальний займенник','INT':'міжметр','NUMERAL':'числівник','UNKNOWN':'???'
+        };
+    } else if (CURRENT_LANG === 'Russian') {
+        posOrder = ['NOUN','PN','PRON','VERB','VBE','MOD','ADJECTIVE','PN_ADJ','ORDNUM','ADVERB','ARTICLE','PREP','CONJ','PART','POSS','INT','NUMERAL','UNKNOWN'];
+        posLabels = {
+            'NOUN':'сущ.','PN':'имя собств.','PRON':'мест.','VERB':'глагол','VBE':'глагол-связка',
+            'MOD':'модальный','ADJECTIVE':'прил.','PN_ADJ':'притяж. прил.','ORDNUM':'поряд. числ.',
+            'ADVERB':'нареч.','ARTICLE':'артикль','PREP':'предлог','CONJ':'союз','PART':'частица',
+            'POSS':'притяж. мест.','INT':'междом.','NUMERAL':'числ.','UNKNOWN':'???'
+        };
+    } else {
+        posOrder = ['NOUN','PN','PRON','VERB','VBE','MOD','ADJECTIVE','ADVERB','ARTICLE','PREP','CONJ','PART'];
+        posLabels = {};
+    }
+
     var posRowY = y;
     var posRowX = x;
     for (var pi = 0; pi < posOrder.length; pi++) {
         var pp = posOrder[pi];
         var pc = getPosColor(pp);
+        var txt = (posLabels[pp] || pp);
+        
         ctxMain.font = 'bold 10px ' + FONT;
-        var tw = ctxMain.measureText(pp).width + 8;
-        if (posRowX + tw > ctxMain.canvas.width - 10) break;
+        var tw = ctxMain.measureText(txt).width + 20;
+        
+        if (posRowX + tw > ctxMain.canvas.width - 10) {
+            posRowX = x;
+            posRowY -= lineH;
+        }
+        
         ctxMain.fillStyle = pc;
         ctxMain.beginPath();
         ctxMain.arc(posRowX + 4, posRowY - 4, 4, 0, Math.PI*2);
         ctxMain.fill();
-        ctxMain.fillText(pp, posRowX + 12, posRowY);
-        posRowX += tw + 10;
+        
+        ctxMain.fillText(txt, posRowX + 12, posRowY);
+        posRowX += tw;
     }
-
-    y -= lineH + 4;
+    y = posRowY - lineH - 4;
 
     // group
     y -= lineH;
