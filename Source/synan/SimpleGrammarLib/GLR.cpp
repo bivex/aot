@@ -21,6 +21,7 @@ CGLRParser::CGLRParser()
 */
 void CGLRParser :: InitGLRParser(const CGLRTable*	pTable)
 {
+	LOGI << "InitGLRParser: start";
 	m_StateNodes.clear();
 	m_SymbolNodes.clear();
 	CStateNode Node;
@@ -36,6 +37,7 @@ void CGLRParser :: InitGLRParser(const CGLRTable*	pTable)
 	m_PendingReductions.clear();
 	m_PendingShifts.clear();
 	m_ActiveNodes.clear();
+	LOGI << "InitGLRParser: end";
 
 
 };

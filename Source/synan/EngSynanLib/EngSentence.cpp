@@ -65,11 +65,7 @@ bool CEngSentence::RunSyntaxInClauses(ESynRulesSet rules)
 		for(int i = 0 ; i < GetClausesCount() ; i++ )
 		{
 			CClause& clause = GetClause(i);
-			clause.BuildSynVariants();
-
-			for (auto& var : clause.m_SynVariants) {
-				clause.BuildSubjAndPredMember(var);
-			}
+			BuildGLRGroupsInClause(clause);
 		}
 
 		return true;
@@ -135,9 +131,7 @@ bool CEngSentence::BuildClauses()
 
 	FindGraPairs();
 
-    // BuildGLRGroupsInSentence();
-    // Disabled: grammar items don't match English morphology symbols yet,
-    // causing assert on empty m_AutomatSymbolInterpetationUnion.
+	// BuildGLRGroupsInSentence();  -- disabled, not needed for English
 
 	if(! BuildInitialClauses() )
 	{

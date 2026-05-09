@@ -593,8 +593,10 @@ bool CLemWord::IsEqualToGrammarItem(const CHomonym& h, const CGrammarItem& I) co
 	}
 
 	if (!I.m_MorphPattern.HasNoInfo()) {
-		if (m_TokenType != ORLE && m_TokenType != OLLE)
-			return false;
+		if (m_Language != morphEnglish) {
+			if (m_TokenType != ORLE && m_TokenType != OLLE)
+				return false;
+		}
 		if (!CheckGrammems(*this, h, I))
 			return false;
 	}
@@ -665,6 +667,9 @@ void CLemWord::BuildTerminalSymbolsByWord(const std::vector<CGrammarItem>& grm_i
 			auto& h = *GetHomonym(k);
 			if (IsEqualToGrammarItem(h, item))
 			{
+				if (m_Language == morphEnglish) {
+					LOGI << "English Match: Word=" << m_strWord << " Hom=" << k << " Item=" << item.m_ItemStrId << " Grm=" << item.m_MorphPattern.ToGrammarFormat();
+				}
 				CInputSymbol N(i, h.GetGramCodes(), h.m_CommonGramCode);
 				h.m_AutomatSymbolInterpetation.insert(N);
 				m_AutomatSymbolInterpetationUnion.insert(N);

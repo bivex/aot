@@ -137,6 +137,9 @@ bool CGLRTable::BuildGLRTable()
 		
 	};
 
+	m_WorkLineSize = m_pWorkGrammar->m_UniqueGrammarItems.size();
+	ConvertBuildCellsToWordCells();
+
 	return true;
 };
 

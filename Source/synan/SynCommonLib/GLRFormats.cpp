@@ -42,10 +42,16 @@ void CSentence::BuildTerminalSymbolsByClause(size_t ClauseNo)
 
 void CSentence::ApplyGLR_Parsing (CGLRParser& Parser, const std::vector<CBuildingUnit>& BuildingUnits)
 {
+	if (!m_pSyntaxOptions) {
+		LOGE << "ApplyGLR_Parsing: m_pSyntaxOptions is NULL!";
+		return;
+	}
+	LOGI << "ApplyGLR_Parsing: m_pSyntaxOptions=" << m_pSyntaxOptions;
 	const CWorkGrammar& G = GetOpt()->m_FormatsGrammar;
+	LOGI << "ApplyGLR_Parsing: G rules count=" << G.m_EncodedRules.size();
 	Parser.m_bRobust = true;
 	Parser.InitGLRParser(&G.m_GLRTable); 
-
+	LOGI << "ApplyGLR_Parsing: Parser initialized";
 
 	for (size_t CurrWordNo = 0; CurrWordNo < BuildingUnits.size(); CurrWordNo++)
 	{
@@ -55,21 +61,15 @@ void CSentence::ApplyGLR_Parsing (CGLRParser& Parser, const std::vector<CBuildin
 						m_Words[Unit.m_WordNo].m_AutomatSymbolInterpetationUnion 
 					:	m_Clauses[Unit.m_ChildClauseNo].m_AutomatSymbolInterpetationUnion;
 
-		assert( !Symbols.empty() );
-		/*for (std::set<CInputSymbol>::const_iterator it = Symbols->begin(); it != Symbols->end(); it++)
-		{
-			const CInputSymbol& debug = *it;
-			int u = 0;
-
-		};*/
-
-		//Parser.DumpParser(true);
-
+		if (Symbols.empty()) {
+			LOGD << "ApplyGLR_Parsing: WordNo=" << Unit.m_WordNo << " has empty symbols, skipping";
+			continue;
+		}
+		
+		LOGD << "ApplyGLR_Parsing: WordNo=" << Unit.m_WordNo << " SymbolsCount=" << Symbols.size();
 
 		if (Parser.ParseSymbol(Symbols))
 		{
-			//  if it is the last word of the sentence and the lst symbol was parsed successfully 
-			//  then we should add an end of stream symbol to the input stream and finish parsing
 			if	(CurrWordNo+1 == BuildingUnits.size())
 			{
 				std::set<CInputSymbol> EndOfSentenceSet;
@@ -82,9 +82,6 @@ void CSentence::ApplyGLR_Parsing (CGLRParser& Parser, const std::vector<CBuildin
 			break;
 
 	};
-
-
-	//Parser.DumpParser(true);
 
 };
 
@@ -282,6 +279,11 @@ bool CSentence::BuildMorphVariantsByTomita(const CGLRParser& Parser, const std::
 		pClause.BuildSynVariantsRecursive(BuildingUnits.begin(),  V);
 	}
 
+	// For GLR-based languages, discard Tomita-built groups; we'll use GLR groups
+	for (auto& var : pClause.m_SynVariants) {
+		var.m_vectorGroups.Clear();
+	}
+
 
 
 	CGroups DummyGroups(GetOpt());
@@ -325,17 +327,9 @@ bool CSentence::BuildMorphVariantsByTomita(const CGLRParser& Parser, const std::
 
 				if (bFound)
 				{
-					//  adding groups checking projectivity
-					const std::vector<CGroup> G =  GroupsList[OccurNo].GetGroups();
-					
-					for (size_t j=0; j< G.size(); j++)
-					{
-						if (		synVariant.m_vectorGroups.GetGroups().empty()
-								||	GladkijPeriodLess(synVariant.m_vectorGroups.GetGroups().back(), G[j])
-							)
-							synVariant.m_vectorGroups.create_group(G[j]);
-					};
-					UnitNo =  C.second-1;
+					// Use GLR-built groups directly (replace Tomita groups)
+					synVariant.m_vectorGroups = GroupsList[OccurNo];
+					UnitNo = C.second-1;
 					break;
 				};
 			};
@@ -401,19 +395,23 @@ void CSentence::BuildGLRGroupsInClause(CClause& pClause)
 
 void CSentence::BuildGLRGroupsInSentence()
 {
-	CClause Clause(this,0, m_Words.size()-1);
+	LOGI << "BuildGLRGroupsInSentence: start";
+	if (m_Words.empty()) return;
+	CClause Clause(this,0, (int)m_Words.size()-1);
 	std::vector<CBuildingUnit> BuildingUnits;
 	Clause.GetBuildingUnits(BuildingUnits);
 	
+	LOGI << "BuildGLRGroupsInSentence: applying GLR parser";
 	CGLRParser Parser;
 	ApplyGLR_Parsing(Parser, BuildingUnits);
 
+	LOGI << "BuildGLRGroupsInSentence: getting best chunks";
 	std::vector< COccurrence> Occurrences;
 	GetBestChunks(Parser, Occurrences);
 
-
+	LOGI << "BuildGLRGroupsInSentence: build groups by GLR, occurrences size=" << Occurrences.size();
 	m_GroupsUnion.Clear();
-	m_GroupsUnion.ResizeAtomicDummy(Clause.size());	
+	m_GroupsUnion.ResizeAtomicDummy(Clause.size());
 	
 	const CWorkGrammar& Grammar = GetOpt()->m_FormatsGrammar;
 
@@ -421,7 +419,7 @@ void CSentence::BuildGLRGroupsInSentence()
 	{
 		BuildGroupByGLR(Parser, o, Clause, m_GroupsUnion);
 	};
-
+	LOGI << "BuildGLRGroupsInSentence: end";
 };
 
 
