@@ -81,6 +81,20 @@ bool CEngSentence::RunSyntaxInClauses(ESynRulesSet rules)
 
 void CEngSentence::DeleteHomOneToThousand()
 {
+    for (int i = 0; i < m_Words.size(); i++) {
+        for (int j = 0; j < m_Words[i].GetHomonymsCount(); j++) {
+            CSynHomonym &HomF = m_Words[i].GetSynHomonym(j);
+            for (int k = 0; k < m_Words[i].GetHomonymsCount(); k++) {
+                CSynHomonym &HomS = m_Words[i].GetSynHomonym(k);
+                if (HomF.m_lFreqHom > 0 && HomS.m_lFreqHom > 0) {
+                    int iFrq = HomF.m_lFreqHom / HomS.m_lFreqHom;
+                    if (iFrq >= 10) HomS.m_bDelete = true;
+                }
+            }
+        }
+
+        m_Words[i].DeleteMarkedHomonymsBeforeClauses();
+    }
 }
 
 void CEngSentence::AddWeightForSynVariantsInClauses()
@@ -128,6 +142,8 @@ bool CEngSentence::BuildClauses()
 	m_bPanicMode = IsPanicSentence();
 
 	assert ( GetClausesCount() == 0 );
+
+	DeleteHomOneToThousand();
 
 	FindGraPairs();
 
