@@ -590,10 +590,41 @@ function drawAll() {
 }
 
 function drawLegend() {
+    var langua = document.getElementById("Language").value;
     var x = 12, y = ctxMain.canvas.height - 10;
     var lineLen = 20, gap = 18, lineH = 16;
     ctxMain.font = '11px Arial';
     ctxMain.lineWidth = 1;
+
+    var labels = {
+        group: '— группа',
+        link: '- - связь',
+        subj: 'S подлежащее',
+        predic: 'P сказуемое'
+    };
+
+    if (langua === 'English') {
+        labels = {
+            group: '— group',
+            link: '- - link',
+            subj: 'S subject',
+            predic: 'P predicate'
+        };
+    } else if (langua === 'German') {
+        labels = {
+            group: '— Gruppe',
+            link: '- - Verbindung',
+            subj: 'S Subjekt',
+            predic: 'P Prädikat'
+        };
+    } else if (langua === 'Ukrainian') {
+        labels = {
+            group: '— група',
+            link: '- - зв\'язок',
+            subj: 'S підмет',
+            predic: 'P присудок'
+        };
+    }
 
     // Group arc
     y -= lineH;
@@ -604,7 +635,7 @@ function drawLegend() {
     ctxMain.lineTo(x + lineLen, y + 6);
     ctxMain.stroke();
     ctxMain.fillStyle = GROUP_ARC_COLOR;
-    ctxMain.fillText('— группа', x + lineLen + 4, y + 10);
+    ctxMain.fillText(labels.group, x + lineLen + 4, y + 10);
 
     // Non-group arc
     y -= lineH;
@@ -615,7 +646,7 @@ function drawLegend() {
     ctxMain.lineTo(x + lineLen, y + 6);
     ctxMain.stroke();
     ctxMain.fillStyle = NONGROUP_ARC_COLOR;
-    ctxMain.fillText('- - связь', x + lineLen + 4, y + 10);
+    ctxMain.fillText(labels.link, x + lineLen + 4, y + 10);
 
     // Subject
     y -= lineH;
@@ -627,7 +658,7 @@ function drawLegend() {
     ctxMain.lineTo(x + lineLen, y + 6);
     ctxMain.stroke();
     ctxMain.fillStyle = SUBJ_COLOR;
-    ctxMain.fillText('S подлежащее', x + lineLen + 4, y + 10);
+    ctxMain.fillText(labels.subj, x + lineLen + 4, y + 10);
 
     // Predicate
     y -= lineH;
@@ -641,7 +672,7 @@ function drawLegend() {
     ctxMain.lineTo(x + lineLen, y + 8);
     ctxMain.stroke();
     ctxMain.fillStyle = PREDIC_COLOR;
-    ctxMain.fillText('P сказуемое', x + lineLen + 4, y + 10);
+    ctxMain.fillText(labels.predic, x + lineLen + 4, y + 10);
 
     ctxMain.setLineDash([]);
     ctxMain.lineWidth = 1;
