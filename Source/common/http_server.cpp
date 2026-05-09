@@ -93,7 +93,7 @@ void TRMLHttpServer::Start() {
 void SendReply(evhttp_request *req, int status, struct evbuffer* response) {
 	evhttp_add_header(evhttp_request_get_output_headers(req),
 		"Access-Control-Allow-Origin", "*");
-	evhttp_send_reply(req, status, "", response);
+	evhttp_send_reply(req, status, "OK", response);
 }
 
 void TRMLHttpServer::OnHttpRequest(evhttp_request *req) {
@@ -110,7 +110,7 @@ void TRMLHttpServer::OnHttpRequest(evhttp_request *req) {
 		evhttp_add_header(outHdrs, "Access-Control-Allow-Origin", "*");
 		evhttp_add_header(outHdrs, "Access-Control-Allow-Methods", "GET, POST, OPTIONS");
 		evhttp_add_header(outHdrs, "Access-Control-Allow-Headers", "Content-Type");
-		evhttp_send_reply(req, HTTP_OK, "", nullptr);
+		evhttp_send_reply(req, HTTP_OK, "OK", nullptr);
 		return;
 	}
 
@@ -196,7 +196,7 @@ void TRMLHttpServer::OnHttpRequest(evhttp_request *req) {
 		TDaemonParsedRequest parsedRequest{ req, uri, headers, action, langua, inputQuery};
 		auto result = OnParsedRequest(parsedRequest);
 		evbuffer_add_printf(outBuf, "%s", result.c_str());
-		SendReply(req, HTTP_OK, outBuf);
+		SendReply(req, HTTP_OK, nullptr);
 	}
 	catch (std::exception& e) {
 		LOGE << "Error: " << e.what() << " Request: "  << uri;
