@@ -254,9 +254,16 @@ void CEngSentence::BuildSubjAndPredRelation(CMorphVariant& synVariant, long Root
 		if (GetEngGramTab()->IsMorphNoun(H.m_iPoses) || 
 		    GetEngGramTab()->is_morph_pronoun(H.m_iPoses) || 
 		    H.HasPos(eNOUN) || H.HasPos(ePRON) || H.HasPos(ePN)) {
-			synVariant.m_Subjects.push_back(i);
-			synVariant.m_bGoodSubject = true;
-			break;
+			
+			const CSynUnit& PU = synVariant.m_SynUnits[iPred];
+			const CSynWord& PW = m_Words[PU.m_SentPeriod.m_iFirstWord];
+			const CSynHomonym& PH = PW.m_Homonyms[PU.m_iHomonymNum];
+
+			if (GetEngGramTab()->GleicheSubjectPredicate(H.GetGramCodes().c_str(), PH.GetGramCodes().c_str())) {
+				synVariant.m_Subjects.push_back(i);
+				synVariant.m_bGoodSubject = true;
+				break;
+			}
 		}
 	}
 };

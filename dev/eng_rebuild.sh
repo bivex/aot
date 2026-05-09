@@ -21,7 +21,8 @@ RML="$(cd "$SCRIPT_DIR/.." && pwd)"
 BUILD_DIR="$RML/build_fast"
 DICT_DIR="$RML/Dicts/Morph/English"
 MORPH_SRC="$RML/Source/morph_dict/data/English"
-CONV="$RML/dev/unimorph_conv/unimorph_to_aot_v2.py"
+CONV="$RML/dev/unimorph_conv/unimorph_to_aot_v4.py"
+
 STATDATA="$MORPH_SRC/StatData.txt"
 WORDDATA="$MORPH_SRC/WordData.txt"
 UDA_EWT="$RML/Dicts/EngSynan/ud-ewt"
@@ -65,7 +66,7 @@ step_morph_bin() {
     err "morph_gen binary not found. Run fast_build.sh first."; exit 1
   fi
   "$BUILD_DIR/Source/morph_dict/morph_gen/morph_gen" \
-    --input "$DICT_DIR/project.mwz" \
+    --input "$DICT_DIR/eng.mwz" \
     --output-folder "$DICT_DIR" \
     --log-level info
   info "  Done."
