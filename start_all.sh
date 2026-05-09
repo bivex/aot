@@ -5,9 +5,12 @@ PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BUILD_DIR="${PROJECT_ROOT}/build"
 PORT_SYNAN=8089
 PORT_SEMAN=8090
+PORT_WWW=8080
+WWW_ROOT="${PROJECT_ROOT}/Source/www/wwwroot"
 LOG_DIR="${PROJECT_ROOT}/Logs"
 SYNAN_LCK="${PROJECT_ROOT}/SynanDaemon.lck"
 SEMAN_LCK="${PROJECT_ROOT}/SemanDaemon.lck"
+WWW_LCK="${PROJECT_ROOT}/wwwroot_server.lck"
 
 # Ensure we are in the project root
 cd "$PROJECT_ROOT"
@@ -28,7 +31,7 @@ stop_services() {
     echo "Stopping existing services..."
     
     # Try using lock file PIDs first
-    for LCK in "$SYNAN_LCK" "$SEMAN_LCK"; do
+    for LCK in "$SYNAN_LCK" "$SEMAN_LCK" "$WWW_LCK"; do
         if [ -f "$LCK" ]; then
             PID=$(cat "$LCK" 2>/dev/null)
             if [ -n "$PID" ] && ps -p "$PID" > /dev/null; then
@@ -39,25 +42,25 @@ stop_services() {
     done
 
     # Fallback to pkill for any remaining instances
-    pkill -f "SynanDaemon|SemanDaemon" 2>/dev/null
+    pkill -f "SynanDaemon|SemanDaemon|python3 -m http.server" 2>/dev/null
     
     # Wait for processes to exit
     MAX_WAIT=10
     COUNT=0
-    while pgrep -f "SynanDaemon|SemanDaemon" > /dev/null && [ $COUNT -lt $MAX_WAIT ]; do
+    while pgrep -f "SynanDaemon|SemanDaemon|python3 -m http.server" > /dev/null && [ $COUNT -lt $MAX_WAIT ]; do
         echo -n "."
         sleep 1
         ((COUNT++))
     done
     echo ""
     
-    if pgrep -f "SynanDaemon|SemanDaemon" > /dev/null; then
+    if pgrep -f "SynanDaemon|SemanDaemon|python3 -m http.server" > /dev/null; then
         echo "Forcing shutdown..."
-        pkill -9 -f "SynanDaemon|SemanDaemon" 2>/dev/null
+        pkill -9 -f "SynanDaemon|SemanDaemon|python3 -m http.server" 2>/dev/null
     fi
     
     # Cleanup lock files
-    rm -f "$SYNAN_LCK" "$SEMAN_LCK" 2>/dev/null
+    rm -f "$SYNAN_LCK" "$SEMAN_LCK" "$WWW_LCK" 2>/dev/null
     echo "Services stopped."
 }
 
@@ -84,11 +87,27 @@ start_services() {
         echo $SEMAN_PID > "$SEMAN_LCK"
         echo "SemanDaemon started with PID $SEMAN_PID (Port $PORT_SEMAN)"
     fi
+
+    # Start Python HTTP server for frontend
+    if [ -d "$WWW_ROOT" ]; then
+        nohup python3 -m http.server "$PORT_WWW" --directory "$WWW_ROOT" > "${LOG_DIR}/www_stdout.log" 2>&1 &
+        WWW_PID=$!
+        echo $WWW_PID > "$WWW_LCK"
+        echo "Frontend server started with PID $WWW_PID (Port $PORT_WWW)"
+        echo ""
+        echo "Frontend URLs:"
+        echo "  Morphology Demo: http://localhost:$PORT_WWW/demo/morph.html"
+        echo "  Syntax Demo:     http://localhost:$PORT_WWW/demo/synt.html"
+        echo "  Modern UI:       http://localhost:$PORT_WWW/modern/index.html"
+    else
+        echo "WARNING: wwwroot directory not found at $WWW_ROOT"
+    fi
     
     echo ""
     echo "Initialization takes ~10-15 seconds."
-    echo "Check progress: tail -f Logs/synan_dmn.log"
-    echo "Check output: tail -f Logs/synan_stdout.log"
+    echo "Check backend progress: tail -f Logs/synan_dmn.log"
+    echo "Check backend output:  tail -f Logs/synan_stdout.log"
+    echo "Check frontend output:  tail -f Logs/www_stdout.log"
 }
 
 case "$1" in
