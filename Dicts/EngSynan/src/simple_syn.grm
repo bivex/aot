@@ -59,13 +59,39 @@
 %% ========== Passive Progressive: "is being eaten" ==========
 [VP] -> [TOKEN grm="VBE"] [TOKEN grm="VERB" grm="ing"] [TOKEN grm="VERB" grm="pp"];
 
+%% ========== Negation with PARTICLE (not) ==========
+[VP] -> [TOKEN grm="VBE"] [TOKEN grm="PART"] [TOKEN grm="VERB" grm="ing"];
+[VP] -> [TOKEN grm="VBE"] [TOKEN grm="PART"] [TOKEN grm="VERB" grm="pp"];
+[VP] -> [TOKEN grm="VBE"] [TOKEN grm="PART"] [TOKEN grm="ADJECTIVE"];
+[VP] -> [TOKEN grm="VBE"] [TOKEN grm="PART"] [NP];
+[VP] -> [TOKEN grm="MOD"] [TOKEN grm="PART"] [TOKEN grm="VERB"];
+[VP] -> [TOKEN grm="MOD"] [TOKEN grm="PART"] [TOKEN grm="VBE"] [TOKEN grm="VERB" grm="ing"];
+[VP] -> [TOKEN grm="VERB"] [TOKEN grm="PART"];
+
+%% ========== Infinitive with PARTICLE (to) ==========
+[VP] -> [TOKEN grm="VBE"] [TOKEN grm="PART"] [TOKEN grm="VERB"];
+[VP] -> [TOKEN grm="VBE"] [TOKEN grm="PART"] [TOKEN grm="VERB"] [NP];
+[VP] -> [TOKEN grm="MOD"] [TOKEN grm="PART"] [TOKEN grm="VBE"] [TOKEN grm="VERB" grm="pp"];
+[VP] -> [TOKEN grm="VBE"] [TOKEN grm="PART"] [TOKEN grm="VERB" grm="pp"];
+[VP] -> [TOKEN grm="VBE"] [TOKEN grm="PART"] [TOKEN grm="VERB" grm="ing"];
+
 %% ========== Adverbial in VP ==========
 [VP] -> [TOKEN grm="VERB"] [TOKEN grm="ADVERB"];
 [VP] -> [TOKEN grm="VERB"] [TOKEN grm="ADVERB"] [NP];
 [VP] -> [TOKEN grm="ADVERB"] [TOKEN grm="VERB"] [NP];
 
+%% ========== Coordination (CONJ) ==========
+[NP] -> [NP] [TOKEN grm="CONJ"] [NP];
+[VP] -> [VP] [TOKEN grm="CONJ"] [VP];
+[VP] -> [TOKEN grm="VERB"] [TOKEN grm="CONJ"] [TOKEN grm="VERB"];
+
+%% ========== Subordinate clause (CONJ) ==========
+[SP] -> [SP] [TOKEN grm="CONJ"] [SP];
+[SP] -> [NP] [VP] [TOKEN grm="CONJ"] [SP];
+[SP] -> [TOKEN grm="CONJ"] [NP] [VP];
+
 %% ========== Subject-Predicate (Root) ==========
 [SP] -> [NP] [VP];
 
 %% ========== Root ==========
-[SYN_GROUP] -> [NP] | [VP] | [PP] | [TOKEN grm="ADVERB"] | [SP];
+[SYN_GROUP] -> [NP] | [VP] | [PP] | [TOKEN grm="ADVERB"] | [TOKEN grm="PART"] | [SP];

@@ -112,9 +112,57 @@ def get_gramcode(pos, tags, gram_to_code, gramtab, next_code_idx_ref):
         }
     return gram_to_code[key]
 
+# Suppletive verb forms not in UniMorph (UniMorph English only has nouns)
+# Each entry: (lemma, POS, [(word_form, tags_tuple), ...])
+CLOSED_CLASS_VERBS = {
+    ('BE', 'VBE'): [
+        ('BE', ('NFIN',)),
+        ('AM', ('PRS', '1', 'SG')),
+        ('IS', ('PRS', '3', 'SG')),
+        ('ARE', ('PRS', 'PL')),
+        ('WAS', ('PST', 'SG')),
+        ('WERE', ('PST', 'PL')),
+        ('BEEN', ('PST;V.PTCP',)),
+        ('BEING', ('PRS;V.PTCP',)),
+    ],
+    ('HAVE', 'VBE'): [
+        ('HAVE', ('PRS',)),
+        ('HAS', ('PRS', '3', 'SG')),
+        ('HAD', ('PST',)),
+        ('HAVING', ('PRS;V.PTCP',)),
+    ],
+    ('DO', 'VBE'): [
+        ('DO', ('PRS',)),
+        ('DOES', ('PRS', '3', 'SG')),
+        ('DID', ('PST',)),
+        ('DONE', ('PST;V.PTCP',)),
+        ('DOING', ('PRS;V.PTCP',)),
+    ],
+}
+
+# Function words that need PART tag but only appear as ADV/NOUN in all.eng+UniMorph
+CLOSED_CLASS_PARTICLES = {
+    ('NOT', 'PART'): [('NOT', ())],
+    ('NEVER', 'PART'): [('NEVER', ())],
+}
+
 def convert():
     lemmas_data = {} # (lemma, aot_pos) -> set of (word, tags_tuple)
-    
+
+    # 0. Inject closed-class verb paradigms (suppletive forms missing from UniMorph)
+    for (lemma, aot_pos), forms in CLOSED_CLASS_VERBS.items():
+        key = (lemma, aot_pos)
+        lemmas_data[key] = set()
+        for word, tags in forms:
+            lemmas_data[key].add((word, tags))
+
+    # 0b. Inject particles that UniMorph mis-tags as ADV
+    for (lemma, aot_pos), forms in CLOSED_CLASS_PARTICLES.items():
+        key = (lemma, aot_pos)
+        lemmas_data[key] = set()
+        for word, tags in forms:
+            lemmas_data[key].add((word, tags))
+
     # 1. Load original all.eng
     if os.path.exists('Dicts/SrcBinDict/all.eng'):
         print("Loading all.eng...")
