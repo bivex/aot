@@ -236,9 +236,8 @@ void JVisualSynAnParamBuilder::WriteVariant(const SSynVariant2Groups& var, CJson
 	for(auto& u : var.m_SynUnits) {
         CJsonObject unit(o.get_doc());
 		unit.add_int("homNo",  u.m_iHomonymNum);
-		std::string  grammems = u.GetGrammemsByAncodes();
-		if (grammems.empty())
-			grammems = GetMHolder(m_pSyntaxHolder->m_LemText.GetDictLanguage()).m_pGramTab->GrammemsToStr(u.m_iGrammems);
+		auto* gramTab = GetMHolder(m_pSyntaxHolder->m_LemText.GetDictLanguage()).m_pGramTab;
+		std::string grammems = gramTab->GrammemsToStr(u.m_iGrammems);
 		unit.add_string_copy("grm",  u.GetPartOfSpeechStr() + " " + grammems);
 		units.push_back(unit.get_value());
 	}
