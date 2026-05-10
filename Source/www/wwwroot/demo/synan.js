@@ -39,25 +39,31 @@ var POS_COLORS = {
 function getPosFromGram(g) { 
     if (!g) return 'UNKNOWN';
     // Split by space, comma or semicolon, take first part, trim and convert to upper
-    var p = (g.split(/[\s;,]/)[0] || 'UNKNOWN').trim().replace(/[\u0000-\u001F\u007F-\u009F]/g, "").toUpperCase();
+    var p = (g.split(/[\s;,]/)[0] || 'UNKNOWN').trim().replace(/[\u0000-\u001F\u007F-\u009F\u00A0]/g, "").toUpperCase();
+    
+    // Stability checks for Cyrillic/Latin lookalikes
+    if (p.length === 1) {
+        var c = p.charCodeAt(0);
+        if (c === 0x0421 || c === 0x0043 || c === 0x0053) return 'NOUN';      // С (Cyr), C (Lat), S (Lat)
+        if (c === 0x041F || c === 0x0050) return 'ADJECTIVE';                 // П (Cyr), P (Lat)
+        if (c === 0x0413 || c === 0x0047) return 'VERB';                      // Г (Cyr), G (Lat)
+        if (c === 0x041D || c === 0x0048) return 'ADVERB';                    // Н (Cyr), H (Lat)
+        if (c === 0x0410) return 'ADJECTIVE';                                 // А (Cyr, adjective identifier in some versions)
+        if (c === 0x0412) return 'VERB';                                      // В (Cyr, verb identifier)
+    }
+
     var map = {
-        // Cyrillic (Russian internal)
-        'С': 'NOUN', 'СУЩ': 'NOUN', 'СУЩЕСТВИТЕЛЬНОЕ': 'NOUN',
-        'П': 'ADJECTIVE', 'ПРИЛ': 'ADJECTIVE', 'ПРИЛАГАТЕЛЬНОЕ': 'ADJECTIVE',
-        'Г': 'VERB', 'ГЛ': 'VERB', 'ГЛАГОЛ': 'VERB',
-        'Н': 'ADVERB', 'НАРЕЧ': 'ADVERB', 'НАРЕЧИЕ': 'ADVERB',
-        'МС': 'PRON', 'МЕСТ': 'PRON', 'МЕСТОИМЕНИЕ': 'PRON',
-        'МС-П': 'PRON', 'МС-ПРЕДК': 'PRON',
-        'ПРЕДЛ': 'PREP', 'ПРЕДЛОГ': 'PREP',
-        'СОЮЗ': 'CONJ', 'СОЧ_СОЮЗ': 'CONJ', 'ПОД_СОЮЗ': 'CONJ',
-        'ЧАСТ': 'PART', 'ЧАСТИЦА': 'PART',
-        'МЕЖД': 'INT', 'МЕЖДОМЕТИЕ': 'INT',
-        'ЧИСЛ': 'NUMERAL', 'ЧИСЛИТЕЛЬНОЕ': 'NUMERAL',
-        'ПРИЧАСТИЕ': 'ADJECTIVE', 'ДЕЕПРИЧАСТИЕ': 'ADVERB',
-        'КР_ПРИЛ': 'ADJECTIVE', 'КР_ПРИЧАСТИЕ': 'VERB', 'ИНФИНИТИВ': 'VERB',
-        'ПРЕДК': 'ADVERB', 'ПОСЛ': 'PREP', 'Н_ПРЕДЛ': 'PREP',
-        'ВВОДН': 'ADVERB', 'ФРАЗ': 'UNKNOWN',
-        // Latin equivalents (from Ukr/Eng or if Cyrillic was transcribed)
+        // Cyrillic
+        '\u0421': 'NOUN', '\u0421\u0423\u0429': 'NOUN',
+        '\u041F': 'ADJECTIVE', '\u041F\u0420\u0418\u041B': 'ADJECTIVE',
+        '\u0413': 'VERB', '\u0413\u041B': 'VERB',
+        '\u041D': 'ADVERB', '\u041D\u0410\u0420\u0415\u0427': 'ADVERB',
+        '\u041C\u0421': 'PRON', '\u041C\u0421-\u041F': 'PRON',
+        '\u041F\u0420\u0415\u0414\u041B': 'PREP', '\u0421\u041E\u042E\u0417': 'CONJ',
+        '\u0427\u0410\u0421\u0422': 'PART', '\u041C\u0415\u0416\u0414': 'INT',
+        '\u0427\u0418\u0421\u041B': 'NUMERAL',
+        
+        // Latin
         'N': 'NOUN', 'A': 'ADJECTIVE', 'V': 'VERB', 'ADV': 'ADVERB',
         'PRON': 'PRON', 'PA': 'PRON', 'P_PRED': 'PRON',
         'PREP': 'PREP', 'POSL': 'PREP', 'CONJ': 'CONJ', 'PARTICLE': 'PART',
@@ -67,29 +73,23 @@ function getPosFromGram(g) {
         'INFINITIVE': 'VERB', 'PRED': 'ADVERB', 'INP': 'ADVERB',
         'COLLOC': 'UNKNOWN', 'VBE': 'VBE', 'MOD': 'MOD', 'ARTICLE': 'ARTICLE',
         'PN': 'PN', 'PN_ADJ': 'PN_ADJ', 'ORDNUM': 'ORDNUM', 'NUMERAL': 'NUMERAL',
-        'POSS': 'POSS', 'PART': 'PART',
-        // Latin-Cyrillic lookalikes
-        'C': 'NOUN', 'P': 'ADJECTIVE', 'H': 'ADVERB', 'T': 'VERB',
+        'PRON': 'PRON', 'POSS': 'POSS', 'PART': 'PART',
+        
         // PUNC
         'PUNC': 'UNKNOWN', 'PUNCT': 'UNKNOWN', 'SENT': 'UNKNOWN'
     };
     var result = map[p] || p;
     
-    // Final fallback: search for Cyrillic keywords anywhere in the string if result is still unknown
+    // Final fallback: search for keywords
     if (result === 'UNKNOWN' || result === p) {
         var gUpper = g.toUpperCase();
-        if (gUpper.indexOf('С ') === 0 || gUpper.indexOf(' С ') !== -1 || gUpper.indexOf('СУЩ') !== -1) return 'NOUN';
-        if (gUpper.indexOf('П ') === 0 || gUpper.indexOf(' П ') !== -1 || gUpper.indexOf('ПРИЛ') !== -1) return 'ADJECTIVE';
-        if (gUpper.indexOf('Г ') === 0 || gUpper.indexOf(' Г ') !== -1 || gUpper.indexOf('ГЛАГ') !== -1) return 'VERB';
-        if (gUpper.indexOf('Н ') === 0 || gUpper.indexOf(' Н ') !== -1 || gUpper.indexOf('НАРЕЧ') !== -1) return 'ADVERB';
-        if (gUpper.indexOf('МС') !== -1 || gUpper.indexOf('МЕСТ') !== -1) return 'PRON';
-        if (gUpper.indexOf('ПРЕДЛ') !== -1) return 'PREP';
-        if (gUpper.indexOf('СОЮЗ') !== -1) return 'CONJ';
-        if (gUpper.indexOf('ЧАСТ') !== -1) return 'PART';
-        if (gUpper.indexOf('МЕЖД') !== -1) return 'INT';
-        if (gUpper.indexOf('ЧИСЛ') !== -1) return 'NUMERAL';
+        if (gUpper.indexOf('\u0421 ') === 0 || gUpper.indexOf(' \u0421 ') !== -1 || gUpper.indexOf('\u0421\u0423\u0429') !== -1) return 'NOUN';
+        if (gUpper.indexOf('\u041F ') === 0 || gUpper.indexOf(' \u041F ') !== -1 || gUpper.indexOf('\u041F\u0420\u0418\u041B') !== -1) return 'ADJECTIVE';
+        if (gUpper.indexOf('\u0413 ') === 0 || gUpper.indexOf(' \u0413 ') !== -1 || gUpper.indexOf('\u0413\u041B\u0410\u0413') !== -1) return 'VERB';
+        if (gUpper.indexOf('\u041D ') === 0 || gUpper.indexOf(' \u041D ') !== -1 || gUpper.indexOf('\u041D\u0410\u0420\u0415\u0427') !== -1) return 'ADVERB';
     }
 
+    console.log("POS check: gram='" + g + "' token='" + p + "' result='" + result + "'");
     return result;
 }
 
@@ -197,7 +197,7 @@ function translateDescriptor(d, lang) {
             'КР_ПРЧ': 'кратк. причастие', 'КР_ПРИЛ': 'кратк. прилаг.',
             'ПРЕДК': 'предикатив', 'ПРЧ': 'причастие', 'ИНФ': 'инфинитив',
             'ВВОД': 'вводное слово', 'ТИРЕ': 'тире', 'ИМ_СКАЗ': 'именное сказуемое',
-            'КАТ_СОСТ': 'категория состояния', 'НСО': 'необособл. опред.',
+            'КАТ_СОСТ': 'категория состояния', 'НСО': 'neобособл. опред.',
             'КОПУЛ': 'связка', 'НАЗЫВ': 'назывное предл.',
             'ОБРАЩ': 'обращение', 'ПРЯМ_РЕЧЬ': 'прямая речь',
             'ВСТАВН': 'вставное предл.', 'УСЛОВ': 'условие', 'ПОВЕЛ': 'повелительное',
