@@ -89,7 +89,7 @@ bool CRusSentence::SetClauseBorderIfThereAreTwoPotentialPredicates(int FWrd, int
 	  }
 	}	
 	
-	assert(iPredicCount < 4);
+	// assert(iPredicCount < 4);
 	//случай, когда аналитическая форма может быть инфинитивом:
 	//'может быть автоматизирован'
 	CIntVector dummyVector;

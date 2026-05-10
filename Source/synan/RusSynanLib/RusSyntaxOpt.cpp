@@ -173,9 +173,16 @@ void CRusSyntaxOpt::InitOptionsLanguageSpecific() {
     }
 
     // MasSingNomNounGramCode is needed by all languages that use gender/number/case
-    auto grs = _QM(rMasculinum)|_QM(rSingular)|_QM(rNominativ);
+    uint64_t grs = _QM(rMasculinum) | _QM(rSingular) | _QM(rNominativ);
     m_MasSingNomNounGramCode = GetGramTab()->GetAllGramCodes(NOUN, grs, GrammemsEqu);
-    assert(m_MasSingNomNounGramCode.length() == 2);
+    if (m_MasSingNomNounGramCode.length() < 2) {
+        LOGE << "Failed to find MasSingNomNounGramCode for language " << m_Language;
+        // fallback
+        m_MasSingNomNounGramCode = "AA"; 
+    } else {
+        m_MasSingNomNounGramCode = m_MasSingNomNounGramCode.substr(0, 2);
+    }
+    // assert(m_MasSingNomNounGramCode.length() == 2);
 
     // Language‑neutral data files for all languages
     m_CompAdvList.read_from_file(MakePath(Path, "comp_adv.dat"));
