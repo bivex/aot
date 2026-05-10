@@ -55,13 +55,12 @@ function getPosFromGram(g) {
 
 function getPosColor(p) { return POS_COLORS[p] || POS_COLORS.UNKNOWN; }
 
-var mainCanvas, longCanvas, ctx, ctxMain;
+var mainCanvas, ctxMain;
+var ROW_HEIGHT = 200;
 
 function initCanvas() {
     mainCanvas = document.getElementById("synanCanvas");
     if (!mainCanvas) return;
-    longCanvas = document.createElement('canvas');
-    ctx = longCanvas.getContext("2d");
     ctxMain = mainCanvas.getContext("2d");
 }
 
@@ -128,40 +127,42 @@ class WordArc {
             var lp = Clause.WordPanels[this.firstWord];
             var rp = Clause.WordPanels[this.lastWord];
             if (!lp || !rp) return;
+            if (lp._row !== rp._row) return;
 
+            var yBase = lp._row * ROW_HEIGHT;
             var x1 = lp.centerX;
             var x2 = rp.centerX;
-            var y  = WORD_Y + POS_BELOW_UKR + SMALL_FONT + BRACKET_BASE + this.depth * BRACKET_ROW;
+            var y  = yBase + WORD_Y + POS_BELOW_UKR + SMALL_FONT + BRACKET_BASE + this.depth * BRACKET_ROW;
 
             var color = this.groupArc ? GROUP_COLOR : LINK_COLOR;
-            ctx.strokeStyle = color;
-            ctx.lineWidth   = this.groupArc ? 2.5 : 1.5;
+            ctxMain.strokeStyle = color;
+            ctxMain.lineWidth   = this.groupArc ? 2.5 : 1.5;
 
-            if (!this.groupArc) ctx.setLineDash([4,3]);
+            if (!this.groupArc) ctxMain.setLineDash([4,3]);
 
-            ctx.beginPath();
-            ctx.moveTo(x1, y);
-            ctx.lineTo(x2, y);
-            ctx.stroke();
+            ctxMain.beginPath();
+            ctxMain.moveTo(x1, y);
+            ctxMain.lineTo(x2, y);
+            ctxMain.stroke();
 
-            ctx.beginPath(); ctx.moveTo(x1, y); ctx.lineTo(x1, y - TICK); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(x2, y); ctx.lineTo(x2, y - TICK); ctx.stroke();
-            ctx.setLineDash([]);
+            ctxMain.beginPath(); ctxMain.moveTo(x1, y); ctxMain.lineTo(x1, y - TICK); ctxMain.stroke();
+            ctxMain.beginPath(); ctxMain.moveTo(x2, y); ctxMain.lineTo(x2, y - TICK); ctxMain.stroke();
+            ctxMain.setLineDash([]);
 
             if (this.strName) {
-                ctx.font = 'bold ' + SMALL_FONT + 'px ' + FONT;
-                var tw = ctx.measureText(this.strName).width;
+                ctxMain.font = 'bold ' + SMALL_FONT + 'px ' + FONT;
+                var tw = ctxMain.measureText(this.strName).width;
                 var mid = (x1 + x2) / 2;
                 var lx = mid - tw/2;
                 var ly = y + SMALL_FONT * 0.35;
 
-                ctx.fillStyle = '#fff';
-                ctx.fillRect(lx-4, ly-SMALL_FONT, tw+8, SMALL_FONT+4);
-                ctx.strokeStyle = color;
-                ctx.strokeRect(lx-4, ly-SMALL_FONT, tw+8, SMALL_FONT+4);
+                ctxMain.fillStyle = '#fff';
+                ctxMain.fillRect(lx-4, ly-SMALL_FONT, tw+8, SMALL_FONT+4);
+                ctxMain.strokeStyle = color;
+                ctxMain.strokeRect(lx-4, ly-SMALL_FONT, tw+8, SMALL_FONT+4);
 
-                ctx.fillStyle = color;
-                ctx.fillText(this.strName, lx, ly);
+                ctxMain.fillStyle = color;
+                ctxMain.fillText(this.strName, lx, ly);
             }
         };
     }
@@ -230,30 +231,19 @@ protoClause.drawWordPanels = function() {
         var pos = getPosFromGram(panel.homonyms[panel.activeHomonym].strCurrentGram);
         var col = getPosColor(pos);
 
-        // Bold for nouns/verbs in legal view
         var isCore = (pos === 'NOUN' || pos === 'VERB' || pos === 'VBE');
-        ctx.font = (isCore ? 'bold ' : '') + FONT_SIZE + 'px ' + FONT;
-        panel.width = ctx.measureText(panel.word).width;
+        var yBase = panel._row * ROW_HEIGHT;
 
-        var prevLineNo = Math.floor(cursor / ctxMain.canvas.width);
-        var lineNo     = Math.floor((panel.width + cursor) / ctxMain.canvas.width);
-        if (lineNo > prevLineNo) cursor = ctxMain.canvas.width * lineNo + LEFT_SPACE;
-
-        panel.x = cursor;
-        panel.y = WORD_Y;
-        panel.centerX = cursor + panel.width / 2;
-
-        ctx.fillStyle = col;
-        ctx.fillText(panel.word, panel.x, panel.y);
+        ctxMain.font = (isCore ? 'bold ' : '') + FONT_SIZE + 'px ' + FONT;
+        ctxMain.fillStyle = col;
+        ctxMain.fillText(panel.word, panel.x, yBase + WORD_Y);
 
         var label = pos === 'NOUN' ? 'іменник' : pos === 'VERB' ? 'дія' : pos === 'VBE' ? 'зв\'язка' : '';
         if (label) {
-            ctx.font = 'bold 9px ' + FONT;
-            ctx.fillStyle = col + 'aa';
-            ctx.fillText(label, panel.x + (panel.width - ctx.measureText(label).width)/2, panel.y + 14);
+            ctxMain.font = 'bold 9px ' + FONT;
+            ctxMain.fillStyle = col + 'aa';
+            ctxMain.fillText(label, panel.x + (panel.width - ctxMain.measureText(label).width)/2, yBase + WORD_Y + 14);
         }
-
-        cursor += panel.width + SPACE_SIZE;
     }
 };
 
@@ -265,34 +255,36 @@ protoClause.drawSubjPredic = function() {
         var p1 = this.WordPanels[arc.firstWord];
         var p2 = this.WordPanels[arc.lastWord];
         if (!p1 || !p2) continue;
+        if (p1._row !== p2._row) continue;
 
-        var yPos = WORD_Y + POS_BELOW_UKR + 15;
-        ctx.strokeStyle = SUBJ_COLOR;
-        ctx.lineWidth = 4;
-        ctx.lineCap = 'round';
-        ctx.beginPath();
-        ctx.moveTo(p1.centerX, yPos);
-        ctx.bezierCurveTo(p1.centerX, yPos + 60, p2.centerX, yPos + 60, p2.centerX, yPos);
-        ctx.stroke();
+        var yBase = p1._row * ROW_HEIGHT;
+        var yPos = yBase + WORD_Y + POS_BELOW_UKR + 15;
+        ctxMain.strokeStyle = SUBJ_COLOR;
+        ctxMain.lineWidth = 4;
+        ctxMain.lineCap = 'round';
+        ctxMain.beginPath();
+        ctxMain.moveTo(p1.centerX, yPos);
+        ctxMain.bezierCurveTo(p1.centerX, yPos + 60, p2.centerX, yPos + 60, p2.centerX, yPos);
+        ctxMain.stroke();
 
-        ctx.fillStyle = SUBJ_COLOR;
-        ctx.beginPath();
-        ctx.arc(p2.centerX, yPos, 4, 0, Math.PI*2);
-        ctx.fill();
+        ctxMain.fillStyle = SUBJ_COLOR;
+        ctxMain.beginPath();
+        ctxMain.arc(p2.centerX, yPos, 4, 0, Math.PI*2);
+        ctxMain.fill();
 
-        ctx.font = 'bold 11px ' + FONT;
+        ctxMain.font = 'bold 11px ' + FONT;
         var sTxt = "СУБ'ЄКТ (Party)", pTxt = "ПРЕДИКАТ (Action)";
-        var sw = ctx.measureText(sTxt).width, pw = ctx.measureText(pTxt).width;
+        var sw = ctxMain.measureText(sTxt).width, pw = ctxMain.measureText(pTxt).width;
 
-        ctx.fillStyle = 'rgba(5, 150, 105, 0.1)';
-        ctx.fillRect(p1.centerX - sw/2 - 5, yPos + 25, sw + 10, 18);
-        ctx.fillStyle = SUBJ_COLOR;
-        ctx.fillText(sTxt, p1.centerX - sw/2, yPos + 38);
+        ctxMain.fillStyle = 'rgba(5, 150, 105, 0.1)';
+        ctxMain.fillRect(p1.centerX - sw/2 - 5, yPos + 25, sw + 10, 18);
+        ctxMain.fillStyle = SUBJ_COLOR;
+        ctxMain.fillText(sTxt, p1.centerX - sw/2, yPos + 38);
 
-        ctx.fillStyle = 'rgba(217, 119, 6, 0.1)';
-        ctx.fillRect(p2.centerX - pw/2 - 5, yPos + 25, pw + 10, 18);
-        ctx.fillStyle = PREDIC_COLOR;
-        ctx.fillText(pTxt, p2.centerX - pw/2, yPos + 38);
+        ctxMain.fillStyle = 'rgba(217, 119, 6, 0.1)';
+        ctxMain.fillRect(p2.centerX - pw/2 - 5, yPos + 25, pw + 10, 18);
+        ctxMain.fillStyle = PREDIC_COLOR;
+        ctxMain.fillText(pTxt, p2.centerX - pw/2, yPos + 38);
     }
 };
 
@@ -306,47 +298,45 @@ function parseSynanJson(json) {
     json.forEach(s => s.forEach(c => TopClauses.push(new TopClause(c))));
 }
 
-function calcWordsLength() {
-    var length = LEFT_SPACE;
-    for (var i in TopClauses) {
-        var Clause = TopClauses[i];
-        for (var j in Clause.WordPanels) {
-            var panel = Clause.WordPanels[j];
-            var pos = getPosFromGram(panel.homonyms[panel.activeHomonym].strCurrentGram);
-            var isCore = (pos === 'NOUN' || pos === 'VERB' || pos === 'VBE');
-            ctx.font = (isCore ? 'bold ' : '') + FONT_SIZE + 'px ' + FONT;
-            var prevLineNo = Math.floor(length / ctxMain.canvas.width);
-            var lineNo     = Math.floor((ctx.measureText(panel.word).width + length) / ctxMain.canvas.width);
-            if (lineNo > prevLineNo)
-                length = ctxMain.canvas.width * lineNo + LEFT_SPACE;
-            length += ctx.measureText(panel.word).width + SPACE_SIZE;
-        }
-    }
-    return length;
-}
-
 function drawAll() {
     var wrapper = document.getElementById('canvasWrapper');
     if (!wrapper) return;
-    ctxMain.canvas.width = wrapper.clientWidth - 40;
-    
-    var canvasH = 450, canvasW = calcWordsLength(); 
-    ctx.canvas.height = canvasH; ctx.canvas.width  = canvasW;
-    ctx.clearRect(0, 0, canvasW, canvasH);
-    cursor = LEFT_SPACE;
+    var viewW = wrapper.clientWidth - 40;
+    if (viewW < 100) viewW = 100;
+    ctxMain.canvas.width = viewW;
 
+    // Pass 1: layout — assign x, _row to every panel
+    var x = LEFT_SPACE;
+    var curRow = 0;
+    for (var ci = 0; ci < TopClauses.length; ci++) {
+        var clause = TopClauses[ci];
+        for (var wi = 0; wi < clause.WordPanels.length; wi++) {
+            var panel = clause.WordPanels[wi];
+            var pos = getPosFromGram(panel.homonyms[panel.activeHomonym].strCurrentGram);
+            var isCore = (pos === 'NOUN' || pos === 'VERB' || pos === 'VBE');
+            ctxMain.font = (isCore ? 'bold ' : '') + FONT_SIZE + 'px ' + FONT;
+            panel.width = ctxMain.measureText(panel.word).width;
+
+            if (x + panel.width > viewW && x > LEFT_SPACE) {
+                curRow++;
+                x = LEFT_SPACE;
+            }
+            panel.x = x;
+            panel.centerX = x + panel.width / 2;
+            panel._row = curRow;
+            x += panel.width + SPACE_SIZE;
+        }
+    }
+
+    ctxMain.canvas.height = (curRow + 1) * ROW_HEIGHT;
+    ctxMain.clearRect(0, 0, viewW, ctxMain.canvas.height);
+
+    // Pass 2: draw
     TopClauses.forEach(c => {
         c.drawWordPanels();
         c.drawArcs();
         c.drawSubjPredic();
     });
-
-    var linesNo = Math.ceil(canvasW / ctxMain.canvas.width);
-    ctxMain.canvas.height = linesNo * 220;
-    ctxMain.clearRect(0, 0, ctxMain.canvas.width, ctxMain.canvas.height);
-    for (var i = 0; i < linesNo; i++) {
-        ctxMain.drawImage(ctx.canvas, ctxMain.canvas.width*i, 0, ctxMain.canvas.width, 220, 0, 220*i, ctxMain.canvas.width, 220);
-    }
 }
 
 function syntax_request() {
