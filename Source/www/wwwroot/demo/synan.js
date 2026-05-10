@@ -41,16 +41,23 @@ function getPosFromGram(g) {
     // Split by space, comma or semicolon, take first part, trim and convert to upper
     var p = (g.split(/[\s;,]/)[0] || 'UNKNOWN').trim().replace(/[\u0000-\u001F\u007F-\u009F]/g, "").toUpperCase();
     var map = {
-        // Cyrillic (Russian/Ukrainian internal)
-        'С': 'NOUN', 'П': 'ADJECTIVE', 'Г': 'VERB', 'Н': 'ADVERB',
-        'МС': 'PRON', 'МС-П': 'PRON', 'МС-ПРЕДК': 'PRON',
-        'ПРЕДЛ': 'PREP', 'СОЮЗ': 'CONJ', 'СОЧ_СОЮЗ': 'CONJ', 'ПОД_СОЮЗ': 'CONJ',
-        'ЧАСТ': 'PART', 'МЕЖД': 'INT', 'ЧИСЛ': 'NUMERAL',
+        // Cyrillic (Russian internal)
+        'С': 'NOUN', 'СУЩ': 'NOUN', 'СУЩЕСТВИТЕЛЬНОЕ': 'NOUN',
+        'П': 'ADJECTIVE', 'ПРИЛ': 'ADJECTIVE', 'ПРИЛАГАТЕЛЬНОЕ': 'ADJECTIVE',
+        'Г': 'VERB', 'ГЛ': 'VERB', 'ГЛАГОЛ': 'VERB',
+        'Н': 'ADVERB', 'НАРЕЧ': 'ADVERB', 'НАРЕЧИЕ': 'ADVERB',
+        'МС': 'PRON', 'МЕСТ': 'PRON', 'МЕСТОИМЕНИЕ': 'PRON',
+        'МС-П': 'PRON', 'МС-ПРЕДК': 'PRON',
+        'ПРЕДЛ': 'PREP', 'ПРЕДЛОГ': 'PREP',
+        'СОЮЗ': 'CONJ', 'СОЧ_СОЮЗ': 'CONJ', 'ПОД_СОЮЗ': 'CONJ',
+        'ЧАСТ': 'PART', 'ЧАСТИЦА': 'PART',
+        'МЕЖД': 'INT', 'МЕЖДОМЕТИЕ': 'INT',
+        'ЧИСЛ': 'NUMERAL', 'ЧИСЛИТЕЛЬНОЕ': 'NUMERAL',
         'ПРИЧАСТИЕ': 'ADJECTIVE', 'ДЕЕПРИЧАСТИЕ': 'ADVERB',
         'КР_ПРИЛ': 'ADJECTIVE', 'КР_ПРИЧАСТИЕ': 'VERB', 'ИНФИНИТИВ': 'VERB',
         'ПРЕДК': 'ADVERB', 'ПОСЛ': 'PREP', 'Н_ПРЕДЛ': 'PREP',
         'ВВОДН': 'ADVERB', 'ФРАЗ': 'UNKNOWN',
-        // Latin equivalents (from Ukr/Eng or if Cyrillic Es was replaced by Latin C)
+        // Latin equivalents (from Ukr/Eng or if Cyrillic was transcribed)
         'N': 'NOUN', 'A': 'ADJECTIVE', 'V': 'VERB', 'ADV': 'ADVERB',
         'PRON': 'PRON', 'PA': 'PRON', 'P_PRED': 'PRON',
         'PREP': 'PREP', 'POSL': 'PREP', 'CONJ': 'CONJ', 'PARTICLE': 'PART',
@@ -60,13 +67,30 @@ function getPosFromGram(g) {
         'INFINITIVE': 'VERB', 'PRED': 'ADVERB', 'INP': 'ADVERB',
         'COLLOC': 'UNKNOWN', 'VBE': 'VBE', 'MOD': 'MOD', 'ARTICLE': 'ARTICLE',
         'PN': 'PN', 'PN_ADJ': 'PN_ADJ', 'ORDNUM': 'ORDNUM', 'NUMERAL': 'NUMERAL',
-        'PRON': 'PRON', 'POSS': 'POSS', 'PART': 'PART',
-        // Common Latin Es/Es confusion
-        'C': 'NOUN', 'P': 'ADJECTIVE', 'H': 'ADVERB', 
+        'POSS': 'POSS', 'PART': 'PART',
+        // Latin-Cyrillic lookalikes
+        'C': 'NOUN', 'P': 'ADJECTIVE', 'H': 'ADVERB', 'T': 'VERB',
         // PUNC
         'PUNC': 'UNKNOWN', 'PUNCT': 'UNKNOWN', 'SENT': 'UNKNOWN'
     };
-    return map[p] || p;
+    var result = map[p] || p;
+    
+    // Final fallback: search for Cyrillic keywords anywhere in the string if result is still unknown
+    if (result === 'UNKNOWN' || result === p) {
+        var gUpper = g.toUpperCase();
+        if (gUpper.indexOf('С ') === 0 || gUpper.indexOf(' С ') !== -1 || gUpper.indexOf('СУЩ') !== -1) return 'NOUN';
+        if (gUpper.indexOf('П ') === 0 || gUpper.indexOf(' П ') !== -1 || gUpper.indexOf('ПРИЛ') !== -1) return 'ADJECTIVE';
+        if (gUpper.indexOf('Г ') === 0 || gUpper.indexOf(' Г ') !== -1 || gUpper.indexOf('ГЛАГ') !== -1) return 'VERB';
+        if (gUpper.indexOf('Н ') === 0 || gUpper.indexOf(' Н ') !== -1 || gUpper.indexOf('НАРЕЧ') !== -1) return 'ADVERB';
+        if (gUpper.indexOf('МС') !== -1 || gUpper.indexOf('МЕСТ') !== -1) return 'PRON';
+        if (gUpper.indexOf('ПРЕДЛ') !== -1) return 'PREP';
+        if (gUpper.indexOf('СОЮЗ') !== -1) return 'CONJ';
+        if (gUpper.indexOf('ЧАСТ') !== -1) return 'PART';
+        if (gUpper.indexOf('МЕЖД') !== -1) return 'INT';
+        if (gUpper.indexOf('ЧИСЛ') !== -1) return 'NUMERAL';
+    }
+
+    return result;
 }
 
 function getPosColor(p)    { return POS_COLORS[p] || POS_COLORS.UNKNOWN; }
