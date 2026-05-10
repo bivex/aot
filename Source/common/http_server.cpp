@@ -195,7 +195,7 @@ void TRMLHttpServer::OnHttpRequest(evhttp_request *req) {
 		};
 		TDaemonParsedRequest parsedRequest{ req, uri, headers, action, langua, inputQuery};
 		auto result = OnParsedRequest(parsedRequest);
-		evbuffer_add_printf(outBuf, "%s", result.c_str());
+		evbuffer_add(outBuf, result.c_str(), result.length());
 		SendReply(req, HTTP_OK, nullptr);
 	}
 	catch (std::exception& e) {

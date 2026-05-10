@@ -283,9 +283,6 @@ void JVisualSynAnParamBuilder::BuildJson(const CSentence& piSent, CJsonObject& o
 }
 
 std::string BuildJson(CSyntaxHolder* pSyntaxHolder, const std::string& query) {
-	if (!pSyntaxHolder->GetSentencesFromSynAn(query, false)) {
-		throw CExpc("Synan has crushed\n");
-	};
 	JVisualSynAnParamBuilder builder(pSyntaxHolder);
     rapidjson::Document d;
     CJsonObject sents(d, rapidjson::kArrayType);

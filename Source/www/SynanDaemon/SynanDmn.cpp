@@ -61,6 +61,9 @@ std::string TSynanHttpServer::ProcessSyntax(TDaemonParsedRequest &request) {
     if (request.Langua == morphEnglish) {
         MakeUpperUtf8(query);
     }
+    if (!P->GetSentencesFromSynAn(query, false)) {
+        throw CExpc("Synan has crushed\n");
+    }
     return BuildJson(P, query);
 };
 
