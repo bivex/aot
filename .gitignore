@@ -108,3 +108,4 @@ SemanDaemon.lck
 input.lem
 /build_fast
 wwwroot_server.lck
+/.hypothesis
