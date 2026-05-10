@@ -38,8 +38,10 @@ var POS_COLORS = {
 
 function getPosFromGram(g) { 
     if (!g) return 'UNKNOWN';
-    var p = (g.split(/[\s;,]/)[0] || 'UNKNOWN').toUpperCase();
+    // Split by space, comma or semicolon, take first part, trim and convert to upper
+    var p = (g.split(/[\s;,]/)[0] || 'UNKNOWN').trim().replace(/[\u0000-\u001F\u007F-\u009F]/g, "").toUpperCase();
     var map = {
+        // Cyrillic (Russian/Ukrainian internal)
         'С': 'NOUN', 'П': 'ADJECTIVE', 'Г': 'VERB', 'Н': 'ADVERB',
         'МС': 'PRON', 'МС-П': 'PRON', 'МС-ПРЕДК': 'PRON',
         'ПРЕДЛ': 'PREP', 'СОЮЗ': 'CONJ', 'СОЧ_СОЮЗ': 'CONJ', 'ПОД_СОЮЗ': 'CONJ',
@@ -47,7 +49,8 @@ function getPosFromGram(g) {
         'ПРИЧАСТИЕ': 'ADJECTIVE', 'ДЕЕПРИЧАСТИЕ': 'ADVERB',
         'КР_ПРИЛ': 'ADJECTIVE', 'КР_ПРИЧАСТИЕ': 'VERB', 'ИНФИНИТИВ': 'VERB',
         'ПРЕДК': 'ADVERB', 'ПОСЛ': 'PREP', 'Н_ПРЕДЛ': 'PREP',
-        // Ukrainian/Latin mappings
+        'ВВОДН': 'ADVERB', 'ФРАЗ': 'UNKNOWN',
+        // Latin equivalents (from Ukr/Eng or if Cyrillic Es was replaced by Latin C)
         'N': 'NOUN', 'A': 'ADJECTIVE', 'V': 'VERB', 'ADV': 'ADVERB',
         'PRON': 'PRON', 'PA': 'PRON', 'P_PRED': 'PRON',
         'PREP': 'PREP', 'POSL': 'PREP', 'CONJ': 'CONJ', 'PARTICLE': 'PART',
@@ -55,7 +58,12 @@ function getPosFromGram(g) {
         'ADJ_SHORT': 'ADJECTIVE', 'PARTICIPLE': 'ADJECTIVE',
         'ADV_PARTICIPLE': 'ADVERB', 'PARTICIPLE_SHORT': 'VERB',
         'INFINITIVE': 'VERB', 'PRED': 'ADVERB', 'INP': 'ADVERB',
-        'COLLOC': 'UNKNOWN', 'VBE': 'VBE',
+        'COLLOC': 'UNKNOWN', 'VBE': 'VBE', 'MOD': 'MOD', 'ARTICLE': 'ARTICLE',
+        'PN': 'PN', 'PN_ADJ': 'PN_ADJ', 'ORDNUM': 'ORDNUM', 'NUMERAL': 'NUMERAL',
+        'PRON': 'PRON', 'POSS': 'POSS', 'PART': 'PART',
+        // Common Latin Es/Es confusion
+        'C': 'NOUN', 'P': 'ADJECTIVE', 'H': 'ADVERB', 
+        // PUNC
         'PUNC': 'UNKNOWN', 'PUNCT': 'UNKNOWN', 'SENT': 'UNKNOWN'
     };
     return map[p] || p;
