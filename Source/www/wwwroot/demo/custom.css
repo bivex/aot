@@ -56,11 +56,22 @@ body {
     border-bottom: 2px solid var(--accent-color);
 }
 
+.ui.menu.aot-nav .logo.item {
+    font-size: 1.2rem !important;
+    color: var(--primary-color) !important;
+    padding-left: 0 !important;
+    text-transform: none !important;
+}
+
+.ui.menu.aot-nav .logo.item b {
+    color: var(--accent-color);
+}
+
 /* Professional Hero Section */
 .ui.hero.header {
     background: linear-gradient(135deg, var(--card-bg) 0%, #fafbfc 100%) !important;
     border-bottom: 1px solid var(--border-color);
-    padding: 4rem 0 3rem 0 !important;
+    padding: 6rem 0 4rem 0 !important;
     margin-bottom: 3rem !important;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
@@ -137,6 +148,44 @@ body {
     border-color: var(--accent-color) !important;
 }
 
+/* Footer Styles */
+.ui.footer.segment.aot-footer {
+    background-color: var(--primary-color) !important;
+    color: #ecf0f1 !important;
+    padding: 4rem 0 !important;
+    margin-top: 5rem !important;
+    border: none !important;
+    border-radius: 0 !important;
+}
+
+.ui.footer.segment.aot-footer .header {
+    color: #fff !important;
+    margin-bottom: 1rem !important;
+}
+
+.ui.footer.segment.aot-footer a {
+    color: #bdc3c7 !important;
+    transition: color 0.2s ease;
+    text-decoration: none;
+}
+
+.ui.footer.segment.aot-footer a:hover {
+    color: var(--accent-color) !important;
+}
+
+.ui.footer.segment.aot-footer .list .item {
+    padding: 0.3rem 0 !important;
+    color: #bdc3c7 !important;
+}
+
+.ui.footer.segment.aot-footer .copyright {
+    margin-top: 3rem !important;
+    padding-top: 2rem !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.9rem;
+    color: #7f8c8d;
+}
+
 /* Status Labels */
 .ui.label.status-success {
     background-color: var(--success-color) !important;
@@ -157,7 +206,7 @@ body {
     }
 
     .ui.hero.header {
-        padding: 2.5rem 0 2rem 0 !important;
+        padding: 4rem 0 3rem 0 !important;
     }
 }
 

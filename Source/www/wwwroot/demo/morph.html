@@ -1,127 +1,152 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
+<!DOCTYPE html>
+<html lang="ru">
 <head>
-    <meta charset="utf-8">
-    <title>АОТ :: Онлайн демо :: Морфология</title>
-    <link href="../aot.css" rel="stylesheet" type="text/css">
+	<title>АОТ :: Онлайн демо :: Морфология</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="Демонстрация морфологического анализа текста в системе АОТ (Автоматическая Обработка Текста)">
+	
+	<!-- Fomantic UI CSS -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fomantic-ui@2.9.3/dist/semantic.min.css">
+	
+	<!-- AOT custom styles -->
+	<link rel="stylesheet" href="../aot.css">
+	<link rel="stylesheet" href="custom.css">
 </head>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script type="module" src="morph.js"> </script>
+<body>
+	<!-- Fixed navigation -->
+	<nav class="ui fixed menu aot-nav" role="navigation">
+		<div class="ui container">
+			<a href="/index.html" class="logo item"><b>AOT</b>.ru</a>
+			<a href="/index.html" class="item">Главная</a>
+			<a href="/history.html" class="item">О нас</a>
+			<a href="/product.html" class="item">Продукты</a>
+			<a href="/download.php" class="item">Скачать</a>
+			<a href="/onlinedemo.html" class="item active">Демо</a>
+			<a href="/technology.html" class="item">Технологии</a>
+			<div class="right menu">
+				<a href="#top" class="item">↑</a>
+			</div>
+		</div>
+	</nav>
+	
+	<!-- Hero header -->
+	<header class="ui hero header" id="top">
+		<div class="ui container">
+			<h1>Морфология</h1>
+			<p class="subtitle">Морфологический анализ и генерация парадигм для русского, английского и немецкого языков.</p>
+		</div>
+	</header>
+	
+	<!-- Main content -->
+	<main class="ui main container" style="padding-top: 3rem;">
+		
+		<div class="ui stackable grid">
+			<div class="sixteen wide column">
+				<section class="ui card aot-card" style="width: 100%;">
+					<div class="content">
+						<h2 class="header">Морфологический анализ</h2>
+						
+						<form class="ui form" id="morph-form">
+							<div class="field">
+								<label for="SearchText">Введите слово:</label>
+								<div class="ui input">
+									<input type="text" id="SearchText" placeholder="Например: мама, walked, laufen...">
+								</div>
+							</div>
+							
+							<div class="inline fields">
+								<label>Выберите язык:</label>
+								<div class="field">
+									<div class="ui radio checkbox">
+										<input type="radio" name="langua" value="Russian" checked>
+										<label>Russian</label>
+									</div>
+								</div>
+								<div class="field">
+									<div class="ui radio checkbox">
+										<input type="radio" name="langua" value="English">
+										<label>English</label>
+									</div>
+								</div>
+								<div class="field">
+									<div class="ui radio checkbox">
+										<input type="radio" name="langua" value="German">
+										<label>German</label>
+									</div>
+								</div>
+							</div>
+							
+							<div class="field">
+								<div class="ui checkbox">
+									<input type="checkbox" id="WithParadigms">
+									<label for="WithParadigms">Показать всю парадигму (все словоформы)</label>
+								</div>
+							</div>
+							
+							<div class="field">
+								<button type="button" class="ui primary button aot-primary" onclick="window.morph_request()">
+									Submit Request
+								</button>
+							</div>
+						</form>
+					</div>
+					
+					<div class="content" id="morphholder" style="min-height: 100px;">
+						<!-- Results will appear here -->
+					</div>
+				</section>
+			</div>
 
-<body bgcolor="#F3F3F3" text="#000000" link="#000000" vlink="#999999" alink="#000000">
-<a name="top"></a>
-<table border="0" align="center" cellpadding="1" cellspacing="0">
-  <tr>
-    <td bgcolor="#666666"><table width="760" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
-        <tr>
-          <td><table border="0" cellspacing="0" cellpadding="5">
-              <tr>
-                <td width="30">&nbsp;</td>
-                <td><font size="+7" face="Arial, Helvetica, sans-serif"><b>АОТ</b></font></td>
-                <td width="40">&nbsp;</td>
-                <td valign="baseline"><font size="+1" face="Arial, Helvetica, sans-serif"> Автоматическая  Обработка  Текста</font></td>
-              </tr>
-            </table>
-            <table width="720" border="0" align="center" cellpadding="0" cellspacing="0" bgcolor="#000000">
-              <tr>
-                <td height="4"><img src="../images/transparent.gif" width="1" height="4"></td>
-              </tr>
-            </table>
-            <table width="760" border="0" cellpadding="0" cellspacing="0">
-              <tr>
-                <td valign="top"><table border="0" cellspacing="0" cellpadding="20">
-                    <tr>
-                      <td>
-                        <p align="center"><font size="-1" face="Arial, Helvetica, sans-serif"><a href="/index.html">главная</a> <a href="/history.html">о&nbsp;нас</a> <a href="/product.html">продукты</a> <a href="/download.php">скачать</a> <a href="/onlinedemo.html">&nbsp;<b>демо</b></a> <a href="/technology.html">технологии</a>  &nbsp; <a href="#top" title="наверх">^</a></font></p>
-                        <table width="720" border="0" cellpadding="3" cellspacing="0" bgcolor="#CCCCCC">
-                          <tr>
-                            <td class="titleblack">Dialing Morphology</td>
-                          </tr>
-                        </table>
-                        <table width="720" border="0" align="center" cellpadding="0" cellspacing="0">
-                          <tr>
-                            <td height="7"><img src="../images/transparent.gif" width="1" height="7"></td>
-                          </tr>
-                          <tr>
-                            <td height="2" bgcolor="#000000"><img src="../images/transparent.gif" width="1" height="2"></td>
-                          </tr>
-                          <tr>
-                            <td height="7"><img src="../images/transparent.gif" width="1" height="7"></td>
-                          </tr>
-                        </table>
-                        <p>&nbsp;</p>
-                        <table border="0" align="center" cellpadding="5" cellspacing="0">
-
-                            <tr><td class="text">Input Your text:</td></tr>
-                            <tr>
-                               <td>
-                               <input type="text" id="SearchText"  value="" size="">
-                               </td>
-                            </tr>
-                            <tr>
-                              <td class="text"><input type="radio" name="langua" value=English >
-                                 English 
-                                <input type="radio" name="langua" value=Russian CHECKED  >
-                                 Russian  
-                                <input type="radio" name="langua" value=German >
-                                 German</td>
-                            </tr>
-                            <tr>
-                              <td class="text"><input name="WithParadigms" id=WithParadigms type="checkbox">
-                                 With paradigms
-                                <input type="hidden" name="search_type" value="morphology">
-                              </td>
-                            </tr>
-                            <tr>
-                              <td align="center" >
-                                     <input type="button" onclick="window.morph_request()" value="Submit Request"/>
-                              </td>
-                            </tr>
-						  <tr> <td> &nbsp; </td> </tr>
-                          <tr> <td> 
-                            <div id="morphholder">
-                            </div>
-                          </td>
-                          </tr>
-
-						  <tr>
-							<td>
-							<a href="/docs/rusmorph.html" > Дескрипторы русской морфологии</a> <br>
-							<a href="/docs/engmorph.html" > Дескрипторы английской морфологии</a>
-							</td>
-						  </tr>
-                        </table>
-
-                        <p>&nbsp;</p>
-                       </td>
-                    </tr>
-		          </table></td>
-              </tr>
-              <tr>
-                <td valign="bottom"><table width="750" border="0" cellspacing="0" cellpadding="0">
-                    <tr>
-                      <td>&nbsp;</td>
-                      <td align="right"><table border="0" cellspacing="5" cellpadding="0">
-                          <tr> 
-                            <td align="right"><font color="#999999" size="1">Разработка 
-                              <a href="mailto:simple@mosk.ru"><font color="#999999">DiP</font></a>.<br>
-                              &copy; 2003 <a href="http://www.aot.ru/"><font color="#999999">АОТ</font></a>. 
-                              Все права защищены.</font></td>
-                          </tr>
-                        </table></td>
-                    </tr>
-                  </table></td>
-              </tr>
-            </table></td>
-        </tr>
-      </table></td>
-    <td bgcolor="#CCCCCC"><img src="../images/transparent.gif" width="1" height="1"></td>
-  </tr>
-  <tr>
-    <td bgcolor="#CCCCCC"><img src="../images/transparent.gif" width="1" height="1"></td>
-    <td bgcolor="#CCCCCC"><img src="../images/transparent.gif" width="1" height="1"></td>
-  </tr>
-</table>
+			<div class="sixteen wide column">
+				<section class="ui info segment">
+					<h3 class="ui header">Справочная информация</h3>
+					<div class="ui bulleted list">
+						<a href="/docs/rusmorph.html" class="item">Дескрипторы русской морфологии</a>
+						<a href="/docs/engmorph.html" class="item">Дескрипторы английской морфологии</a>
+					</div>
+				</section>
+			</div>
+		</div>
+		
+	</main>
+	
+	<!-- Footer -->
+	<footer class="ui footer segment aot-footer">
+		<div class="ui container">
+			<div class="ui stackable grid">
+				<div class="three wide column">
+					<h4 class="ui header">Проект</h4>
+					<div class="ui link list">
+						<a href="/index.html" class="item">Главная</a>
+						<a href="/history.html" class="item">История</a>
+						<a href="/download.php" class="item">Скачать</a>
+					</div>
+				</div>
+				<div class="three wide column">
+					<h4 class="ui header">Контакты</h4>
+					<div class="ui link list">
+						<a href="mailto:simple@mosk.ru" class="item">simple@mosk.ru</a>
+						<a href="http://www.aot.ru/" class="item">AOT.ru</a>
+					</div>
+				</div>
+				<div class="ten wide right aligned column">
+					<h4 class="ui header">АОТ: Система анализа текста</h4>
+					<p>&copy; 2003-2026 Проект АОТ. Все права защищены.</p>
+				</div>
+			</div>
+		</div>
+	</footer>
+	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/fomantic-ui@2.9.3/dist/semantic.min.js"></script>
+	<script type="module" src="morph.js"></script>
+	<script>
+		$(document).ready(function() {
+			$('.ui.radio.checkbox').checkbox();
+			$('.ui.checkbox').checkbox();
+		});
+	</script>
 </body>
 </html>

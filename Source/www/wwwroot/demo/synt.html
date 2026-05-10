@@ -22,6 +22,9 @@
 	<!-- Fixed navigation -->
 	<nav class="ui fixed menu aot-nav" role="navigation" aria-label="Основное меню">
 		<div class="ui container">
+			<a href="/index.html" class="logo item">
+				<b>AOT</b>.ru
+			</a>
 			<a href="/index.html" class="item">Главная</a>
 			<a href="/history.html" class="item">О нас</a>
 			<a href="/product.html" class="item">Продукты</a>
@@ -37,74 +40,112 @@
 	<!-- Hero header -->
 	<header class="ui hero header" id="top" role="banner">
 		<div class="ui container">
-			<h1>АОТ</h1>
-			<p class="subtitle">Автоматическая Обработка Текста</p>
+			<h1>Синтаксис</h1>
+			<p class="subtitle">Автоматический анализ структуры предложения для русского, английского и немецкого языков.</p>
 		</div>
 	</header>
 	
 	<!-- Main content -->
-	<main id="main-content" class="ui main container" role="main">
+	<main id="main-content" class="ui main container" role="main" style="padding-top: 3rem;">
 		
-		<!-- Demo card -->
-		<section class="ui demo card aot-card" aria-labelledby="demo-title">
-			<h2 id="demo-title" class="header">Синтаксический анализ</h2>
-			
-			<form class="ui form" id="syntax-form" autocomplete="off">
-				<div class="field">
-					<label for="InputText">Ввод текста:</label>
-					<div class="ui demo textarea">
-						<textarea 
-							id="InputText" 
-							name="InputText" 
-							placeholder="Введите текст для анализа синтаксиса..."
-							aria-label="Текст для синтаксического анализа"
-							rows="6"
-						></textarea>
+		<div class="ui stackable grid">
+			<div class="sixteen wide column">
+				<!-- Demo card -->
+				<section class="ui demo card aot-card" aria-labelledby="demo-title" style="width: 100%;">
+					<div class="content">
+						<h2 id="demo-title" class="header">Синтаксический анализ</h2>
+						
+						<form class="ui form" id="syntax-form" autocomplete="off">
+							<div class="field">
+								<label for="InputText">Ввод текста:</label>
+								<div class="ui demo textarea">
+									<textarea 
+										id="InputText" 
+										name="InputText" 
+										placeholder="Введите текст для анализа синтаксиса..."
+										aria-label="Текст для синтаксического анализа"
+										rows="6"
+									></textarea>
+								</div>
+							</div>
+							
+							<div class="field">
+								<label for="Language">Язык / Language:</label>
+								<select id="Language" name="Language" class="ui fluid dropdown">
+									<option value="Russian" selected>Русский (Russian)</option>
+									<option value="German">Deutsch (German)</option>
+									<option value="English">English</option>
+									<option value="Ukrainian">Українська (Ukrainian)</option>
+								</select>
+							</div>
+							
+							<div class="field">
+								<button type="button" class="ui primary button aot-primary" onclick="window.syntax_request()" aria-label="Отправить запрос на анализ">
+									Submit Request
+								</button>
+								<button type="button" class="ui button" onclick="clearForm()" aria-label="Очистить форму">
+									Clear
+								</button>
+							</div>
+						</form>
 					</div>
-				</div>
-				
-				<div class="field">
-					<label for="Language">Язык / Language:</label>
- 					<select id="Language" name="Language" class="ui fluid dropdown">
- 						<option value="Russian" selected>Русский (Russian)</option>
- 						<option value="German">Deutsch (German)</option>
- 						<option value="English">English</option>
- 						<option value="Ukrainian">Українська (Ukrainian)</option>
- 					</select>
-				</div>
-				
-				<div class="field">
-					<button type="button" class="ui primary button aot-primary" onclick="window.syntax_request()" aria-label="Отправить запрос на анализ">
-						Submit Request
-					</button>
-					<button type="button" class="ui button" onclick="clearForm()" aria-label="Очистить форму">
-						Clear
-					</button>
-				</div>
-			</form>
-			
-			<!-- Canvas output -->
-			<div class="ui canvas segment" id="canvasWrapper" role="region" aria-live="polite" aria-label="Результат синтаксического анализа">
-				<canvas id="synanCanvas"></canvas>
+					
+					<!-- Canvas output -->
+					<div class="ui canvas segment" id="canvasWrapper" role="region" aria-live="polite" aria-label="Результат синтаксического анализа" style="border: none; border-top: 1px solid var(--border-color); border-radius: 0; min-height: 300px; background: #fff;">
+						<canvas id="synanCanvas"></canvas>
+					</div>
+				</section>
 			</div>
-		</section>
-		
-		<!-- Info section -->
-		<section class="ui info segment" aria-labelledby="info-title">
-			<h3 id="info-title" class="ui header">О модуле синтаксис</h3>
-			<p>Краткое описание <a href="/demo/rus_syn_consts.html">констант русского синтаксиса</a>.</p>
-		</section>
+
+			<div class="sixteen wide column">
+				<!-- Info section -->
+				<section class="ui info segment" aria-labelledby="info-title">
+					<h3 id="info-title" class="ui header">О модуле синтаксис</h3>
+					<p>Синтаксический анализатор AOT строит дерево зависимостей или иерархию синтаксических групп для входного предложения. 
+					Он учитывает морфологические характеристики слов, словарную информацию о сочетаемости и правила грамматики.</p>
+					<p>Краткое описание <a href="/demo/rus_syn_consts.html">констант русского синтаксиса</a>.</p>
+				</section>
+			</div>
+		</div>
 		
 	</main>
 	
 	<!-- Footer -->
-	<footer class="ui footer segment" role="contentinfo">
+	<footer class="ui footer segment aot-footer" role="contentinfo">
 		<div class="ui container">
-			<p>
-				Разработка <a href="mailto:simple@mosk.ru">DiP</a>.
-				&copy; 2003 <a href="http://www.aot.ru/">АОТ</a>. Все права защищены.
-			</p>
-			<a href="#top" class="ui" title="Наверх" aria-label="Наверх">↑ Наверх</a>
+			<div class="ui stackable grid">
+				<div class="three wide column">
+					<h4 class="ui header">Проект</h4>
+					<div class="ui link list">
+						<a href="/index.html" class="item">Главная</a>
+						<a href="/history.html" class="item">История</a>
+						<a href="/download.php" class="item">Скачать</a>
+						<a href="/onlinedemo.html" class="item">Демо-версии</a>
+					</div>
+				</div>
+				<div class="three wide column">
+					<h4 class="ui header">Разработчикам</h4>
+					<div class="ui link list">
+						<a href="https://github.com/nemo-72/aot" class="item" target="_blank">GitHub Repo</a>
+						<a href="/technology.html" class="item">Технологии</a>
+						<a href="/demo/rus_syn_consts.html" class="item">Синт. константы</a>
+					</div>
+				</div>
+				<div class="three wide column">
+					<h4 class="ui header">Контакты</h4>
+					<div class="ui link list">
+						<a href="mailto:simple@mosk.ru" class="item">simple@mosk.ru</a>
+						<a href="http://www.aot.ru/" class="item">AOT.ru</a>
+					</div>
+				</div>
+				<div class="seven wide right aligned column">
+					<h4 class="ui header">АОТ: Система анализа текста</h4>
+					<p>Профессиональные решения для автоматической обработки естественного языка с 2003 года.</p>
+				</div>
+			</div>
+			<div class="copyright center aligned">
+				&copy; 2003-2026 Проект АОТ. Разработка DiP. Все права защищены.
+			</div>
 		</div>
 	</footer>
 	
