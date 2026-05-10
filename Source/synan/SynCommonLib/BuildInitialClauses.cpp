@@ -220,8 +220,10 @@ int CSentence::CanLinkSimpleSimilar(int CommaWordNo)
 		if (!pSent)
 			throw CExpc ("Cannot create sentence");
 		
-		for (int i = StartClauseWordNo; i < std::min((int)m_Words.size(), CommaWordNo + Radius); i++)
+		for (int i = StartClauseWordNo; i < std::min((int)m_Words.size(), CommaWordNo + Radius); i++) {
             pSent->m_Words.push_back(m_Words[i]);
+			pSent->m_Words.back().SetSentence(pSent);
+		}
 		
 
 		CClause C(pSent, 0,  pSent->m_Words.size() - 1);

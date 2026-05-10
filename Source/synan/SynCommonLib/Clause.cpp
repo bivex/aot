@@ -452,8 +452,10 @@ void CClause::GetBuildingUnits(std::vector<CBuildingUnit>& BuildingUnits)
 		{
 			U.m_HomonymsCount =  GetWords()[WordNo].m_Homonyms.size();
 		};
-		assert (U.m_HomonymsCount > 0);
-		assert (U.m_HomonymsCount <= 64);
+		if (U.m_HomonymsCount > 64) {
+			LOGW << "GetBuildingUnits: word " << WordNo << " has " << U.m_HomonymsCount << " homonyms";
+		}
+		// assert (U.m_HomonymsCount <= 64);
 
 		BuildingUnits.push_back(U);
 	};

@@ -50,6 +50,9 @@ void CSynWord::Reset()
 
 void CSynWord::SetSentence(CSentence* s) {
 	m_pSent = s;
+	for (size_t i = 0; i < m_Homonyms.size(); i++) {
+		m_Homonyms[i].SetSentence(s);
+	}
 }
 
 const CSynHomonym& CSynWord::GetSynHomonym(int i) const { 
