@@ -431,8 +431,9 @@ bool CRusFormatCaller::gleiche_for_big_numbers(int i_noun, int i_number, uint64_
         return false; //пять девочка
     }
     auto noun_gram_codes = sent[i_first_noun].GetGramCodes();
-    bool noun_can_be_pl_gen = GetOpt()->GetGramTab()->FindGrammems(noun_gram_codes.c_str(),
-                                                                   _QM(rGenitiv) | _QM(rPlural));
+    bool noun_can_be_pl_gen = !noun_gram_codes.empty()
+        && GetOpt()->GetGramTab()->FindGrammems(noun_gram_codes.c_str(),
+                                                 _QM(rGenitiv) | _QM(rPlural));
 
     if (!arabicNumber) {
         /*
