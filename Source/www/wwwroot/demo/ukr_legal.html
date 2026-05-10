@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+	<title>АОТ :: Онлайн демо :: Юридичний аналіз (UA)</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="Демонстрація синтаксичного аналізу юридичних документів українською мовою в системі АОТ">
+	
+	<!-- Fomantic UI CSS -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fomantic-ui@2.9.3/dist/semantic.min.css">
+	
+	<!-- AOT custom styles -->
+	<link rel="stylesheet" href="../aot.css">
+	<link rel="stylesheet" href="custom.css">
+</head>
+
+<body>
+	<!-- Fixed navigation -->
+	<nav class="ui fixed menu aot-nav" role="navigation">
+		<div class="ui container">
+			<a href="/index.html" class="logo item"><b>AOT</b>.ru</a>
+			<a href="/index.html" class="item">Головна</a>
+			<a href="/onlinedemo.html" class="item active">Демо</a>
+			<a href="/technology.html" class="item">Технології</a>
+			<div class="right menu">
+				<a href="#top" class="item">↑</a>
+			</div>
+		</div>
+	</nav>
+	
+	<!-- Hero header -->
+	<header class="ui hero header" id="top">
+		<div class="ui container">
+			<h1>Юридичний аналіз</h1>
+			<p class="subtitle">Автоматичний розбір структури юридичних та офіційних документів українською мовою.</p>
+		</div>
+	</header>
+	
+	<!-- Main content -->
+	<main id="main-content" class="ui main container" style="padding-top: 3rem;">
+		
+		<div class="ui stackable grid">
+			<div class="sixteen wide column">
+				<!-- Demo card -->
+				<section class="ui card aot-card" style="width: 100%;">
+					<div class="content">
+						<h2 class="header">Аналіз юридичного тексту</h2>
+						
+						<form class="ui form" id="syntax-form">
+							<div class="field">
+								<label for="InputText">Текст документа:</label>
+								<textarea 
+									id="InputText" 
+									rows="8" 
+									placeholder="Вставте фрагмент юридичного тексту (договір, закон, наказ)..."
+								>Цей Договір набирає чинності з моменту його підписання Сторонами та діє до повного виконання ними своїх зобов'язань.</textarea>
+							</div>
+							
+							<div class="field">
+								<label>Приклади юридичних формулювань:</label>
+								<div class="ui buttons small">
+									<button type="button" class="ui button" onclick="setExample(0)">Договір</button>
+									<button type="button" class="ui button" onclick="setExample(1)">Закон</button>
+									<button type="button" class="ui button" onclick="setExample(2)">Повноваження</button>
+								</div>
+							</div>
+							
+							<div class="field" style="display: none;">
+								<select id="Language">
+									<option value="Ukrainian" selected>Ukrainian</option>
+								</select>
+							</div>
+							
+							<div class="field">
+								<button type="button" class="ui primary button aot-primary" onclick="window.syntax_request()">
+									Аналізувати структуру
+								</button>
+								<button type="button" class="ui button" onclick="clearForm()">Очистити</button>
+							</div>
+						</form>
+					</div>
+					
+					<!-- Canvas output -->
+					<div class="ui canvas segment" id="canvasWrapper" style="border: none; border-top: 1px solid var(--border-color); border-radius: 0; min-height: 400px; background: #fff; overflow-x: auto;">
+						<canvas id="synanCanvas"></canvas>
+					</div>
+				</section>
+			</div>
+
+			<div class="sixteen wide column">
+				<section class="ui info segment">
+					<h3 class="ui header">Особливості юридичного розбору</h3>
+					<p>Даний модуль використовує спеціалізовану граматику для виявлення складних конструкцій, характерних для юридичного стилю:</p>
+					<div class="ui bulleted list">
+						<div class="item">Розбір складних дієприкметникових та дієприслівникових зворотів.</div>
+						<div class="item">Виявлення суб'єктів та об'єктів у багатослівних реченнях.</div>
+						<div class="item">Аналіз логічних зв'язків між частинами правових норм.</div>
+					</div>
+				</section>
+			</div>
+		</div>
+		
+	</main>
+	
+	<!-- Footer -->
+	<footer class="ui footer segment aot-footer">
+		<div class="ui container">
+			<div class="ui stackable grid">
+				<div class="three wide column">
+					<h4 class="ui header">Проект</h4>
+					<div class="ui link list">
+						<a href="/index.html" class="item">Головна</a>
+						<a href="/history.html" class="item">Історія</a>
+						<a href="/onlinedemo.html" class="item">Демо-версії</a>
+					</div>
+				</div>
+				<div class="ten wide right aligned column">
+					<h4 class="ui header">АОТ: Система аналізу тексту</h4>
+					<p>&copy; 2003-2026 Проект АОТ. Всі права захищені.</p>
+				</div>
+			</div>
+		</div>
+	</footer>
+	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/fomantic-ui@2.9.3/dist/semantic.min.js"></script>
+	<script src="synan_legal.js?v=2"></script>
+	
+	<script>
+		const examples = [
+			"Цей Договір набирає чинності з моменту його підписання Сторонами та діє до повного виконання ними своїх зобов'язань.",
+			"Органи державної влади та органи місцевого самоврядування діють лише на підставі, в межах повноважень та у спосіб, що передбачені Конституцією та законами України.",
+			"Сторони несуть відповідальність за невиконання або неналежне виконання умов цього Договору відповідно до чинного законодавства України."
+		];
+
+		function setExample(i) {
+			$('#InputText').val(examples[i]);
+			window.syntax_request();
+		}
+
+		function clearForm() {
+			$('#InputText').val('');
+			$('#canvasWrapper').empty().append('<canvas id="synanCanvas"></canvas>');
+			if (window.reinitCanvas) window.reinitCanvas();
+		}
+
+		$(document).ready(function() {
+			// Pre-init
+		});
+	</script>
+</body>
+</html>
