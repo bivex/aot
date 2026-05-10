@@ -82,6 +82,7 @@ chunker_lex.cpp
 
 # Test outputs
 test_*
+!tests/
 Test*
 *.test
 
