@@ -54,6 +54,7 @@ The project includes a web-based interface for visualizing linguistic analysis:
 - **Ukrainian Legal Demo**: `demo/ukr_legal.html` — Specialized for Ukrainian legal documents.
 
 ![English Legal Demo](Docs/images/eng_legal_demo.png)
+![Ukrainian Legal Demo](Docs/images/ukr_legal_demo.png)
 
 To run the demos locally, see the [Web Interface Guide](Docs/web_interface.md).
 

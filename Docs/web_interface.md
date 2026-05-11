@@ -79,6 +79,7 @@ The **English Legal Demo** features:
 - **Improved UX**: Optimized D3.js visualization with 60fps zooming and semantic coloring of sentences.
 
 ![English Legal Demo Visualizer](../Docs/images/eng_legal_demo.png)
+![Ukrainian Legal Demo Visualizer](../Docs/images/ukr_legal_demo.png)
 
 ---
 
