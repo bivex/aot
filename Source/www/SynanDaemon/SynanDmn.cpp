@@ -52,19 +52,21 @@ std::string TSynanHttpServer::ProcessSyntax(TDaemonParsedRequest &request) {
     } else if (request.Langua == morphEnglish) {
         P = &EnglishSyntaxHolder;
     }
-    
+
     if (P == nullptr) {
         return "[]";
     }
 
     std::string query = request.Query;
+    std::string originalQuery;
     if (request.Langua == morphEnglish) {
+        originalQuery = query;
         MakeUpperUtf8(query);
     }
     if (!P->GetSentencesFromSynAn(query, false)) {
         throw CExpc("Synan has crushed\n");
     }
-    return BuildJson(P, query);
+    return BuildJson(P, query, originalQuery);
 };
 
 

@@ -50,8 +50,15 @@ class JVisualSynAnParamBuilder
 	void AddGroup(std::vector<SSynVariant2Groups>& synVariants, const CGroup& piGroup);
     void WriteWords(const CSentence& piSent, long StartWord, long LastWord, CJsonObject& words);
     void WriteVariant(const SSynVariant2Groups& var, CJsonObject& o);
+
 public:
 	const CSyntaxHolder* m_pSyntaxHolder;
+	std::vector<std::string> m_OriginalWords;
+	size_t m_OriginalWordIdx;
+
+	void TokenizeOriginal(const std::string& text);
+	std::string GetOriginalWord(const std::string& upperWord);
+
 	JVisualSynAnParamBuilder(const CSyntaxHolder* pSyntaxHolder);
 	virtual ~JVisualSynAnParamBuilder();
 	void BuildJson(const CSentence& piSent, CJsonObject& o);
@@ -60,19 +67,75 @@ public:
 JVisualSynAnParamBuilder::JVisualSynAnParamBuilder(const CSyntaxHolder* pSyntaxHolder)
 {
 	m_pSyntaxHolder = pSyntaxHolder;
+	m_OriginalWordIdx = 0;
 }
 
 JVisualSynAnParamBuilder::~JVisualSynAnParamBuilder()
 {
 }
 
+void JVisualSynAnParamBuilder::TokenizeOriginal(const string& text) {
+	m_OriginalWords.clear();
+	m_OriginalWordIdx = 0;
+	size_t i = 0;
+	while (i < text.size()) {
+		unsigned char c = text[i];
+		if (c <= 32) {
+			i++;
+			continue;
+		}
+		size_t start = i;
+		bool isWord = (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c > 127 || c == '_' || c == '@' || c == '/';
+		if (isWord) {
+			while (i < text.size()) {
+				unsigned char ch = text[i];
+				bool isWordCh = (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9') || ch > 127 || ch == '_' || ch == '\'' || ch == '-' || ch == '/' || ch == '@';
+				if (isWordCh)
+					i++;
+				else if (ch == '.' && i + 1 < text.size() && ((text[i+1] >= 'a' && text[i+1] <= 'z') || (text[i+1] >= 'A' && text[i+1] <= 'Z') || (text[i+1] >= '0' && text[i+1] <= '9')))
+					i++;
+				else
+					break;
+			}
+		} else {
+			i++;
+		}
+		m_OriginalWords.push_back(text.substr(start, i - start));
+	}
+}
+
+std::string JVisualSynAnParamBuilder::GetOriginalWord(const std::string& upperWord)
+{
+	if (m_OriginalWords.empty()) return upperWord;
+	size_t startIdx = m_OriginalWordIdx;
+	while (m_OriginalWordIdx < m_OriginalWords.size()) {
+		std::string orig = m_OriginalWords[m_OriginalWordIdx];
+		m_OriginalWordIdx++;
+		std::string upper = orig;
+		MakeUpperUtf8(upper);
+		if (upper == upperWord) return orig;
+	}
+	// If not found, try from the beginning if we haven't already
+	if (startIdx > 0) {
+		m_OriginalWordIdx = 0;
+		while (m_OriginalWordIdx < startIdx) {
+			std::string orig = m_OriginalWords[m_OriginalWordIdx];
+			m_OriginalWordIdx++;
+			std::string upper = orig;
+			MakeUpperUtf8(upper);
+			if (upper == upperWord) return orig;
+		}
+		m_OriginalWordIdx = startIdx; // restore if still not found
+	}
+	return upperWord;
+}
 
 void JVisualSynAnParamBuilder::WriteWords(const CSentence& piSent, long StartWord, long LastWord, CJsonObject& words)
 {
 	for(int i = StartWord ; i <= LastWord ; i++ ) {
 		const CSynWord& W = piSent.m_Words[i];
         CJsonObject word(words.get_doc());
-        word.add_string("str",  W.m_strWord);
+        word.add_string_copy("str",  GetOriginalWord(W.m_strWord));
 
         CJsonObject homs(words.get_doc(), rapidjson::kArrayType);
 		for(auto& h : W.m_Homonyms)	{
@@ -87,7 +150,7 @@ void JVisualSynAnParamBuilder::WriteWords(const CSentence& piSent, long StartWor
 }
 
 void JVisualSynAnParamBuilder::GetTopClauses(const CSentence& piSent, std::vector<long>& topClauses)
-{	
+{
 	long clCount = piSent.m_Clauses.size();
 	const CClause*  piNextClause = 0;
 
@@ -99,9 +162,9 @@ void JVisualSynAnParamBuilder::GetTopClauses(const CSentence& piSent, std::vecto
 		{
 			piNextClause = piClause;
 			topClauses.push_back(i);
-		}			
+		}
 	}
-	reverse(topClauses.begin(), topClauses.end());		
+	reverse(topClauses.begin(), topClauses.end());
 }
 
 // this procedure adds all variants of the clause iClause to allSynVariants
@@ -281,8 +344,11 @@ void JVisualSynAnParamBuilder::BuildJson(const CSentence& piSent, CJsonObject& o
     }
 }
 
-std::string BuildJson(CSyntaxHolder* pSyntaxHolder, const std::string& query) {
+std::string BuildJson(CSyntaxHolder* pSyntaxHolder, const std::string& query, const std::string& originalQuery) {
 	JVisualSynAnParamBuilder builder(pSyntaxHolder);
+	if (!originalQuery.empty()) {
+		builder.TokenizeOriginal(originalQuery);
+	}
     rapidjson::Document d;
     CJsonObject sents(d, rapidjson::kArrayType);
 	for (auto& s : pSyntaxHolder->m_Synan.m_vectorSents) {
@@ -292,4 +358,3 @@ std::string BuildJson(CSyntaxHolder* pSyntaxHolder, const std::string& query) {
 	}
 	return sents.dump_rapidjson();
 }
-
