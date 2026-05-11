@@ -68,6 +68,19 @@ void CLemTextCreator::InitGraphan() {
 }
 
 
+static void NormalizeApostrophes(std::string& s) {
+	const std::string right_sq = "\xe2\x80\x99"; // U+2019 RIGHT SINGLE QUOTATION MARK
+	const std::string left_sq  = "\xe2\x80\x98"; // U+2018 LEFT SINGLE QUOTATION MARK
+	const std::string mod_ap   = "\xca\xbc";     // U+02BC MODIFIER LETTER APOSTROPHE
+	const char ap = '\'';
+	size_t pos = 0;
+	while ((pos = s.find(right_sq, pos)) != std::string::npos) s.replace(pos, 3, 1, ap);
+	pos = 0;
+	while ((pos = s.find(left_sq, pos)) != std::string::npos) s.replace(pos, 3, 1, ap);
+	pos = 0;
+	while ((pos = s.find(mod_ap, pos)) != std::string::npos) s.replace(pos, 2, 1, ap);
+}
+
 bool CLemTextCreator::BuildLemText(std::string str, bool bFile, int& CountOfWords)
 {
 	auto lemmatizer = GetMHolder(m_Language).m_pLemmatizer;
@@ -75,6 +88,8 @@ bool CLemTextCreator::BuildLemText(std::string str, bool bFile, int& CountOfWord
 	CountOfWords = 0;
 
 	try {
+		if (!bFile) NormalizeApostrophes(str);
+
 		// ============  Graphematics =======================
 		t1 = clock();
 		if (bFile) {
