@@ -40,7 +40,20 @@ RML is a comprehensive linguistic processing framework developed for natural lan
 - **Semantic analysis** — semantic graph construction, Russian→English translation
 - **N-gram statistics** — collocation detection with bigram frequencies
 - **HTTP daemons** — REST-like API for integration into other applications
+- **Web Interface** — Visual demos for morphological and syntactic analysis
 - **Cross-platform** — Linux, macOS, Windows (via CMake)
+
+---
+
+## 🚀 Web Interface & Demos
+
+The project includes a web-based interface for visualizing linguistic analysis:
+
+- **Unified Interface**: `modern/index.html` — A modern SPA for general morphology and syntax.
+- **English Legal Demo**: `demo/eng_legal.html` — Optimized for complex contract analysis with original casing preservation.
+- **Ukrainian Legal Demo**: `demo/ukr_legal.html` — Specialized for Ukrainian legal documents.
+
+To run the demos locally, see the [Web Interface Guide](Docs/web_interface.md).
 
 ---
 

@@ -67,6 +67,17 @@ This version features:
 - **Premium Design**: Dark mode with modern typography and animations.
 - **Enhanced Visualizer**: Re-implemented syntax tree with better clarity.
 
+### Specialized Demos (Legal & Contract Analysis)
+Dedicated interfaces for analyzing legal documents and complex contracts are available:
+- **English Legal Demo**: `http://localhost:8080/demo/eng_legal.html`
+- **Ukrainian Legal Demo**: `http://localhost:8080/demo/ukr_legal.html`
+
+The **English Legal Demo** features:
+- **High-Precision Parser**: Optimized for complex legal structures and long sentences.
+- **Case Preservation**: The backend preserves the original casing of the input text (e.g., proper nouns, acronyms, and technical terms like `SCRA`, `FDCPA`, `w/it`).
+- **POS Visualization**: Integrated Part-of-Speech labels in the syntax tree.
+- **Improved UX**: Optimized D3.js visualization with 60fps zooming and semantic coloring of sentences.
+
 ---
 
 ## 3. Production Deployment (Nginx)

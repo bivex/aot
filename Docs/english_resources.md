@@ -40,7 +40,11 @@ The project includes large-scale databases for Russian-English translation and l
 *   **Location:** `Dicts/EngSynan/`
 *   **Rules:** `synan.grm` and `src/simple_syn.grm`.
 *   **Function:** Defines the grammar rules for the English syntactic analyzer.
-*   **Syntactic Relations (NEW):**
+*   **Key Features:**
     *   **Subject-Predicate (SP)**: Identified via heuristics in `CEngSentence`. The parser finds the first verb as the predicate and the preceding noun-like unit as the subject.
     *   **Phrasal Groups**: `[NP]` (Noun Phrase), `[VP]` (Verb Phrase), and `[PP]` (Prepositional Phrase).
     *   **SP Relation Tag**: Marked as `isSubj` in the API output to enable visualization.
+    *   **Original Casing (NEW)**: The syntactic analyzer daemon (`SynanDaemon`) preserves the original casing of the input text in the output JSON (`str` field). This is critical for legal and technical document analysis where casing carries semantic meaning (e.g., proper nouns, acronyms like `SCRA`, or specific legal terms).
+
+## 7. English Legal Demo
+A specialized web interface for English legal text analysis is available in `Source/www/wwwroot/demo/eng_legal.html`. It demonstrates the parser's capabilities on complex legal structures and features a modern, high-performance visualization using D3.js.
