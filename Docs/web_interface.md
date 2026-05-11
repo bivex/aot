@@ -78,6 +78,8 @@ The **English Legal Demo** features:
 - **POS Visualization**: Integrated Part-of-Speech labels in the syntax tree.
 - **Improved UX**: Optimized D3.js visualization with 60fps zooming and semantic coloring of sentences.
 
+![English Legal Demo Visualizer](../Docs/images/eng_legal_demo.png)
+
 ---
 
 ## 3. Production Deployment (Nginx)
