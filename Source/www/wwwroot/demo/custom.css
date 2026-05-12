@@ -18,11 +18,13 @@
 /* Base */
 body {
     background-color: var(--bg-color) !important;
-    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
     line-height: 1.6;
     color: var(--text-color);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
 }
 
 .ui.container {
@@ -191,8 +193,9 @@ body {
 
 @media screen and (max-width: 640px) {
     .aot-hero { padding: 4rem 1.25rem 3rem; }
-    .aot-hero h1 { font-size: 2.2rem; }
+    .aot-hero h1 { font-size: 2.2rem; letter-spacing: -0.5px; }
     .aot-hero p { font-size: 1rem; }
+    .nav-links a { font-size: 1rem; letter-spacing: 0; }
 }
 
 /* ═══ Card Styles ═══ */
@@ -333,6 +336,42 @@ body {
         grid-template-columns: 1fr;
         gap: 2rem;
     }
+}
+
+/* ═══ iOS Typography Fixes ═══ */
+
+/* Prevent iOS auto-zoom on focus for inputs/textareas */
+textarea,
+input[type="text"],
+input[type="search"],
+.ui.input input,
+.ui.form textarea,
+.ui.form input {
+    font-size: 16px !important;
+}
+
+/* Respect safe area on notched iPhones */
+@supports (padding: env(safe-area-inset-bottom)) {
+    .aot-footer {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+    .aot-nav {
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+    }
+}
+
+/* iOS button tap highlight */
+.ui.button {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent iOS from styling inputs */
+.ui.form textarea,
+.ui.form input {
+    -webkit-appearance: none;
+    appearance: none;
+    border-radius: 6px !important;
 }
 
 /* ═══ Legacy overrides (Fomantic compat) ═══ */
