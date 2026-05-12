@@ -18,13 +18,26 @@
 /* Base */
 body {
     background-color: var(--bg-color) !important;
-    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+    font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif !important;
     line-height: 1.6;
     color: var(--text-color);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
+    font-feature-settings: 'kern' 1, 'liga' 1;
+}
+
+/* SF Pro tracking: tighten large headings, loosen body slightly */
+h1, h2, h3 {
+    letter-spacing: -0.02em;
+    text-rendering: optimizeLegibility;
+}
+
+/* Monospace for code/measure elements */
+code, pre, .mono {
+    font-family: "SF Mono", "Menlo", "Monaco", monospace;
+}
 }
 
 .ui.container {
