@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "EngSentence.h"
 #include "EngFormatCaller.h"
+#include <future>
 
 
 CSentence* NewSentenceEnglish (const CSyntaxOpt* pSyntaxOptions)
@@ -62,10 +63,24 @@ bool CEngSentence::RunSyntaxInClauses(ESynRulesSet rules)
 		if( m_pSyntaxOptions == NULL )
 			return false;
 
-		for(int i = 0 ; i < GetClausesCount() ; i++ )
+		int count = GetClausesCount();
+		if (count <= 1)
 		{
-			CClause& clause = GetClause(i);
-			BuildGLRGroupsInClause(clause);
+			for(int i = 0; i < count; i++)
+				BuildGLRGroupsInClause(GetClause(i));
+		}
+		else
+		{
+			std::vector<std::future<void>> futures;
+			futures.reserve(count);
+			for(int i = 0; i < count; i++)
+			{
+				futures.push_back(std::async(std::launch::async, [this, i]() {
+					BuildGLRGroupsInClause(GetClause(i));
+				}));
+			}
+			for (auto& f : futures)
+				f.get();
 		}
 
 		return true;
