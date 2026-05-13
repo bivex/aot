@@ -109,3 +109,4 @@ input.lem
 /build_fast
 wwwroot_server.lck
 /.hypothesis
+/synan_trace.trace

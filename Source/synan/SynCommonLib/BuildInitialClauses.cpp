@@ -184,9 +184,9 @@ int CSentence::CanLinkSimpleSimilar(int CommaWordNo)
 	try
 	{
 
-		/*
-			if comma is at the very  beginning of ath the end, then exit
-		*/
+			/*
+				if comma is at the very  beginning of ath the end, then exit
+			*/
 		if	(		(CommaWordNo == 0) 
 				||	(CommaWordNo + 1 >= m_Words.size() )
 			)
@@ -216,12 +216,26 @@ int CSentence::CanLinkSimpleSimilar(int CommaWordNo)
 
 		const int Radius = (GetOpt()->m_Language == morphGerman)? 10 : 6;
 		int StartClauseWordNo = std::max(0, CommaWordNo - Radius);
+		int EndClauseWordNo = std::min((int)m_Words.size(), CommaWordNo + Radius);
+
+		// Check cache: if the window hasn't changed, reuse the groups from last call
+		if (m_CanLinkCacheStart == StartClauseWordNo && m_CanLinkCacheEnd == EndClauseWordNo && m_CanLinkCacheValid)
+		{
+			for (const auto& cg : m_CanLinkCacheGroups)
+			{
+				if (cg.first < CommaWordNo && cg.second > CommaWordNo)
+					return cg.second;
+			}
+			return -1;
+		}
+
 		CSentence* pSent = GetOpt()->NewSentence();
 		if (!pSent)
 			throw CExpc ("Cannot create sentence");
-		
-		for (int i = StartClauseWordNo; i < std::min((int)m_Words.size(), CommaWordNo + Radius); i++) {
-            pSent->m_Words.push_back(m_Words[i]);
+
+		pSent->m_Words.reserve(EndClauseWordNo - StartClauseWordNo);
+		for (int i = StartClauseWordNo; i < EndClauseWordNo; i++) {
+	            pSent->m_Words.push_back(m_Words[i]);
 			pSent->m_Words.back().SetSentence(pSent);
 		}
 		
@@ -230,6 +244,12 @@ int CSentence::CanLinkSimpleSimilar(int CommaWordNo)
 		pSent->AddClause(C);	
 		pSent->m_bShouldUseTwoPotentialRule = false;
 		pSent->RunSyntaxInClauses(SimpleSimilarRules);
+
+		// Cache all groups found in this window
+		m_CanLinkCacheGroups.clear();
+		m_CanLinkCacheStart = StartClauseWordNo;
+		m_CanLinkCacheEnd = EndClauseWordNo;
+		m_CanLinkCacheValid = true;
 		
 		int Result = -1;
 		const CClause& prClause = pSent->m_Clauses[0];
@@ -246,12 +266,22 @@ int CSentence::CanLinkSimpleSimilar(int CommaWordNo)
 						continue;
 				};
 
-				if	(		(group.m_iFirstWord+StartClauseWordNo < CommaWordNo) 
-						&&	(group.m_iLastWord+StartClauseWordNo > CommaWordNo)
+				int absFirst = group.m_iFirstWord + StartClauseWordNo;
+				int absLast  = group.m_iLastWord + StartClauseWordNo;
+
+				// Add to cache (deduplicated)
+				bool dup = false;
+				for (auto& cg : m_CanLinkCacheGroups) {
+					if (cg.first == absFirst && cg.second == absLast) { dup = true; break; }
+				}
+				if (!dup)
+					m_CanLinkCacheGroups.push_back({absFirst, absLast});
+
+				if	(		(absFirst < CommaWordNo) 
+						&&	(absLast > CommaWordNo)
 					)
 				{
-					Result = group.m_iLastWord + StartClauseWordNo;
-					break;
+					Result = absLast;
 				};
 			}
 		
@@ -712,6 +742,7 @@ bool CSentence::BuildInitialClauses()
     // IsValid();
 
 	m_bFirstInPairFound = false;
+		m_CanLinkCacheValid = false;
 
 	
 	int iFirstWord = 0;	

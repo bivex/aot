@@ -10,13 +10,8 @@ public:
 	bool m_IsSubj;
 	std::string m_strDescr;
 	bool operator < (const SGroup& gr) const {
-		if ((m_W1 <= gr.m_W1) && (m_W2 >= gr.m_W2))
-			return true;
-
-		if (m_W2 < gr.m_W1)
-			return true;
-
-		return false;
+		if (m_W1 != gr.m_W1) return m_W1 < gr.m_W1;
+		return m_W2 < gr.m_W2;
 	}
 
 	void ToJson (CJsonObject& o) const {
@@ -49,11 +44,12 @@ class JVisualSynAnParamBuilder
 	void AddHomonym(std::vector<SSynVariant2Groups>& synVariants, const CSynUnit& Unit);
 	void AddGroup(std::vector<SSynVariant2Groups>& synVariants, const CGroup& piGroup);
     void WriteWords(const CSentence& piSent, long StartWord, long LastWord, CJsonObject& words);
-    void WriteVariant(const SSynVariant2Groups& var, CJsonObject& o);
+    void WriteVariant(const SSynVariant2Groups& var, CJsonObject& o, const CAgramtab* gramTab);
 
 public:
 	const CSyntaxHolder* m_pSyntaxHolder;
 	std::vector<std::string> m_OriginalWords;
+	std::vector<std::string> m_UpperWords;
 	size_t m_OriginalWordIdx;
 
 	void TokenizeOriginal(const std::string& text);
@@ -76,6 +72,7 @@ JVisualSynAnParamBuilder::~JVisualSynAnParamBuilder()
 
 void JVisualSynAnParamBuilder::TokenizeOriginal(const string& text) {
 	m_OriginalWords.clear();
+	m_UpperWords.clear();
 	m_OriginalWordIdx = 0;
 	size_t i = 0;
 	while (i < text.size()) {
@@ -100,7 +97,11 @@ void JVisualSynAnParamBuilder::TokenizeOriginal(const string& text) {
 		} else {
 			i++;
 		}
-		m_OriginalWords.push_back(text.substr(start, i - start));
+		std::string word = text.substr(start, i - start);
+		std::string upper = word;
+		MakeUpperUtf8(upper);
+		m_OriginalWords.push_back(std::move(word));
+		m_UpperWords.push_back(std::move(upper));
 	}
 }
 
@@ -109,23 +110,18 @@ std::string JVisualSynAnParamBuilder::GetOriginalWord(const std::string& upperWo
 	if (m_OriginalWords.empty()) return upperWord;
 	size_t startIdx = m_OriginalWordIdx;
 	while (m_OriginalWordIdx < m_OriginalWords.size()) {
-		std::string orig = m_OriginalWords[m_OriginalWordIdx];
+		if (m_UpperWords[m_OriginalWordIdx] == upperWord)
+			return m_OriginalWords[m_OriginalWordIdx];
 		m_OriginalWordIdx++;
-		std::string upper = orig;
-		MakeUpperUtf8(upper);
-		if (upper == upperWord) return orig;
 	}
-	// If not found, try from the beginning if we haven't already
 	if (startIdx > 0) {
 		m_OriginalWordIdx = 0;
 		while (m_OriginalWordIdx < startIdx) {
-			std::string orig = m_OriginalWords[m_OriginalWordIdx];
+			if (m_UpperWords[m_OriginalWordIdx] == upperWord)
+				return m_OriginalWords[m_OriginalWordIdx];
 			m_OriginalWordIdx++;
-			std::string upper = orig;
-			MakeUpperUtf8(upper);
-			if (upper == upperWord) return orig;
 		}
-		m_OriginalWordIdx = startIdx; // restore if still not found
+		m_OriginalWordIdx = startIdx;
 	}
 	return upperWord;
 }
@@ -140,9 +136,9 @@ void JVisualSynAnParamBuilder::WriteWords(const CSentence& piSent, long StartWor
         CJsonObject homs(words.get_doc(), rapidjson::kArrayType);
 		for(auto& h : W.m_Homonyms)	{
             rapidjson::Value hom;
-            hom.SetString(h.GetLemma().c_str(), h.GetLemma().length());
+            hom.SetString(h.GetLemma().c_str(), h.GetLemma().length(), words.get_allocator());
             homs.push_back(hom);
-		}
+        }
         word.move_to_member("homonyms", homs.get_value());
 		words.push_back(word);
 	}
@@ -167,12 +163,9 @@ void JVisualSynAnParamBuilder::GetTopClauses(const CSentence& piSent, std::vecto
 	reverse(topClauses.begin(), topClauses.end());
 }
 
-// this procedure adds all variants of the clause iClause to allSynVariants
-// and before it the procedure adds all variants of subclauses of clause iClause
 void JVisualSynAnParamBuilder::AddVariants(std::vector<SSynVariant2Groups>& allSynVariants,long iClause,  const CSentence& piSent)
 {
 	const CClause& Clause = piSent.m_Clauses[iClause];
-	long variantsCount = Clause.GetSynVariantsCount();
 
 	for(CSVI i =  Clause.m_SynVariants.begin() ; i != Clause.m_SynVariants.end(); i++ )
 	{
@@ -191,7 +184,7 @@ void JVisualSynAnParamBuilder::AddVariants(std::vector<SSynVariant2Groups>& allS
 			synVariants[j].m_Groups.push_back(group);
 		}
 
-		allSynVariants.insert(allSynVariants.end(), synVariants.begin(), synVariants.end());
+		allSynVariants.insert(allSynVariants.end(), std::make_move_iterator(synVariants.begin()), std::make_move_iterator(synVariants.end()));
 	}
 }
 
@@ -246,7 +239,7 @@ void JVisualSynAnParamBuilder::AddOneVariant(std::vector<SSynVariant2Groups>& al
 {
 	long unitsCount = piVar.m_SynUnits.size();
 	SSynVariant2Groups var;
-	allSynVariants.push_back(var);
+	allSynVariants.push_back(std::move(var));
 
 	for(long i = 0 ; i < unitsCount ; i++ )
 	{
@@ -268,46 +261,57 @@ void JVisualSynAnParamBuilder::AddOneVariant(std::vector<SSynVariant2Groups>& al
 
 void JVisualSynAnParamBuilder::MultTwoVariants(SSynVariant2Groups& var1, SSynVariant2Groups& var2, SSynVariant2Groups& res)
 {
-	res = var1;
-	res.m_SynUnits.insert(res.m_SynUnits.end(), var2.m_SynUnits.begin(), var2.m_SynUnits.end());
-	res.m_Groups.insert(res.m_Groups.end(), var2.m_Groups.begin(), var2.m_Groups.end());
+	res = std::move(var1);
+	res.m_SynUnits.insert(res.m_SynUnits.end(),
+		std::make_move_iterator(var2.m_SynUnits.begin()),
+		std::make_move_iterator(var2.m_SynUnits.end()));
+	res.m_Groups.insert(res.m_Groups.end(),
+		std::make_move_iterator(var2.m_Groups.begin()),
+		std::make_move_iterator(var2.m_Groups.end()));
 }
 
 
 void JVisualSynAnParamBuilder::MultVariants(std::vector<SSynVariant2Groups>& synVariants1, std::vector<SSynVariant2Groups>& synVariants2)
 {
+	size_t s1 = synVariants1.size();
+	size_t s2 = synVariants2.size();
+
+	if (s1 == 0) {
+		synVariants1 = std::move(synVariants2);
+		return;
+	}
+
 	std::vector<SSynVariant2Groups> resVars;
-	for(int i = 0 ; i < synVariants1.size() ; i++)
+	resVars.reserve(s1 * s2);
+	for(size_t i = 0 ; i < s1 ; i++)
 	{
-		for(int j = 0 ; j < synVariants2.size() ; j++)
+		for(size_t j = 0 ; j < s2 ; j++)
 		{
 			SSynVariant2Groups res;
 			MultTwoVariants(synVariants1[i], synVariants2[j], res);
-			resVars.push_back(res);
+			resVars.push_back(std::move(res));
 		}
 	}
 
-	if( synVariants1.size() == 0)
-		synVariants1 = synVariants2;
-	else
-		synVariants1 = resVars;
+	synVariants1 = std::move(resVars);
 }
 
-void JVisualSynAnParamBuilder::WriteVariant(const SSynVariant2Groups& var, CJsonObject& o) {
+void JVisualSynAnParamBuilder::WriteVariant(const SSynVariant2Groups& var, CJsonObject& o, const CAgramtab* gramTab) {
 
     CJsonObject units(o.get_doc(), rapidjson::kArrayType);
-	for(auto& u : var.m_SynUnits) {
+	for(const auto& u : var.m_SynUnits) {
         CJsonObject unit(o.get_doc());
 		unit.add_int("homNo",  u.m_iHomonymNum);
-		auto* gramTab = GetMHolder(m_pSyntaxHolder->m_LemText.GetDictLanguage()).m_pGramTab;
-		std::string grammems = gramTab->GrammemsToStr(u.m_iGrammems);
-		unit.add_string_copy("grm",  u.GetPartOfSpeechStr() + " " + grammems);
+		std::string grm = u.GetPartOfSpeechStr();
+		grm += ' ';
+		grm += gramTab->GrammemsToStr(u.m_iGrammems);
+		unit.add_string_copy("grm", grm);
 		units.push_back(unit.get_value());
 	}
     o.move_to_member("units", units.get_value());
 
     CJsonObject groups(o.get_doc(), rapidjson::kArrayType);
-	for (auto& group : var.m_Groups) {
+	for (const auto& group : var.m_Groups) {
         CJsonObject g(o.get_doc());
 		group.ToJson(g);
         groups.push_back(g.get_value());
@@ -318,6 +322,9 @@ void JVisualSynAnParamBuilder::WriteVariant(const SSynVariant2Groups& var, CJson
 void JVisualSynAnParamBuilder::BuildJson(const CSentence& piSent, CJsonObject& o) {
     std::vector<long> topClauses;
     GetTopClauses(piSent, topClauses);
+
+    auto* gramTab = GetMHolder(m_pSyntaxHolder->m_LemText.GetDictLanguage()).m_pGramTab;
+
     for(long i = 0; i < topClauses.size() ; i++ ) {
         const CClause& C = 	piSent.m_Clauses[topClauses[i]];
         CJsonObject clause(o.get_doc());
@@ -328,15 +335,15 @@ void JVisualSynAnParamBuilder::BuildJson(const CSentence& piSent, CJsonObject& o
         std::vector<SSynVariant2Groups> synVariants;
         AddVariants(synVariants, topClauses[i],  piSent);
         CJsonObject variants(o.get_doc(), rapidjson::kArrayType);
+        int offset = C.m_iFirstWord;
         for(auto& v : synVariants) {
-            std::vector<SGroup>& G =  v.m_Groups;
             for(auto& g : v.m_Groups)	{
-                g.m_W1 -= C.m_iFirstWord;
-                g.m_W2 -= C.m_iFirstWord;
+                g.m_W1 -= offset;
+                g.m_W2 -= offset;
             };
             sort(v.m_Groups.begin(), v.m_Groups.end());
             CJsonObject var(o.get_doc());
-            WriteVariant(v, var);
+            WriteVariant(v, var, gramTab);
             variants.push_back(var.get_value());
         }
         clause.move_to_member("variants", variants.get_value());

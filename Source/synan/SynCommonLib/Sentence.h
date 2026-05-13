@@ -133,6 +133,11 @@ public:
 
 	size_t m_ClauseClauseVarsCount;
 
+		int m_CanLinkCacheStart = -1;
+		int m_CanLinkCacheEnd = -1;
+		bool m_CanLinkCacheValid = false;
+		std::vector<std::pair<int,int>> m_CanLinkCacheGroups;
+
 
 	CSentence(const CSyntaxOpt* m_pSyntaxOptions);
 	virtual ~CSentence() {};
