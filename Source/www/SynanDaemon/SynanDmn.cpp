@@ -2,6 +2,7 @@
 #include "SynanDmn.h"
 
 #include "common/BigramsReader.h"
+#include <chrono>
 
 TSynanHttpServer::TSynanHttpServer() :
     TRMLHttpServer(),
@@ -63,10 +64,17 @@ std::string TSynanHttpServer::ProcessSyntax(TDaemonParsedRequest &request) {
         originalQuery = query;
         MakeUpperUtf8(query);
     }
+    auto t0 = std::chrono::steady_clock::now();
     if (!P->GetSentencesFromSynAn(query, false)) {
         throw CExpc("Synan has crushed\n");
     }
-    return BuildJson(P, query, originalQuery);
+    auto t1 = std::chrono::steady_clock::now();
+    auto json = BuildJson(P, query, originalQuery);
+    auto t2 = std::chrono::steady_clock::now();
+    double ms_synan = std::chrono::duration<double, std::milli>(t1 - t0).count();
+    double ms_json  = std::chrono::duration<double, std::milli>(t2 - t1).count();
+    LOGI << "PERF synan=" << ms_synan << "ms json=" << ms_json << "ms total=" << (ms_synan + ms_json) << "ms";
+    return json;
 };
 
 

@@ -1,5 +1,6 @@
 #include "SyntaxHolder.h"
 #include "synan/MAPostLib/PostMorphInterface.h"
+#include <chrono>
 
 extern CPostMorphInteface* NewRussianPostMorph();
 extern CPostMorphInteface* NewGermanPostMorph();
@@ -76,21 +77,24 @@ bool CSyntaxHolder::GetSentencesFromSynAn(std::string utf8str, bool bFile)
 		m_LemText.m_LemWords.clear();
 		int CountOfWords;
 
+		auto t0 = std::chrono::steady_clock::now();
 		if (!BuildLemText(utf8str, bFile, CountOfWords))
 			return false;;
 
         #ifdef _DEBUG
-			m_LemText.SaveToFile("before.lem");
+				m_LemText.SaveToFile("before.lem");
         #endif
 
+		auto t1 = std::chrono::steady_clock::now();
 		if (m_pPostMorph) {
 			m_pPostMorph->ProcessData(m_LemText);
 		}
 
-#ifdef _DEBUG
-		m_LemText.SaveToFile("after.lem");
-#endif
-		
+	#ifdef _DEBUG
+			m_LemText.SaveToFile("after.lem");
+	#endif
+
+		auto t2 = std::chrono::steady_clock::now();
 		LOGI << "GetSentencesFromSynAn: ProcessData lang=" << m_Language;
 		if (!m_Synan.ProcessData(&m_LemText))
 		{
@@ -98,6 +102,11 @@ bool CSyntaxHolder::GetSentencesFromSynAn(std::string utf8str, bool bFile)
 			return false;
 		};
 
+		auto t3 = std::chrono::steady_clock::now();
+		double ms_morph = std::chrono::duration<double, std::milli>(t1 - t0).count();
+		double ms_post  = std::chrono::duration<double, std::milli>(t2 - t1).count();
+		double ms_synan = std::chrono::duration<double, std::milli>(t3 - t2).count();
+		LOGI << "PERF build_lem=" << ms_morph << "ms postmorph=" << ms_post << "ms synan=" << ms_synan << "ms";
 		return true;
 	}
 	catch (...)
@@ -111,7 +120,7 @@ std::string  CSyntaxHolder::GetClauseTypeDescr(const CClause& C, int ClauseTypeN
 {
 	if (ClauseTypeNo == -1)
 		return " ";
-	assert (ClauseTypeNo < C.m_vectorTypes.size() );
+	assert (ClauseTypeNo < C.vectorTypes.size() );
 	auto gramtab = GetMHolder(m_Language).m_pGramTab;
 	return gramtab->GetClauseNameByType(C.m_vectorTypes[ClauseTypeNo].m_Type);
 };
