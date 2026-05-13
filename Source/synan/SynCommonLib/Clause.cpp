@@ -482,7 +482,7 @@ int AddUnitAsWord (std::vector<CBuildingUnit>::const_iterator pUnit, int Current
 };
 
 // максимальное количество вариантов в одной  клаузе (все остальные игнорируются)
-const int MorphVarMaxCount = 1600;
+const int MorphVarMaxCount = 200;
 
 void CClause::BuildSynVariantsRecursive(std::vector<CBuildingUnit>::iterator pUnit, CMorphVariant& synVariant)
 {
