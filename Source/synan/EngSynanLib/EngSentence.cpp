@@ -281,6 +281,32 @@ void CEngSentence::BuildSubjAndPredRelation(CMorphVariant& synVariant, long Root
 			}
 		}
 	}
+
+	if (!synVariant.m_bGoodSubject) {
+		// Try looking after the predicate for inverted subjects (questions, existential there)
+		for (long i = iPred + 1; i < (long)synVariant.m_SynUnits.size(); i++) {
+			const CSynUnit& U = synVariant.m_SynUnits[i];
+			if (U.m_Type != EWord) continue;
+
+			const CSynWord& W = m_Words[U.m_SentPeriod.m_iFirstWord];
+			const CSynHomonym& H = W.m_Homonyms[U.m_iHomonymNum];
+
+			if (GetEngGramTab()->IsMorphNoun(H.m_iPoses) || 
+			    GetEngGramTab()->is_morph_pronoun(H.m_iPoses) || 
+			    H.HasPos(eNOUN) || H.HasPos(ePRON) || H.HasPos(ePN)) {
+				
+				const CSynUnit& PU = synVariant.m_SynUnits[iPred];
+				const CSynWord& PW = m_Words[PU.m_SentPeriod.m_iFirstWord];
+				const CSynHomonym& PH = PW.m_Homonyms[PU.m_iHomonymNum];
+
+				if (GetEngGramTab()->GleicheSubjectPredicate(H.GetGramCodes().c_str(), PH.GetGramCodes().c_str())) {
+					synVariant.m_Subjects.push_back(i);
+					synVariant.m_bGoodSubject = true;
+					break;
+				}
+			}
+		}
+	}
 };
 
 void CEngSentence::AfterBuildGroupsTrigger(class CClause &)
