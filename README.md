@@ -387,6 +387,10 @@ RML/
 ├── build/                  # CMake build directory ( created during build )
 ├── Dicts/                  # Dictionary data ( generated during build )
 │   ├── Morph/              # Morphological dictionaries
+│   │   ├── Russian/        # ~25 MB  | 298k lemmas | 4.2M forms
+│   │   ├── Ukrainian/      # ~25 MB  | 419k lemmas | 4.0M forms
+│   │   ├── English/        # ~94 MB  | 145k lemmas | 2.5M forms
+│   │   └── German/         # ~12 MB  | 80k lemmas  | 1.5M forms
 │   ├── Bigrams/            # Bigram statistics
 │   ├── Ross/               # Thesaurus
 │   ├── Aoss/               # Semantic dictionary
@@ -394,6 +398,11 @@ RML/
 │   └── GerSynan/           # German grammar tables
 ├── Source/                 # Source code
 │   ├── morph_dict/         # Morphological dictionary library ( git submodule )
+│   │   └── data/
+│   │       ├── Russian/    # Source: morphs.json (33 MB, 2,767 models)
+│   │       ├── Ukrainian/  # Source: morphs.json (39 MB, 5,855 models)
+│   │       ├── English/    # Source: morphs.json (28 MB, 2,639 models)
+│   │       └── German/     # Source: morphs.json (21 MB, 1,319 models)
 │   ├── dicts/              # Dictionary processing tools
 │   ├── graphan/            # Graphematical analysis
 │   ├── morphen/            # Morphological analysis
@@ -401,12 +410,79 @@ RML/
 │   ├── seman/              # Semantic analysis
 │   ├── common/             # Common utilities
 │   └── www/                # HTTP daemons
+├── Scripts/                # Utility scripts
+│   └── dict_rebuild/       # Dictionary rebuild scripts (see below)
 ├── Docs/                   # Additional documentation
 ├── Texts/                  # Sample texts for training ( bigrams )
 ├── COPYING                 # LGPL license
 ├── README.md              # This file
 └── BUILD_MACOS.md         # macOS build guide ( if you're on macOS )
 ```
+
+## Rebuilding Dictionaries
+
+### Quick Stats (Binary Output)
+
+| Language | Total Size | Lemmas | Word Forms | WordData Entries |
+|----------|-----------|--------|------------|------------------|
+| Russian  | 25 MB     | ~298k  | ~4.2M      | 51,084           |
+| Ukrainian| 25 MB     | ~419k  | ~4.0M      | 418,983          |
+| English  | 94 MB     | ~145k  | ~2.5M      | 13,933           |
+| German   | 12 MB     | ~80k   | ~1.5M      | 0 (empty)        |
+
+**Source data** (in `Source/morph_dict/data/<Language>/`):
+- `morphs.json` — morphological models (20–40 MB per language)
+- `gramtab.json` — grammatical codes
+- `WordData.txt` — words with frequency corpus (Ukrainian has the richest: 418k entries)
+
+**Binary output** (in `Dicts/Morph/<Language>/`):
+- `morph.bases` — lemmas base (2–5 MB)
+- `morph.annot` — annotations (3–6 MB)
+- `morph.forms_autom` — morphological automaton (4–9 MB)
+- `npredict.bin` — unknown word predictor (0.8–3.4 MB)
+- `*wordweight.bin` & `*homoweight.bin` — frequency tables (empty for German)
+
+### Rebuild Scripts
+
+The project includes automated rebuild scripts for all supported languages:
+
+```bash
+cd Scripts/dict_rebuild
+
+# Rebuild specific language
+./rebuild_russian_dicts.sh      # Russian
+./rebuild_ukrainian_dicts.sh    # Ukrainian
+./rebuild_english_dicts.sh      # English
+./rebuild_german_dicts.sh       # German
+
+# Verify integrity
+./verify_russian_dicts.sh
+./verify_ukrainian_dicts.sh
+
+# Full cycle with API test
+./rebuild_and_test.sh              # Russian
+./rebuild_and_test_ukrainian.sh    # Ukrainian
+
+# Rebuild all at once
+./rebuild_all_dicts.sh
+```
+
+**Script options:**
+- `--clean` — clean build directory first
+- `--skip-build` — skip building `morph_gen`, only regenerate dictionaries
+- `-h, --help` — show usage
+
+**Workflow:**
+1. Edit source files in `Source/morph_dict/data/<Language>/` (e.g., add words to `WordData.txt`)
+2. Run rebuild: `./Scripts/dict_rebuild/rebuild_<lang>_dicts.sh --skip-build`
+3. Verify: `./Scripts/dict_rebuild/verify_<lang>_dicts.sh`
+4. Restart daemons if they are running
+
+**Prerequisites for rebuilding:**
+- CMake ≥ 3.24, C++17 compiler, Flex, Bison, zlib
+- On macOS: `brew install cmake zlib flex bison libevent` and set `FLEX_TOOL`/`BISON_TOOL`
+
+See `Scripts/dict_rebuild/README.md` for complete documentation.
 
 ---
 
