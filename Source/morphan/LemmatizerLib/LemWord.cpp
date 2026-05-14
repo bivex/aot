@@ -56,11 +56,13 @@ size_t	CLemWord::GetHomonymsCount() const
 
 const CHomonym* CLemWord::GetHomonym(int i) const
 {
+	if (i < 0 || i >= (int)m_MorphHomonyms.size()) return nullptr;
 	return &m_MorphHomonyms[i];
 }
 
 CHomonym* CLemWord::GetHomonym(int i)
 {
+	if (i < 0 || i >= (int)m_MorphHomonyms.size()) return nullptr;
 	return &m_MorphHomonyms[i];
 }
 
@@ -314,6 +316,7 @@ void CLemWord::DeleteOborotMarks()
 
 int		CLemWord::GetOborotNo() const
 {
+	if (GetHomonymsCount() == 0) return -1;
     return GetHomonym(0)->m_OborotNo;
 };
 

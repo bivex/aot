@@ -1,0 +1,56 @@
+(lldb) target create "./build_fast/Source/www/SynanDaemon/SynanDaemon"
+Current executable set to '/Volumes/External/Code/aot/build_fast/Source/www/SynanDaemon/SynanDaemon' (arm64).
+(lldb) command source -s 0 'lldb_cmds.txt'
+Executing commands in '/Volumes/External/Code/aot/lldb_cmds.txt'.
+(lldb) run --host 127.0.0.1 --port 8108 --skipbigrams
+INFO  [DealWithLockFile@213] possible port conflicts..., removing /Volumes/External/Code/aot/SynanDaemon.lck
+INFO  [TRMLHttpServer::Initialize@66] initialize daemon at 127.0.0.1:8108
+INFO  [TSynanHttpServer::LoadSynan@83] Loading Russian Syntax
+INFO  [TSynanHttpServer::LoadSynan@89] Loading German Syntax
+INFO  [BuildWorkGrammar@243] reading from the root source file /Volumes/External/Code/aot/Dicts/GerSynan/postmorph.grm
+INFO  [BuildWorkGrammar@251] Number of rules = 29
+INFO  [BuildWorkGrammar@264] creating all variants of nodes from nodes with work attributes
+INFO  [BuildWorkGrammar@267] Number of rules = 65
+INFO  [BuildWorkGrammar@269] checking coherence
+INFO  [CWorkGrammar::IsValid@290] validation...
+
+INFO  [CWorkGrammar::LoadFromPrecompiled@477] loading from precompiled grammar /Volumes/External/Code/aot/Dicts/GerSynan/postmorph.grammar_precompiled
+INFO  [CWorkGrammar::LoadGrammarForGLR@617] create token list for each node
+INFO  [CWorkGrammar::LoadGrammarForGLR@619] all done
+
+INFO  [BuildWorkGrammar@243] reading from the root source file /Volumes/External/Code/aot/Dicts/GerSynan/synan.grm
+INFO  [BuildWorkGrammar@251] Number of rules = 151
+INFO  [BuildWorkGrammar@264] creating all variants of nodes from nodes with work attributes
+INFO  [BuildWorkGrammar@267] Number of rules = 282
+INFO  [BuildWorkGrammar@269] checking coherence
+INFO  [CWorkGrammar::IsValid@290] validation...
+
+INFO  [CWorkGrammar::LoadFromPrecompiled@477] loading from precompiled grammar /Volumes/External/Code/aot/Dicts/GerSynan/synan.grammar_precompiled
+INFO  [CWorkGrammar::LoadGrammarForGLR@617] create token list for each node
+INFO  [CWorkGrammar::LoadGrammarForGLR@619] all done
+
+INFO  [TSynanHttpServer::LoadSynan@95] Loading Ukrainian Syntax
+INFO  [BuildWorkGrammar@243] reading from the root source file /Volumes/External/Code/aot/Dicts/UkrSynan/synan.grm
+INFO  [BuildWorkGrammar@251] Number of rules = 22
+INFO  [BuildWorkGrammar@264] creating all variants of nodes from nodes with work attributes
+INFO  [BuildWorkGrammar@267] Number of rules = 22
+INFO  [BuildWorkGrammar@269] checking coherence
+INFO  [CWorkGrammar::IsValid@290] validation...
+
+INFO  [CWorkGrammar::LoadGrammarForGLR@617] create token list for each node
+INFO  [CWorkGrammar::LoadGrammarForGLR@619] all done
+
+INFO  [TSynanHttpServer::LoadSynan@101] Loading Ukrainian Morphology
+INFO  [TSynanHttpServer::LoadSynan@107] Loading English Morphology
+INFO  [TSynanHttpServer::LoadSynan@113] Loading English Syntax
+INFO  [BuildWorkGrammar@243] reading from the root source file /Volumes/External/Code/aot/Dicts/EngSynan/synan.grm
+INFO  [BuildWorkGrammar@251] Number of rules = 81
+INFO  [BuildWorkGrammar@264] creating all variants of nodes from nodes with work attributes
+INFO  [BuildWorkGrammar@267] Number of rules = 86
+INFO  [BuildWorkGrammar@269] checking coherence
+INFO  [CWorkGrammar::IsValid@290] validation...
+
+INFO  [CWorkGrammar::LoadGrammarForGLR@617] create token list for each node
+INFO  [CWorkGrammar::LoadGrammarForGLR@619] all done
+
+INFO  [TRMLHttpServer::Start@86] run message loop for daemon, start listen socket

@@ -148,7 +148,8 @@ void CRusSentence::TryToRebuildDashInClause()
 
 		int j = pClause.m_iFirstWord;
 		for (; j <= pClause.m_iLastWord; j++)
-			if (	!m_Words[j].GetSynHomonym(0).IsLemma("У")
+			if (	m_Words[j].GetHomonymsCount() > 0
+					&& !m_Words[j].GetSynHomonym(0).IsLemma("У")
 					&& !(GetOpt()->m_Language == morphUkrainian && m_Words[j].GetSynHomonym(0).IsLemma("В"))
 				&&	m_Words[j].GetHomonymByPOS(PREP) != -1 
 				)
@@ -162,8 +163,9 @@ void CRusSentence::TryToRebuildDashInClause()
 
 		for (j = pClause.m_iFirstWord; j <= pClause.m_iLastWord; j++)
 		{
-			if ( m_Words[j].GetSynHomonym(0).IsLemma("ЭТО")
-				|| (GetOpt()->m_Language == morphUkrainian && m_Words[j].GetSynHomonym(0).IsLemma("ЦЕ"))	)
+			if ( m_Words[j].GetHomonymsCount() > 0
+				&& (m_Words[j].GetSynHomonym(0).IsLemma("ЭТО")
+				    || (GetOpt()->m_Language == morphUkrainian && m_Words[j].GetSynHomonym(0).IsLemma("ЦЕ")))	)
 			{
 				Eto.push_back(j);
 				continue;

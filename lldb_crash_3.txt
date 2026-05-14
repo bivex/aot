@@ -1,0 +1,92 @@
+(lldb) target create "./build_fast/Source/www/SynanDaemon/SynanDaemon"
+Current executable set to '/Volumes/External/Code/aot/build_fast/Source/www/SynanDaemon/SynanDaemon' (arm64).
+(lldb) command source -s 0 'lldb_cmds.txt'
+Executing commands in '/Volumes/External/Code/aot/lldb_cmds.txt'.
+(lldb) run --host 127.0.0.1 --port 8109 --skipbigrams
+INFO  [DealWithLockFile@213] possible port conflicts..., removing /Volumes/External/Code/aot/SynanDaemon.lck
+INFO  [TRMLHttpServer::Initialize@66] initialize daemon at 127.0.0.1:8109
+INFO  [TSynanHttpServer::LoadSynan@83] Loading Russian Syntax
+INFO  [TSynanHttpServer::LoadSynan@89] Loading German Syntax
+INFO  [BuildWorkGrammar@243] reading from the root source file /Volumes/External/Code/aot/Dicts/GerSynan/postmorph.grm
+INFO  [BuildWorkGrammar@251] Number of rules = 29
+INFO  [BuildWorkGrammar@264] creating all variants of nodes from nodes with work attributes
+INFO  [BuildWorkGrammar@267] Number of rules = 65
+INFO  [BuildWorkGrammar@269] checking coherence
+INFO  [CWorkGrammar::IsValid@290] validation...
+
+INFO  [CWorkGrammar::LoadFromPrecompiled@477] loading from precompiled grammar /Volumes/External/Code/aot/Dicts/GerSynan/postmorph.grammar_precompiled
+INFO  [CWorkGrammar::LoadGrammarForGLR@617] create token list for each node
+INFO  [CWorkGrammar::LoadGrammarForGLR@619] all done
+
+INFO  [BuildWorkGrammar@243] reading from the root source file /Volumes/External/Code/aot/Dicts/GerSynan/synan.grm
+INFO  [BuildWorkGrammar@251] Number of rules = 151
+INFO  [BuildWorkGrammar@264] creating all variants of nodes from nodes with work attributes
+INFO  [BuildWorkGrammar@267] Number of rules = 282
+INFO  [BuildWorkGrammar@269] checking coherence
+INFO  [CWorkGrammar::IsValid@290] validation...
+
+INFO  [CWorkGrammar::LoadFromPrecompiled@477] loading from precompiled grammar /Volumes/External/Code/aot/Dicts/GerSynan/synan.grammar_precompiled
+INFO  [CWorkGrammar::LoadGrammarForGLR@617] create token list for each node
+INFO  [CWorkGrammar::LoadGrammarForGLR@619] all done
+
+INFO  [TSynanHttpServer::LoadSynan@95] Loading Ukrainian Syntax
+INFO  [BuildWorkGrammar@243] reading from the root source file /Volumes/External/Code/aot/Dicts/UkrSynan/synan.grm
+INFO  [BuildWorkGrammar@251] Number of rules = 22
+INFO  [BuildWorkGrammar@264] creating all variants of nodes from nodes with work attributes
+INFO  [BuildWorkGrammar@267] Number of rules = 22
+INFO  [BuildWorkGrammar@269] checking coherence
+INFO  [CWorkGrammar::IsValid@290] validation...
+
+INFO  [CWorkGrammar::LoadGrammarForGLR@617] create token list for each node
+INFO  [CWorkGrammar::LoadGrammarForGLR@619] all done
+
+INFO  [TSynanHttpServer::LoadSynan@101] Loading Ukrainian Morphology
+INFO  [TSynanHttpServer::LoadSynan@107] Loading English Morphology
+INFO  [TSynanHttpServer::LoadSynan@113] Loading English Syntax
+INFO  [BuildWorkGrammar@243] reading from the root source file /Volumes/External/Code/aot/Dicts/EngSynan/synan.grm
+INFO  [BuildWorkGrammar@251] Number of rules = 81
+INFO  [BuildWorkGrammar@264] creating all variants of nodes from nodes with work attributes
+INFO  [BuildWorkGrammar@267] Number of rules = 86
+INFO  [BuildWorkGrammar@269] checking coherence
+INFO  [CWorkGrammar::IsValid@290] validation...
+
+INFO  [CWorkGrammar::LoadGrammarForGLR@617] create token list for each node
+INFO  [CWorkGrammar::LoadGrammarForGLR@619] all done
+
+INFO  [TRMLHttpServer::Start@86] run message loop for daemon, start listen socket
+INFO  [TRMLHttpServer::OnHttpRequest@105] request method: 2 (GET=1,POST=2,OPTIONS=16)
+INFO  [TRMLHttpServer::OnHttpRequest@118] /?action=syntax&langua=Russian
+INFO  [TRMLHttpServer::OnHttpRequest@131] POST body length: 227
+INFO  [CSyntaxHolder::GetSentencesFromSynAn@98] GetSentencesFromSynAn: ProcessData lang=1
+Process 2786 launched: '/Volumes/External/Code/aot/build_fast/Source/www/SynanDaemon/SynanDaemon' (arm64)
+Process 2786 stopped
+* thread #1, queue = 'com.apple.main-thread', stop reason = EXC_BAD_ACCESS (code=1, address=0x7f)
+    frame #0: 0x00000001000e9bf4 SynanDaemon`CHomonym::IsLemma(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>> const&) const
+SynanDaemon`CHomonym::IsLemma:
+->  0x1000e9bf4 <+0>:  ldrb   w9, [x0, #0x7f]
+    0x1000e9bf8 <+4>:  sxtb   w8, w9
+    0x1000e9bfc <+8>:  ldr    x10, [x0, #0x70]
+    0x1000e9c00 <+12>: cmp    w8, #0x0
+Target 0: (SynanDaemon) stopped.
+(lldb) bt
+* thread #1, queue = 'com.apple.main-thread', stop reason = EXC_BAD_ACCESS (code=1, address=0x7f)
+  * frame #0: 0x00000001000e9bf4 SynanDaemon`CHomonym::IsLemma(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>> const&) const
+    frame #1: 0x000000010005dbec SynanDaemon`CRusSentence::TryToRebuildDashInClause() + 340
+    frame #2: 0x000000010004ee3c SynanDaemon`CRusSentence::BuildClauses() + 1564
+    frame #3: 0x0000000100082b70 SynanDaemon`CSentence::CreateSyntaxStructure() + 48
+    frame #4: 0x00000001000123d0 SynanDaemon`CSentencesCollection::ReadAndProcessSentences(CLemmatizedText const*) + 856
+    frame #5: 0x0000000100011d78 SynanDaemon`CSentencesCollection::ProcessData(CLemmatizedText const*) + 40
+    frame #6: 0x0000000100013538 SynanDaemon`CSyntaxHolder::GetSentencesFromSynAn(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>, bool) + 524
+    frame #7: 0x000000010000e0ac SynanDaemon`TSynanHttpServer::ProcessSyntax(TDaemonParsedRequest&) + 260
+    frame #8: 0x000000010001095c SynanDaemon`TRMLHttpServer::OnHttpRequest(evhttp_request*) + 1836
+    frame #9: 0x00000001002f981c libevent-2.1.7.dylib`evhttp_handle_request + 304
+    frame #10: 0x00000001002f8ed4 libevent-2.1.7.dylib`evhttp_read_body + 704
+    frame #11: 0x00000001002f9244 libevent-2.1.7.dylib`evhttp_get_body + 668
+    frame #12: 0x00000001002d98fc libevent-2.1.7.dylib`bufferevent_run_readcb_ + 48
+    frame #13: 0x00000001002de368 libevent-2.1.7.dylib`bufferevent_readcb + 356
+    frame #14: 0x00000001002e3cc8 libevent-2.1.7.dylib`event_process_active_single_queue + 988
+    frame #15: 0x00000001002e10d8 libevent-2.1.7.dylib`event_base_loop + 952
+    frame #16: 0x0000000100010140 SynanDaemon`TRMLHttpServer::Start() + 308
+    frame #17: 0x0000000100009960 SynanDaemon`main + 828
+    frame #18: 0x00000001856e7da4 dyld`start + 6992
+(lldb) quit
