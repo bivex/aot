@@ -17,6 +17,7 @@ target_link_libraries(SynanLib
     SynCommonLib
     RusSynanLib
     GerSynanLib
+    UkrSynanLib
     EngSynanLib
 )
 

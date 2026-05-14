@@ -6,6 +6,7 @@
 #include "synan/RusSynanLib/RusSyntaxOpt.h"
 #include "synan/GerSynanLib/GerSyntaxOpt.h"
 #include "synan/EngSynanLib/EngSyntaxOpt.h"
+#include "synan/UkrSynanLib/UkrSyntaxOpt.h"
 
 
 CSyntaxOpt *NewOptions(MorphLanguageEnum langua) {
@@ -16,7 +17,7 @@ CSyntaxOpt *NewOptions(MorphLanguageEnum langua) {
         return new CEngSyntaxOpt(langua);
 
     if (langua == morphUkrainian)
-        return new CRusSyntaxOpt(morphUkrainian);
+        return new CUkrSyntaxOpt(morphUkrainian);
 
     return new CRusSyntaxOpt(morphRussian);
 }

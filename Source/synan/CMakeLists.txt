@@ -8,6 +8,7 @@ add_subdirectory (SimpleGrammarPrecompiled)
 
 add_subdirectory (EngSynanLib)
 add_subdirectory (GerSynanLib)
+add_subdirectory (UkrSynanLib)
 add_subdirectory (RusSynanLib)
 add_subdirectory (SynCommonLib)
 add_subdirectory (SynanLib)

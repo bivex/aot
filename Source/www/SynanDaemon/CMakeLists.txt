@@ -11,6 +11,7 @@ add_executable (SynanDaemon
 
 target_link_libraries(SynanDaemon 
     SynanLib
+    UkrSynanLib
     event
     BigramsLib
     #Libevent

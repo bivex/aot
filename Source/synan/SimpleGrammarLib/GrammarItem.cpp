@@ -200,7 +200,7 @@ void CGrammarItem::AddAttribute(std::string Name, std::string Value, MorphLangua
 			};
 
 		if (m_TokenType == OTHER_TOKEN_TYPE)
-			m_TokenType = (Language == morphRussian) ? ORLE : OLLE;
+			m_TokenType = (Language == morphRussian || Language == morphUkrainian) ? ORLE : OLLE;
 		return;
 	}
 	else if (Name == "graphem") {
@@ -210,7 +210,7 @@ void CGrammarItem::AddAttribute(std::string Name, std::string Value, MorphLangua
 	{
 		m_MorphPattern.InitFromGrammarFormat(Language, Value);
 		if (m_TokenType == OTHER_TOKEN_TYPE)
-			m_TokenType = (Language == morphRussian) ? ORLE : OLLE;
+			m_TokenType = (Language == morphRussian || Language == morphUkrainian) ? ORLE : OLLE;
 		return;
 	}
 	else  if (Name == "form")
@@ -270,7 +270,7 @@ void CGrammarItem::AddAttribute(std::string Name, std::string Value, MorphLangua
 					throw CExpc("Bad value for attribute \"register\" (\"%s\"). It can be \"AA\", \"aa\" or \"Aa\"", Value.c_str());
 				};
 		if (m_TokenType == OTHER_TOKEN_TYPE)
-			m_TokenType = (Language == morphRussian) ? ORLE : OLLE;
+			m_TokenType = (Language == morphRussian || Language == morphUkrainian) ? ORLE : OLLE;
 		return;
 	}
 	else if (Name == "filename")
@@ -281,7 +281,7 @@ void CGrammarItem::AddAttribute(std::string Name, std::string Value, MorphLangua
 			throw CExpc("file %s does not exist", Value.c_str());
 		}
 		if (m_TokenType == OTHER_TOKEN_TYPE)
-			m_TokenType = (Language == morphRussian) ? ORLE : OLLE;
+			m_TokenType = (Language == morphRussian || Language == morphUkrainian) ? ORLE : OLLE;
 	}
 	m_Attributes[Name] = Value;
 };

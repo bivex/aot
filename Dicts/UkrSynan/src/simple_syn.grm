@@ -1,0 +1,33 @@
+%% ========== Ukrainian Syntax Rules ==========
+
+%% ========== Noun Phrase (NP) ==========
+[NP] -> [TOKEN grm="N"];
+[NP] -> [TOKEN grm="PRON"];
+[NP] -> [TOKEN grm="A"] [TOKEN grm="N"];
+[NP] -> [TOKEN grm="PA"] [TOKEN grm="N"];
+[NP] -> [TOKEN grm="NUM"] [TOKEN grm="N"];
+[NP] -> [TOKEN grm="ORD_NUM"] [TOKEN grm="N"];
+[NP] -> [TOKEN grm="A"] [TOKEN grm="A"] [TOKEN grm="N"];
+
+%% ========== Prepositional Phrase (PP) ==========
+[PP] -> [TOKEN grm="PREP"] [NP];
+
+%% ========== Verb Phrase (VP) ==========
+[VP] -> [TOKEN grm="V"];
+[VP] -> [TOKEN grm="V"] [NP];
+[VP] -> [TOKEN grm="V"] [PP];
+[VP] -> [TOKEN grm="V"] [NP] [PP];
+[VP] -> [TOKEN grm="ADV"] [TOKEN grm="V"];
+[VP] -> [TOKEN grm="V"] [TOKEN grm="ADV"];
+[VP] -> [TOKEN grm="INFINITIVE"];
+[VP] -> [TOKEN grm="V"] [TOKEN grm="INFINITIVE"];
+
+%% ========== Subject-Predicate (SP) ==========
+[SP] -> [NP] [VP];
+[SP] -> [VP] [NP]; 
+[SP] -> [NP] [TOKEN grm="PRED"];
+[SP] -> [NP] [TOKEN grm="ADJ_SHORT"];
+
+%% ========== Coordination ==========
+[NP] -> [NP] [TOKEN grm="CONJ"] [NP];
+[VP] -> [VP] [TOKEN grm="CONJ"] [VP];
