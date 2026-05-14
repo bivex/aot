@@ -1,67 +1,97 @@
-# Скрипты для пересборки русских словарей RML
+# Скрипти для перебудов словників RML
 
-## Быстрый старт
+## Швидкий старт
 
-### Полная пересборка с тестированием
+### Перебудова всіх словників
 ```bash
 cd Scripts/dict_rebuild
-./rebuild_and_test.sh
+./rebuild_all_dicts.sh
 ```
 
 ### Только пересборка словарей
 ```bash
 ./rebuild_russian_dicts.sh
+./rebuild_ukrainian_dicts.sh
+./rebuild_english_dicts.sh
+./rebuild_german_dicts.sh
 ```
 
-### Только проверка (без сборки)
+### Только перевірка (без зборки)
 ```bash
 ./verify_russian_dicts.sh
+./verify_ukrainian_dicts.sh
+./verify_english_dicts.sh
+./verify_german_dicts.sh
 ```
 
 ## Подробное описание
 
 ### 1. `rebuild_russian_dicts.sh`
 
-Основной скрипт для пересборки русских морфологических словарей.
+Перебудова російських морфологічних словників.
 
-**Возможности:**
-- Конфигурирует CMake (если не настроено)
-- Собирает инструмент `morph_gen`
-- Генерирует бинарные словари из исходных данных (`morphs.json`, `WordData.txt`, `gramtab.json`)
-- Создаёт файлы частот (`*wordweight.bin`, `*homoweight.bin`)
-- Поддерживает параллельную сборку
+**Можливості:**
+- Конфігурує CMake (якщо не налаштовано)
+- Збирає інструмент `morph_gen`
+- Генерує бінарні словники з вихідних даних (`morphs.json`, `WordData.txt`, `gramtab.json`)
+- Створює файли частот (`*wordweight.bin`, `*homoweight.bin`)
+- Підтримує паралельну збірку
 
-**Параметры:**
-- `--clean` — удалить директорию build перед сборкой
-- `--skip-build` — пропустить этап сборки `morph_gen`, только перегенерировать словари
-- `-h, --help` — показать справку
+**Параметри:**
+- `--clean` — видалити директорію build перед зборкою
+- `--skip-build` — пропустити етап збірки `morph_gen`, тільки перегенерувати словники
+- `-h, --help` — показати довідку
 
-**Примеры:**
+**Приклади:**
 ```bash
-# Полная пересборка с чистым билд-директорием
+# Повна перебудова з чистою директорією
 ./rebuild_russian_dicts.sh --clean
 
-# Только перегенерация словарей (если morph_gen уже собран)
+# Тільки перегенерація словників (якщо morph_gen вже зібраний)
 ./rebuild_russian_dicts.sh --skip-build
 ```
 
+### 1a. `rebuild_ukrainian_dicts.sh`
+
+Аналогічно для української мови.
+
+### 1b. `rebuild_english_dicts.sh`
+
+Аналогічно для англійської мови.
+
+### 1c. `rebuild_german_dicts.sh`
+
+Аналогічно для німецької мови.
+
 ### 2. `verify_russian_dicts.sh`
 
-Скрипт проверки корректности пересобранных словарей.
+Перевірка коректності перебудованих російських словників.
 
-**Проверяет:**
-- Наличие всех обязательных бинарных файлов (12 файлов)
-- Наличие исходных файлов словаря
-- Присутствие ключевых глаголов "перестройки" в `WordData.txt`:
+**Перевіряє:**
+- Наявність усіх обов'язкових бінарних файлів (12 файлів)
+- Наявність вихідних файлів словника
+- Присутність ключових дієслів "перебудови" у `WordData.txt`:
   - перестроить, отстроить, восстановить, реконструировать
   - обновить, отремонтировать, реставрировать
-- Валидность JSON-файлов
-- Относительные времена сборки (source vs binary)
+- Валідність JSON-файлів
+- Відносні часи збірки (source vs binary)
 
-**Пример:**
+**Приклад:**
 ```bash
 ./verify_russian_dicts.sh
 ```
+
+### 2a. `verify_ukrainian_dicts.sh`
+
+Аналогічно для української мови.
+
+### 2b. `verify_english_dicts.sh`
+
+Аналогічно для англійської мови.
+
+### 2c. `verify_german_dicts.sh`
+
+Аналогічно для німецької мови.
 
 ### 3. `rebuild_and_test.sh`
 
@@ -99,25 +129,57 @@ export BISON_TOOL=/opt/homebrew/opt/bison/bin/bison
 sudo apt-get install build-essential cmake zlib1g-dev flex bison libevent-dev
 ```
 
-## Структура словарей
+## Структура словників
 
 ```
-Source/morph_dict/data/Russian/   ← Исходники (edit these files)
-├── morphs.json     – модели лемм (35 MB)
-├── gramtab.json    – грамматические коды
-└── WordData.txt    – слова с частотой (1.7 MB)
+Source/morph_dict/data/<Мова>/       ← Джерела (редагуйте тут)
+├── morphs.json     – моделі лемм (~20–40 MB)
+├── gramtab.json    – граматичні коди
+└── WordData.txt    – слова з частотами (~0.1–15 MB)
 
-Dicts/Morph/Russian/              ← Сгенерированные бинарники (used by daemons)
-├── morph.bases         – база лемм (2.6 MB)
-├── morph.annot         – аннотации (4.7 MB)
-├── morph.forms_autom   – автомат форм (6.4 MB)
-├── gramtab.json        – копия грамматики
-├── morph.options       – настройки
-├── npredict.bin        – предиктор неизвестных слов
-└── *wordweight.bin     – частотные словари (lemma/homonym)
+Dicts/Morph/<Мова>/                  ← Згенеровані бінарники (використовуються демонами)
+├── morph.bases         – база лемм (2–5 MB)
+├── morph.annot         – аннотації (4–8 MB)
+├── morph.forms_autom   – автомат форм (4–9 MB)
+├── gramtab.json        – копія граматики
+├── morph.options       – налаштування
+├── npredict.bin        – предиктор невідомих слів
+└── *wordweight.bin     – частотні словники (lemma/homonym)
+    Примітка: німецький словник не має WordData.txt, тому freq-файли порожні.
 ```
 
-## Запуск демонов после пересборки
+## Запуск демонів після перебудови
+
+```bash
+# Термінал 1 — семантичний аналізатор
+RML=$(pwd) ./Bin/SemanDaemon --host 127.0.0.1 --port 8081
+
+# Термінал 2 — синтаксичний і морфологічний
+RML=$(pwd) ./Bin/SynanDaemon --host 127.0.0.1 --port 8082
+
+# Тест API
+curl -G --data-urlencode "action=morph" \
+     --data-urlencode "langua=Russian" \
+     --data-urlencode "query=перестроить" \
+     http://127.0.0.1:8082/
+```
+Source/morph_dict/data/<Мова>/       ← Джерела (редагуйте тут)
+├── morphs.json     – моделі лемм (~20–40 MB)
+├── gramtab.json    – граматичні коди
+└── WordData.txt    – слова з частотами (~0.1–15 MB)
+
+Dicts/Morph/<Мова>/                  ← Згенеровані бінарники (використовуються демонами)
+├── morph.bases         – база лемм (2–5 MB)
+├── morph.annot         – аннотації (4–8 MB)
+├── morph.forms_autom   – автомат форм (4–9 MB)
+├── gramtab.json        – копія граматики
+├── morph.options       – налаштування
+├── npredict.bin        – предиктор невідомих слів
+└── *wordweight.bin     – частотні словники (lemma/homonym)
+    Примітка: німецький словник не має WordData.txt, тому freq-файли порожні.
+```
+
+## Запуск демонів після перебудови
 
 ```bash
 # В одном терминале — семантический анализатор
@@ -135,54 +197,87 @@ curl -G --data-urlencode "action=morph" \
 
 ## Что делают скрипты
 
-### Пересборка (rebuild_russian_dicts.sh)
-1. Проверяет переменную окружения `RML`
-2. При необходимости конфигурирует CMake (с учётом macOS flex/bison из Homebrew)
-3. Собирает `morph_gen`, `StatDatBin`, `word_freq_bin`
-4. Запускает целевую сборку `Russian_Morph`
-5. Создаёт все бинарные файлы в `Dicts/Morph/Russian/`
+### Перебудова (`rebuild_<lang>_dicts.sh`)
 
-### Проверка (verify_russian_dicts.sh)
-1. Считает все 12 обязательных файла
-2. Проверяет, что в `WordData.txt` есть глаголы на rebuild-тематику
-3. Валидирует JSON через Python3 (если доступен)
-4. Показывает временные метки source vs binary
+1. Перевіряє змінну оточення `RML`
+2. При необхідності конфігурує CMake (з урахуванням macOS flex/bison з Homebrew)
+3. Збирає `morph_gen`, `StatDatBin`, `word_freq_bin`
+4. Запускає цільову збірку `<Language>_Morph`
+5. Створює усі бінарні файли у `Dicts/Morph/<Language>/`
 
-### Тест (rebuild_and_test.sh)
-1. Выполняет пересборку (с `--skip-build`)
-2. Запускает проверку
-3. Стартует SynanDaemon в фоне
-4. Шлёт тестовый запрос с предложением containing rebuild verbs
-5. Останавливает демон
+### Перевірка (`verify_<lang>_dicts.sh`)
 
-## Замечания
+1. Підраховує 12 обов'язкових бінарних файлів
+2. Перевіряє, що у `WordData.txt` є відповідні дієслова rebuild-семантики
+3. Валідує JSON через Python3 (якщо доступний)
+4. Показує часові мітки source vs binary
 
-- Скрипты должны запускаться из корня проекта RML
-- Все пути вычисляются относительно местоположения скриптов
-- Для первого запуска используйте `rebuild_russian_dicts.sh` без флагов (сделает полную сборку)
-- При внесении изменений в `WordData.txt` или `morphs.json` — запускайте только `rebuild_russian_dicts.sh --skip-build`
-- Для полной чистки (все языки) удалите `build/` и `Dicts/Morph/` вручную
+### Тест (`rebuild_and_test_<lang>.sh`)
 
-## Troubleshooting
+1. Виконує перебудову (з `--skip-build`)
+2. Запускає перевірку
+3. Стартує SynanDaemon у фоновому режимі
+4. Відправляє тестовізапит із реченням contain rebuild-дієслова
+5. Зупиняє демон
 
-**Ошибка: `RML environment variable is not set`**
+## Зауваження
+
+- Скрипти мають запускатися з кореня проекту RML
+- Усі шляхи обчислюються відносно розташування скриптів
+- Для першого запуску використовуйте `rebuild_russian_dicts.sh` без прапорців (зробить повну збірку)
+- При внесенні змін до `WordData.txt` або `morphs.json` — запускайте тільки `rebuild_<lang>_dicts.sh --skip-build`
+- Для повної очистки (всі мови) видаліть `build/` та `Dicts/Morph/` вручну
+
+## Тестування
+
+Після перебудови можна протестувати API:
+
+```bash
+# Російська
+curl -G --data-urlencode "action=syntax" \
+     --data-urlencode "langua=Russian" \
+     --data-urlencode "query=Мы хотим перестроить здание." \
+     http://127.0.0.1:8082/
+
+# Українська
+curl -G --data-urlencode "action=syntax" \
+     --data-urlencode "langua=Ukrainian" \
+     --data-urlencode "query=Ми хочемо відбудувати будинок." \
+     http://127.0.0.1:8082/
+
+# Англійська
+curl -G --data-urlencode "action=syntax" \
+     --data-urlencode "langua=English" \
+     --data-urlencode "query=We want to rebuild the building." \
+     http://127.0.0.1:8082/
+
+# Німецька
+curl -G --data-urlencode "action=syntax" \
+     --data-urlencode "langua=German" \
+     --data-urlencode "query=Wir wollen das Gebäude wiederaufbauen." \
+     http://127.0.0.1:8082/
+```
+
+## Вирішення проблем
+
+**`RML environment variable is not set`**
 ```bash
 export RML=$(pwd)
 ```
 
-**Ошибка: `morph_gen: command not found`**
+**`morph_gen: command not found`**
 ```bash
-./rebuild_russian_dicts.sh --clean   # полная пересборка
+./rebuild_russian_dicts.sh --clean   # повна перебудова
 ```
 
-**Ошибка: Flex/Bison not found (macOS)**
+**Permission denied**
+```bash
+chmod +x Scripts/dict_rebuild/*.sh
+```
+
+**Flex/Bison not found on macOS**
 ```bash
 brew install flex bison
 export FLEX_TOOL=/opt/homebrew/opt/flex/bin/flex
 export BISON_TOOL=/opt/homebrew/opt/bison/bin/bison
-```
-
-**Ошибка: Permission denied**
-```bash
-chmod +x rebuild_russian_dicts.sh verify_russian_dicts.sh rebuild_and_test.sh
 ```
