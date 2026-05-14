@@ -24,6 +24,7 @@ bool	CRusSentence::IsGoodSubject(const CMorphVariant& synVariant, const std::str
 	return false;
 
 	const CSynUnit& PredUnit = synVariant.m_SynUnits[synVariant.m_iPredk];
+	if (m_Words[PredUnit.m_SentPeriod.m_iFirstWord].m_Homonyms.empty() || PredUnit.m_iHomonymNum >= (int)m_Words[PredUnit.m_SentPeriod.m_iFirstWord].m_Homonyms.size()) return false;
 	const CSynHomonym& PredHom = m_Words[PredUnit.m_SentPeriod.m_iFirstWord].m_Homonyms[PredUnit.m_iHomonymNum];
 
 	//  для фразы "Боже ты мой!"
@@ -33,6 +34,7 @@ bool	CRusSentence::IsGoodSubject(const CMorphVariant& synVariant, const std::str
 
 	const CSynUnit& SubjUnit = synVariant.m_SynUnits[synVariant.GetFirstSubject()];
 	const CSynWord& SubjWord = m_Words[SubjUnit.m_SentPeriod.m_iFirstWord];
+	if (SubjWord.m_Homonyms.empty() || SubjUnit.m_iHomonymNum >= (int)SubjWord.m_Homonyms.size()) return false;
 	const CSynHomonym& SubjHom = SubjWord.m_Homonyms[SubjUnit.m_iHomonymNum];
 
 	if( SubjHom.IsLemma("ЧТО") || (GetOpt()->m_Language == morphUkrainian && SubjHom.IsLemma("ЩО")) )
@@ -87,6 +89,7 @@ bool CRusSentence::find_subj_and_predic_noun_with_dash(CMorphVariant& synVariant
 			continue; 
 
 		const CSynWord& W = m_Words[U.m_SentPeriod.m_iFirstWord];
+		if (W.m_Homonyms.empty() || U.m_iHomonymNum >= (int)W.m_Homonyms.size()) continue;
 		const CSynHomonym& H = W.m_Homonyms[U.m_iHomonymNum];
 
 		if( W.m_bDash )
@@ -157,6 +160,7 @@ bool CRusSentence::can_be_subject(const CMorphVariant& synVariant, int SubjWordN
 	const CSynWord& SubjWord = m_Words[SubjUnit.m_SentPeriod.m_iFirstWord];
     if ( SubjWord.HasDes(OPun)  ) return false;
 
+	if (SubjWord.m_Homonyms.empty() || SubjUnit.m_iHomonymNum >= (int)SubjWord.m_Homonyms.size()) return false;
 	const CSynHomonym& SubjHom = SubjWord.m_Homonyms[SubjUnit.m_iHomonymNum];
 	const std::string& strWord = SubjWord.m_strUpperWord;
 
@@ -237,6 +241,7 @@ bool CRusSentence::can_be_subject(const CMorphVariant& synVariant, int SubjWordN
 				hasprep = true;
 			if (U.m_Type == EClause) continue;
 			const CSynWord& W = m_Words[U.m_SentPeriod.m_iFirstWord];
+				if (m_Words[U.m_SentPeriod.m_iFirstWord].m_Homonyms.empty() || U.m_iHomonymNum >= (int)m_Words[U.m_SentPeriod.m_iFirstWord].m_Homonyms.size()) continue;
 			const CSynHomonym& H = W.m_Homonyms[U.m_iHomonymNum];
 			if ( H.IsSynNoun() ) 
 					iGrCount++;
@@ -367,6 +372,7 @@ bool CRusSentence::GleicheSubjPredForNumeralAndSimilar(const CMorphVariant& synV
 	const CGroup& group = synVariant.m_vectorGroups.GetGroups()[iGroup];
 
 	const CSynUnit& PredUnit = synVariant.m_SynUnits[predk];
+	if (m_Words[PredUnit.m_SentPeriod.m_iFirstWord].m_Homonyms.empty() || PredUnit.m_iHomonymNum >= (int)m_Words[PredUnit.m_SentPeriod.m_iFirstWord].m_Homonyms.size()) return false;
 	const CSynHomonym& PredHom = m_Words[PredUnit.m_SentPeriod.m_iFirstWord].m_Homonyms[PredUnit.m_iHomonymNum];
 
 	switch( group.m_GroupType)
@@ -431,10 +437,12 @@ bool CRusSentence::GleicheSubjPredForNumeralAndSimilar(const CMorphVariant& synV
 bool CRusSentence::gleiche_subj_pred_for_numerals_as_nouns(const CMorphVariant& synVariant, int predk, int i_subj) const
 {
 	const CSynUnit& PredUnit = synVariant.m_SynUnits[predk];
+	if (m_Words[PredUnit.m_SentPeriod.m_iFirstWord].m_Homonyms.empty() || PredUnit.m_iHomonymNum >= (int)m_Words[PredUnit.m_SentPeriod.m_iFirstWord].m_Homonyms.size()) return false;
 	const CSynHomonym& PredHom = m_Words[PredUnit.m_SentPeriod.m_iFirstWord].m_Homonyms[PredUnit.m_iHomonymNum];
 
 	int main_word = synVariant.m_vectorGroups.get_main_word(i_subj);
 	const CSynUnit& SubjUnit = synVariant.m_SynUnits[main_word];
+	if (m_Words[SubjUnit.m_SentPeriod.m_iFirstWord].m_Homonyms.empty() || SubjUnit.m_iHomonymNum >= (int)m_Words[SubjUnit.m_SentPeriod.m_iFirstWord].m_Homonyms.size()) return false;
 	const CSynHomonym& SubjHom = m_Words[SubjUnit.m_SentPeriod.m_iFirstWord].m_Homonyms[SubjUnit.m_iHomonymNum];
 
 	if( CanNumeralBeNoun(SubjHom.GetLemma()) )
@@ -456,11 +464,13 @@ bool CRusSentence::gleiche_subj_pred_for_numerals_as_nouns(const CMorphVariant& 
 bool CRusSentence::check_verb_subj_coordination(const CMorphVariant& synVariant, int predk, int SubjGroupFirstWordNo, int& SubjWordNo) const
 {
 	const CSynUnit& PredUnit = synVariant.m_SynUnits[predk];
+	if (m_Words[PredUnit.m_SentPeriod.m_iFirstWord].m_Homonyms.empty() || PredUnit.m_iHomonymNum >= (int)m_Words[PredUnit.m_SentPeriod.m_iFirstWord].m_Homonyms.size()) return false;
 	const CSynHomonym& PredHom = m_Words[PredUnit.m_SentPeriod.m_iFirstWord].m_Homonyms[PredUnit.m_iHomonymNum];
 
     int gr_num = synVariant.m_vectorGroups.get_maximal_group_no(SubjGroupFirstWordNo);
     int main_word = (gr_num == -1) ? SubjGroupFirstWordNo : synVariant.m_vectorGroups.GetGroups()[gr_num].m_MainWordNo;
 	const CSynUnit& SubjUnit = synVariant.m_SynUnits[main_word];
+	if (m_Words[SubjUnit.m_SentPeriod.m_iFirstWord].m_Homonyms.empty() || SubjUnit.m_iHomonymNum >= (int)m_Words[SubjUnit.m_SentPeriod.m_iFirstWord].m_Homonyms.size()) return false;
 	const CSynHomonym& SubjHom = m_Words[SubjUnit.m_SentPeriod.m_iFirstWord].m_Homonyms[SubjUnit.m_iHomonymNum];
 
 
@@ -508,9 +518,11 @@ bool CRusSentence::check_adj_subj_coordination(const CMorphVariant& synVariant, 
     int gr_num = synVariant.m_vectorGroups.get_maximal_group_no(SubjGroupFirstWordNo);
     int main_word = (gr_num == -1) ? SubjGroupFirstWordNo : synVariant.m_vectorGroups.GetGroups()[gr_num].m_MainWordNo;
 	const CSynUnit& SubjUnit = synVariant.m_SynUnits[main_word];
+	if (m_Words[SubjUnit.m_SentPeriod.m_iFirstWord].m_Homonyms.empty() || SubjUnit.m_iHomonymNum >= (int)m_Words[SubjUnit.m_SentPeriod.m_iFirstWord].m_Homonyms.size()) return false;
 	const CSynHomonym& SubjHom = m_Words[SubjUnit.m_SentPeriod.m_iFirstWord].m_Homonyms[SubjUnit.m_iHomonymNum];
 
 	const CSynUnit& PredUnit = synVariant.m_SynUnits[predk];
+	if (m_Words[PredUnit.m_SentPeriod.m_iFirstWord].m_Homonyms.empty() || PredUnit.m_iHomonymNum >= (int)m_Words[PredUnit.m_SentPeriod.m_iFirstWord].m_Homonyms.size()) return false;
 	const CSynHomonym& PredHom = m_Words[PredUnit.m_SentPeriod.m_iFirstWord].m_Homonyms[PredUnit.m_iHomonymNum];
 
 	/*
@@ -583,6 +595,7 @@ bool CRusSentence::find_subj(CMorphVariant& synVariant, int predk)
 	if (PredUnit.m_Type == EClause)  return false;
 	const CSynWord& PredWord = m_Words[PredUnit.m_SentPeriod.m_iFirstWord];
 	const CSynHomonym& PredHom = PredWord.m_Homonyms[PredUnit.m_iHomonymNum];
+	if (PredWord.m_Homonyms.empty() || PredUnit.m_iHomonymNum >= (int)PredWord.m_Homonyms.size()) return false;
 
 	if ( PredUnit.m_Type == EClause ) return false; 
 
@@ -627,6 +640,7 @@ bool CRusSentence::find_subj(CMorphVariant& synVariant, int predk)
 
 					const CSynUnit& U = synVariant.m_SynUnits[k];
 					if (U.m_Type == EClause) continue;
+					if (m_Words[U.m_SentPeriod.m_iFirstWord].m_Homonyms.empty() || U.m_iHomonymNum >= (int)m_Words[U.m_SentPeriod.m_iFirstWord].m_Homonyms.size()) continue;
 					const CSynHomonym& H = m_Words[U.m_SentPeriod.m_iFirstWord].m_Homonyms[U.m_iHomonymNum];
 				   	uint64_t grammems = H.m_iGrammems;
 					int GroupNo = synVariant.m_vectorGroups.get_minimal_group(k);

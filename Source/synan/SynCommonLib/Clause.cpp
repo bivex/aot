@@ -602,8 +602,9 @@ void CClause::BuildSynVariants()
 
 void	CClause::BuildSubjAndPredMember(CMorphVariant& synVariant)
 {
-	int RootWordNo = (synVariant.m_ClauseTypeNo == -1) ? -1 : m_vectorTypes[synVariant.m_ClauseTypeNo].m_Root.m_WordNo;
-	EClauseType Type = (synVariant.m_ClauseTypeNo == -1) ? UnknownSyntaxElement : m_vectorTypes[synVariant.m_ClauseTypeNo].m_Type;
+	if (synVariant.m_ClauseTypeNo < 0 || synVariant.m_ClauseTypeNo >= (int)m_vectorTypes.size()) return;
+	int RootWordNo = m_vectorTypes[synVariant.m_ClauseTypeNo].m_Root.m_WordNo;
+	EClauseType Type = m_vectorTypes[synVariant.m_ClauseTypeNo].m_Type;
 	m_pSent->BuildSubjAndPredRelation(synVariant, UnitNoByWordNo(RootWordNo), Type);
 };
 

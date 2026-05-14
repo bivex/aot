@@ -244,6 +244,7 @@ void CEngSentence::BuildSubjAndPredRelation(CMorphVariant& synVariant, long Root
 			const CSynUnit& U = synVariant.m_SynUnits[i];
 			if (U.m_Type != EWord) continue;
 			const CSynWord& W = m_Words[U.m_SentPeriod.m_iFirstWord];
+				if (W.m_Homonyms.empty() || U.m_iHomonymNum >= (int)W.m_Homonyms.size()) continue;
 			const CSynHomonym& H = W.m_Homonyms[U.m_iHomonymNum];
 			if (GetEngGramTab()->is_verb_form(H.m_iPoses) || H.HasPos(eVERB) || H.HasPos(eVBE) || H.HasPos(eMOD)) {
 				iPred = i;
@@ -265,6 +266,7 @@ void CEngSentence::BuildSubjAndPredRelation(CMorphVariant& synVariant, long Root
 		if (U.m_Type != EWord) continue;
 
 		const CSynWord& W = m_Words[U.m_SentPeriod.m_iFirstWord];
+			if (W.m_Homonyms.empty() || U.m_iHomonymNum >= (int)W.m_Homonyms.size()) continue;
 		const CSynHomonym& H = W.m_Homonyms[U.m_iHomonymNum];
 
 		if (GetEngGramTab()->IsMorphNoun(H.m_iPoses) || 
@@ -287,6 +289,7 @@ void CEngSentence::BuildSubjAndPredRelation(CMorphVariant& synVariant, long Root
 			const CSynUnit& PU = synVariant.m_SynUnits[iPred];
 			const CSynWord& PW = m_Words[PU.m_SentPeriod.m_iFirstWord];
 			const CSynHomonym& PH = PW.m_Homonyms[PU.m_iHomonymNum];
+				if (PW.m_Homonyms.empty() || PU.m_iHomonymNum >= (int)PW.m_Homonyms.size()) break;
 
 			if (GetEngGramTab()->GleicheSubjectPredicate(H.GetGramCodes().c_str(), PH.GetGramCodes().c_str())) {
 				synVariant.m_Subjects.push_back(i);
@@ -304,7 +307,9 @@ void CEngSentence::BuildSubjAndPredRelation(CMorphVariant& synVariant, long Root
 			if (U.m_Type != EWord) continue;
 
 			const CSynWord& W = m_Words[U.m_SentPeriod.m_iFirstWord];
+			if (W.m_Homonyms.empty() || U.m_iHomonymNum >= (int)W.m_Homonyms.size()) continue;
 			const CSynHomonym& H = W.m_Homonyms[U.m_iHomonymNum];
+				if (W.m_Homonyms.empty() || U.m_iHomonymNum >= (int)W.m_Homonyms.size()) continue;
 
 			if (GetEngGramTab()->IsMorphNoun(H.m_iPoses) || 
 			    GetEngGramTab()->is_morph_pronoun(H.m_iPoses) || 
@@ -313,6 +318,7 @@ void CEngSentence::BuildSubjAndPredRelation(CMorphVariant& synVariant, long Root
 				const CSynUnit& PU = synVariant.m_SynUnits[iPred];
 				const CSynWord& PW = m_Words[PU.m_SentPeriod.m_iFirstWord];
 				const CSynHomonym& PH = PW.m_Homonyms[PU.m_iHomonymNum];
+				if (PW.m_Homonyms.empty() || PU.m_iHomonymNum >= (int)PW.m_Homonyms.size()) break;
 
 				// For questions like "What did you say", "did" (VBE) is iPred. 
 				// We accept the first NP after it as subject.

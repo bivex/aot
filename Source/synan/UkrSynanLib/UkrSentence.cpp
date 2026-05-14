@@ -30,6 +30,7 @@ void CUkrSentence::BuildSubjAndPredRelation(CMorphVariant& synVariant, long Root
 
 	const CSynUnit& PU = synVariant.m_SynUnits[iPred];
 	const CSynWord& PW = m_Words[PU.m_SentPeriod.m_iFirstWord];
+	if (PW.m_Homonyms.empty() || PU.m_iHomonymNum >= (int)PW.m_Homonyms.size()) return;
 	const CSynHomonym& PH = PW.m_Homonyms[PU.m_iHomonymNum];
 
 	// Forward scan (inverted subjects)
@@ -38,11 +39,12 @@ void CUkrSentence::BuildSubjAndPredRelation(CMorphVariant& synVariant, long Root
 		if (U.m_Type != EWord) continue;
 
 		const CSynWord& W = m_Words[U.m_SentPeriod.m_iFirstWord];
+		if (W.m_Homonyms.empty() || U.m_iHomonymNum >= (int)W.m_Homonyms.size()) continue;
 		const CSynHomonym& H = W.m_Homonyms[U.m_iHomonymNum];
 
-		if (GetUkrGramTab()->IsMorphNoun(H.m_iPoses) || 
+		if (GetUkrGramTab()->IsMorphNoun(H.m_iPoses) ||
 		    GetUkrGramTab()->is_morph_pronoun(H.m_iPoses)) {
-			
+
 			if (GetUkrGramTab()->GleicheSubjectPredicate(H.GetGramCodes().c_str(), PH.GetGramCodes().c_str())) {
 				synVariant.m_Subjects.push_back(i);
 				synVariant.m_bGoodSubject = true;
@@ -58,11 +60,12 @@ void CUkrSentence::BuildSubjAndPredRelation(CMorphVariant& synVariant, long Root
 			if (U.m_Type != EWord) continue;
 
 			const CSynWord& W = m_Words[U.m_SentPeriod.m_iFirstWord];
+			if (W.m_Homonyms.empty() || U.m_iHomonymNum >= (int)W.m_Homonyms.size()) continue;
 			const CSynHomonym& H = W.m_Homonyms[U.m_iHomonymNum];
 
-			if (GetUkrGramTab()->IsMorphNoun(H.m_iPoses) || 
+			if (GetUkrGramTab()->IsMorphNoun(H.m_iPoses) ||
 			    GetUkrGramTab()->is_morph_pronoun(H.m_iPoses)) {
-				
+
 				if (GetUkrGramTab()->GleicheSubjectPredicate(H.GetGramCodes().c_str(), PH.GetGramCodes().c_str())) {
 					synVariant.m_Subjects.push_back(i);
 					synVariant.m_bGoodSubject = true;
