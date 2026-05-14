@@ -1,9 +1,9 @@
+cmake_minimum_required(VERSION 3.16)
 project(aot)
 
 set(CMAKE_LEGACY_CYGWIN_WIN32 0)
 
 macro (declare_cmake_min_version)
-    cmake_minimum_required(VERSION 3.16)
 endmacro(declare_cmake_min_version)
 
 declare_cmake_min_version()
