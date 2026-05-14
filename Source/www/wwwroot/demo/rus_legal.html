@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="ru">
 <head>
-	<title>АОТ :: Онлайн демо :: Юридичний аналіз (UA)</title>
+	<title>АОТ :: Онлайн демо :: Юридический анализ (RU)</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta name="description" content="Демонстрація синтаксичного аналізу юридичних документів українською мовою в системі АОТ">
+	<meta name="description" content="Демонстрация синтаксического анализа юридических документов на русском языке в системе АОТ">
 	<meta name="theme-color" content="#1a252f">
 
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fomantic-ui@2.9.3/dist/semantic.min.css">
@@ -15,7 +15,7 @@
 <body>
 
 <!-- ═══ Navigation ═══ -->
-<nav class="aot-nav" role="navigation" aria-label="Основна навігація">
+<nav class="aot-nav" role="navigation" aria-label="Основная навигация">
 	<div class="nav-inner">
 		<a href="/index.html" class="nav-brand">
 			<span class="brand-accent">AOT</span><span class="brand-dot">.ru</span>
@@ -25,9 +25,9 @@
 			<span></span><span></span><span></span>
 		</button>
 		<div class="nav-links">
-			<a href="/index.html">Головна</a>
+			<a href="/index.html">Главная</a>
 			<a href="/onlinedemo.html" class="active">Демо</a>
-			<a href="/technology.html">Технології</a>
+			<a href="/technology.html">Технологии</a>
 		</div>
 	</div>
 </nav>
@@ -36,9 +36,9 @@
 <header class="aot-hero" id="top">
 	<div class="hero-glow"></div>
 	<div class="hero-inner">
-		<div class="hero-badge">Українська мова</div>
-		<h1>Юридичний аналіз</h1>
-		<p>Автоматичний розбір структури юридичних та офіційних документів українською мовою.</p>
+		<div class="hero-badge">Русский язык</div>
+		<h1>Юридический анализ</h1>
+		<p>Автоматический разбор структуры юридических и официальных документов на русском языке.</p>
 	</div>
 </header>
 
@@ -50,7 +50,7 @@
 			<!-- Demo card -->
 			<section class="ui card aot-card" style="width: 100%;">
 				<div class="content">
-					<h2 class="header">Аналіз юридичного тексту</h2>
+					<h2 class="header">Анализ юридического текста</h2>
 
 					<form class="ui form" id="syntax-form">
 						<div class="field">
@@ -58,32 +58,32 @@
 							<textarea
 								id="InputText"
 								rows="8"
-								placeholder="Вставте фрагмент юридичного тексту (договір, закон, наказ)..."
-							>Цей Договір набирає чинності з моменту його підписання Сторонами та діє до повного виконання ними своїх зобов'язань.</textarea>
+								placeholder="Вставьте фрагмент юридического текста (договор, закон, приказ)..."
+							>Настоящий Договор вступает в силу с момента его подписания Сторонами и действует до полного исполнения ими своих обязательств.</textarea>
 						</div>
 
 						<div class="field">
-							<label>Приклади юридичних формулювань:</label>
+							<label>Примеры юридических формулировок:</label>
 							<div class="ui buttons small">
-								<button type="button" class="ui button" onclick="setExample(0)">Договір</button>
+								<button type="button" class="ui button" onclick="setExample(0)">Договор</button>
 								<button type="button" class="ui button" onclick="setExample(1)">Закон</button>
-								<button type="button" class="ui button" onclick="setExample(2)">Повноваження</button>
+								<button type="button" class="ui button" onclick="setExample(2)">Полномочия</button>
 							</div>
 						</div>
 
 						<div class="field" style="display: none;">
 							<select id="Language">
-								<option value="Ukrainian" selected>Ukrainian</option>
+								<option value="Russian" selected>Russian</option>
 							</select>
 						</div>
 
 						<div class="field">
 							<button type="button" class="ui primary button aot-primary" onclick="window.syntax_request()">
-								Аналізувати структуру
+								Анализировать структуру
 							</button>
-							<button type="button" class="ui button" onclick="clearForm()">Очистити</button>
+							<button type="button" class="ui button" onclick="clearForm()">Очистить</button>
 							<button type="button" class="ui button" onclick="window.saveSvg()" id="btnSaveSvg" style="display:none">
-								Зберегти SVG
+								Сохранить SVG
 							</button>
 						</div>
 					</form>
@@ -98,12 +98,12 @@
 
 		<div class="sixteen wide column">
 			<section class="ui info segment">
-				<h3 class="ui header">Особливості юридичного розбору</h3>
-				<p>Даний модуль використовує спеціалізовану граматику для виявлення складних конструкцій, характерних для юридичного стилю:</p>
+				<h3 class="ui header">Особенности юридического разбора</h3>
+				<p>Данный модуль использует специализированную грамматику для выявления сложных конструкций, характерных для юридического стиля:</p>
 				<div class="ui bulleted list">
-					<div class="item">Розбір складних дієприкметникових та дієприслівникових зворотів.</div>
-					<div class="item">Виявлення суб'єктів та об'єктів у багатослівних реченнях.</div>
-					<div class="item">Аналіз логічних зв'язків між частинами правових норм.</div>
+					<div class="item">Разбор сложных причастных и деепричастных оборотов.</div>
+					<div class="item">Выявление субъектов и объектов в многословных предложениях.</div>
+					<div class="item">Анализ логических связей между частями правовых норм.</div>
 				</div>
 			</section>
 		</div>
@@ -119,24 +119,24 @@
 				<div class="footer-brand">
 					<span class="brand-accent">AOT</span><span class="brand-dot">.ru</span>
 				</div>
-				<p class="footer-desc">Система автоматичного аналізу тексту. Синтаксичний розбір українських, російських, англійських та німецьких документів.</p>
+				<p class="footer-desc">Система автоматического анализа текста. Синтаксический разбор русских, украинских, английских и немецких документов.</p>
 			</div>
 			<div class="footer-col">
 				<h4>Проект</h4>
-				<a href="/index.html">Головна</a>
-				<a href="/history.html">Історія</a>
-				<a href="/onlinedemo.html">Демо-версії</a>
-				<a href="/technology.html">Технології</a>
+				<a href="/index.html">Главная</a>
+				<a href="/history.html">История</a>
+				<a href="/onlinedemo.html">Демо-версии</a>
+				<a href="/technology.html">Технологии</a>
 			</div>
 			<div class="footer-col">
 				<h4>Демо</h4>
-				<a href="rus_legal.html">Юридичний RU</a>
+				<a href="rus_legal.html">Юридический RU</a>
 				<a href="ukr_legal.html">Юридичний UA</a>
 				<a href="eng_legal.html">Legal EN</a>
 			</div>
 		</div>
 		<div class="footer-bottom">
-			<p>&copy; 2003&ndash;2026 Проект АОТ. Всі права захищені.</p>
+			<p>&copy; 2003&ndash;2026 Проект АОТ. Все права защищены.</p>
 		</div>
 	</div>
 </footer>
@@ -144,13 +144,13 @@
 <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fomantic-ui@2.9.3/dist/semantic.min.js"></script>
-<script src="synan_legal.js?v=4"></script>
+<script src="synan_rus_legal.js?v=1"></script>
 
 <script>
 	const examples = [
-		"Цей Договір набирає чинності з моменту його підписання Сторонами та діє до повного виконання ними своїх зобов'язань.",
-		"Органи державної влади та органи місцевого самоврядування діють лише на підставі, в межах повноважень та у спосіб, що передбачені Конституцією та законами України.",
-		"Сторони несуть відповідальність за невиконання або неналежне виконання умов цього Договору відповідно до чинного законодавства України."
+		"Настоящий Договор вступает в силу с момента его подписания Сторонами и действует до полного исполнения ими своих обязательств.",
+		"Органы государственной власти и органы местного самоуправления действуют только на основании, в пределах полномочий и способом, предусмотренным Конституцией и законами Российской Федерации.",
+		"Стороны несут ответственность за неисполнение или ненадлежащее исполнение условий настоящего Договора в соответствии с действующим законодательством Российской Федерации."
 	];
 
 	function setExample(i) {
@@ -175,7 +175,7 @@
 		var url = URL.createObjectURL(blob);
 		var a = document.createElement('a');
 		a.href = url;
-		a.download = 'synan_legal.svg';
+		a.download = 'synan_rus_legal.svg';
 		document.body.appendChild(a);
 		a.click();
 		document.body.removeChild(a);
