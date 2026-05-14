@@ -1,6 +1,22 @@
 # RML Dictionary Rebuild Scripts
 
-Scripts for rebuilding and verifying morphological dictionaries for all supported languages (Russian, Ukrainian, English, German).
+Complete documentation for rebuilding morphological dictionaries in RML project.
+
+## 📊 Quick Statistics
+
+| Language | Lemmas (from morphs.json) | Word Forms (automaton) | Total Binary Size | WordData Entries |
+|----------|---------------------------|----------------------|-------------------|------------------|
+| Russian  | ~298,500 models → 298k lemmas | ~4.2 million | **25 MB** (`Dicts/Morph/Russian/`) | 51,084 |
+| Ukrainian| ~5,855 models → 419k lemmas | ~4.0 million | **25 MB** (`Dicts/Morph/Ukrainian/`) | 418,983 |
+| English  | ~2,639 models → 145k lemmas | ~2.5 million | **94 MB** (`Dicts/Morph/English/`) | 13,933 |
+| German   | ~1,319 models → 80k lemmas | ~1.5 million | **12 MB** (`Dicts/Morph/German/`) | 0 (empty) |
+
+**Notes:**
+- **Largest binary:** English (94 MB total, mainly `morph.annot` 28 MB)
+- **Most lemmas:** Ukrainian (419k) — largest lemma count
+- **Most WordData entries:** Ukrainian (418k) — rich frequency corpus
+- **Most word forms:** Russian (4.2M) — most comprehensive morphological coverage
+- **German:** Has no frequency corpus (WordData.txt empty), so `*wordweight.bin` files are minimal (expected)
 
 ## Quick Start
 

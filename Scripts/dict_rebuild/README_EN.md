@@ -1,6 +1,17 @@
 # RML Dictionary Rebuild Scripts
 
-Automated rebuild and verification system for RML morphological dictionaries (Russian, Ukrainian, English, German).
+Automated rebuild and verification for RML morphological dictionaries.
+
+## Quick Stats
+
+| Language | Lemmas | Word Forms | Total Size | WordData Entries |
+|----------|--------|------------|------------|-----------------|
+| Russian  | ~298k  | ~4.2M      | 25 MB      | 51,084          |
+| Ukrainian| ~419k  | ~4.0M      | 25 MB      | 418,983         |
+| English  | ~145k  | ~2.5M      | 94 MB      | 13,933          |
+| German   | ~80k   | ~1.5M      | 12 MB      | 0 (empty)       |
+
+*Largest: English (94 MB total), Most lemmas: Ukrainian (419k), Most entries: Ukrainian (418k), Most word forms: Russian (4.2M)*
 
 ## Quick Start
 
