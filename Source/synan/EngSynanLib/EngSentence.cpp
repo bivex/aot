@@ -259,6 +259,7 @@ void CEngSentence::BuildSubjAndPredRelation(CMorphVariant& synVariant, long Root
 	synVariant.m_iPredk = iPred;
 
 	// Basic English heuristic: the subject is often the closest Noun or Pronoun before the predicate.
+	// But in questions, we should be careful with WH-words.
 	for (long i = iPred - 1; i >= 0; i--) {
 		const CSynUnit& U = synVariant.m_SynUnits[i];
 		if (U.m_Type != EWord) continue;
@@ -270,6 +271,19 @@ void CEngSentence::BuildSubjAndPredRelation(CMorphVariant& synVariant, long Root
 		    GetEngGramTab()->is_morph_pronoun(H.m_iPoses) || 
 		    H.HasPos(eNOUN) || H.HasPos(ePRON) || H.HasPos(ePN)) {
 			
+			// If it's a WH-word (What, Where, etc.) and there are words after the predicate,
+			// it might be a question where the subject is after the verb.
+			bool bIsWhWord = false;
+			std::string lemma = H.GetLemma();
+			if (lemma == "WHAT" || lemma == "WHERE" || lemma == "WHEN" || lemma == "HOW" || lemma == "WHY" || lemma == "WHICH") {
+				bIsWhWord = true;
+			}
+
+			if (bIsWhWord && iPred + 1 < (long)synVariant.m_SynUnits.size()) {
+				// Potential question, continue searching after predicate
+				continue;
+			}
+
 			const CSynUnit& PU = synVariant.m_SynUnits[iPred];
 			const CSynWord& PW = m_Words[PU.m_SentPeriod.m_iFirstWord];
 			const CSynHomonym& PH = PW.m_Homonyms[PU.m_iHomonymNum];
@@ -284,6 +298,7 @@ void CEngSentence::BuildSubjAndPredRelation(CMorphVariant& synVariant, long Root
 
 	if (!synVariant.m_bGoodSubject) {
 		// Try looking after the predicate for inverted subjects (questions, existential there)
+		// In "Where did you go", "did" is iPred, "you" is at iPred + 1.
 		for (long i = iPred + 1; i < (long)synVariant.m_SynUnits.size(); i++) {
 			const CSynUnit& U = synVariant.m_SynUnits[i];
 			if (U.m_Type != EWord) continue;
@@ -299,11 +314,16 @@ void CEngSentence::BuildSubjAndPredRelation(CMorphVariant& synVariant, long Root
 				const CSynWord& PW = m_Words[PU.m_SentPeriod.m_iFirstWord];
 				const CSynHomonym& PH = PW.m_Homonyms[PU.m_iHomonymNum];
 
+				// For questions like "What did you say", "did" (VBE) is iPred. 
+				// We accept the first NP after it as subject.
 				if (GetEngGramTab()->GleicheSubjectPredicate(H.GetGramCodes().c_str(), PH.GetGramCodes().c_str())) {
 					synVariant.m_Subjects.push_back(i);
 					synVariant.m_bGoodSubject = true;
 					break;
 				}
+				
+				// Stop after first potential NP to avoid picking objects
+				break; 
 			}
 		}
 	}

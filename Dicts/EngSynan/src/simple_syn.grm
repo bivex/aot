@@ -76,6 +76,8 @@
 [VP] -> [TOKEN grm="VBE"] [TOKEN grm="PART"] [TOKEN grm="VERB" grm="ing"];
 
 %% ========== Adverbial in VP ==========
+[VP] -> [TOKEN grm="VERB"];
+[VP] -> [TOKEN grm="VERB"] [NP];
 [VP] -> [TOKEN grm="VERB"] [TOKEN grm="ADVERB"];
 [VP] -> [TOKEN grm="VERB"] [TOKEN grm="ADVERB"] [NP];
 [VP] -> [TOKEN grm="ADVERB"] [TOKEN grm="VERB"] [NP];
@@ -86,12 +88,13 @@
 [SP] -> [TOKEN grm="PRON"] [TOKEN grm="VBE"] [NP];
 [SP] -> [TOKEN grm="PRON"] [TOKEN grm="VBE"] [PP];
 [SP] -> [TOKEN grm="PRON"] [TOKEN grm="VBE"] [TOKEN grm="ADVERB"];
-[SP] -> [TOKEN grm="ADVERB"] [TOKEN grm="VBE"] [NP] [TOKEN grm="VERB"];
-[SP] -> [TOKEN grm="ADVERB"] [TOKEN grm="VBE"] [NP] [TOKEN grm="VERB"] [TOKEN grm="ADVERB"];
-[SP] -> [TOKEN grm="ADVERB"] [TOKEN grm="MOD"] [NP] [TOKEN grm="VERB"];
-[SP] -> [TOKEN grm="ADVERB"] [TOKEN grm="MOD"] [NP] [TOKEN grm="VERB"] [TOKEN grm="ADVERB"];
-[SP] -> [TOKEN grm="PRON"] [TOKEN grm="VBE"] [NP] [TOKEN grm="VERB"];
-[SP] -> [TOKEN grm="PRON"] [TOKEN grm="MOD"] [NP] [TOKEN grm="VERB"];
+[SP] -> [TOKEN grm="ADVERB"] [TOKEN grm="VBE"] [NP] [VP];
+[SP] -> [TOKEN grm="ADVERB"] [TOKEN grm="MOD"] [NP] [VP];
+[SP] -> [TOKEN grm="PRON"] [TOKEN grm="VBE"] [NP] [VP];
+[SP] -> [TOKEN grm="PRON"] [TOKEN grm="MOD"] [NP] [VP];
+[SP] -> [TOKEN grm="ADVERB"] [TOKEN grm="VBE"] [NP] [VP] [TOKEN grm="ADVERB"];
+[SP] -> [TOKEN grm="ADVERB"] [TOKEN grm="MOD"] [NP] [VP] [TOKEN grm="ADVERB"];
+
 
 %% ========== Existential "there" ==========
 [SP] -> [TOKEN grm="ADVERB"] [TOKEN grm="VBE"] [NP];
