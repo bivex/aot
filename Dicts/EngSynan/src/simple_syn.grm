@@ -18,7 +18,10 @@
 
 %% ========== Simple Verb Phrase (VP) ==========
 [VP] -> [TOKEN grm="VERB"];
+[VP] -> [TOKEN grm="VBE"] [TOKEN grm="ADJECTIVE"];
+[VP] -> [TOKEN grm="MOD"] [VP];
 [VP] -> [TOKEN grm="VERB"] [NP];
+
 [VP] -> [TOKEN grm="VERB"] [NP] [PP];
 [VP] -> [TOKEN grm="VERB"] [PP];
 
@@ -77,7 +80,10 @@
 
 %% ========== Adverbial in VP ==========
 [VP] -> [TOKEN grm="VERB"];
+[VP] -> [TOKEN grm="VBE"] [TOKEN grm="ADJECTIVE"];
+[VP] -> [TOKEN grm="MOD"] [VP];
 [VP] -> [TOKEN grm="VERB"] [NP];
+
 [VP] -> [TOKEN grm="VERB"] [TOKEN grm="ADVERB"];
 [VP] -> [TOKEN grm="VERB"] [TOKEN grm="ADVERB"] [NP];
 [VP] -> [TOKEN grm="ADVERB"] [TOKEN grm="VERB"] [NP];
