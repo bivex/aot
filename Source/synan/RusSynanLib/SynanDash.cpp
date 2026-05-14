@@ -148,11 +148,11 @@ void CRusSentence::TryToRebuildDashInClause()
 
 		int j = pClause.m_iFirstWord;
 		for (; j <= pClause.m_iLastWord; j++)
-			if (	m_Words[j].GetHomonymsCount() > 0
+				if ( m_Words[j].GetHomonymsCount() > 0
 					&& !m_Words[j].GetSynHomonym(0).IsLemma("У")
 					&& !(GetOpt()->m_Language == morphUkrainian && m_Words[j].GetSynHomonym(0).IsLemma("В"))
-				&&	m_Words[j].GetHomonymByPOS(PREP) != -1 
-				)
+					&& m_Words[j].GetHomonymByPOS(PREP) != -1
+					)
 				 break;
 
 		if ( j < pClause.m_iLastWord ) continue;
@@ -180,9 +180,10 @@ void CRusSentence::TryToRebuildDashInClause()
 
 			if ( m_Words[j].GetHomonymsCount() > 1 && !isdigit((BYTE)m_Words[j].m_strWord[0]) ) continue;
 
-			if ( m_Words[j].GetSynHomonym(0).IsLemma("КОТОРЫЙ")
-				|| (GetOpt()->m_Language == morphUkrainian && m_Words[j].GetSynHomonym(0).IsLemma("ЯКИЙ")))
-				continue;
+				if ( m_Words[j].GetHomonymsCount() > 0
+						&& (m_Words[j].GetSynHomonym(0).IsLemma("КОТОРЫЙ")
+							|| (GetOpt()->m_Language == morphUkrainian && m_Words[j].GetSynHomonym(0).IsLemma("ЯКИЙ"))))
+					continue;
 
 			if (		HasNounInNom( m_Words[j]) 
                 && 	!m_Words[j].HasDes(OFAM2) 
@@ -199,8 +200,9 @@ void CRusSentence::TryToRebuildDashInClause()
 				continue;
 			}
 
-			if ( m_Words[j].GetSynHomonym(0).IsLemma("У")
-				|| (GetOpt()->m_Language == morphUkrainian && m_Words[j].GetSynHomonym(0).IsLemma("В")) )
+				if ( m_Words[j].GetHomonymsCount() > 0
+					&& (m_Words[j].GetSynHomonym(0).IsLemma("У")
+						|| (GetOpt()->m_Language == morphUkrainian && m_Words[j].GetSynHomonym(0).IsLemma("В"))) )
 			{
 				Prep_U = j;
 				continue;
@@ -278,7 +280,7 @@ void CRusSentence::TryToRebuildDashInClause()
 			uint64_t tormoz = _QM(rNeutrum) |  _QM(rSingular) |  _QM(rNominativ); 
 			for (int k = 0; k < Eto.size() && k < Noun_Nom.size(); k++)
 				//  без "тормоза" во фразе "это облако" восстановится тире
-				if	(!m_Words[Noun_Nom[k]].GetSynHomonym(0).HasSetOfGrammemsExact(tormoz) )
+					if	(m_Words[Noun_Nom[k]].GetHomonymsCount() > 0 && !m_Words[Noun_Nom[k]].GetSynHomonym(0).HasSetOfGrammemsExact(tormoz) )
 					if (Noun_Nom[k] > Eto[k])
 					{
 						BuildDash(ClauseNo, Eto[k]);
