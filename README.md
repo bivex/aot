@@ -423,12 +423,12 @@ RML/
 
 ### Quick Stats (Binary Output)
 
-| Language | Total Size | Lemmas | Word Forms | WordData Entries |
-|----------|-----------|--------|------------|------------------|
-| Russian  | 25 MB     | 298,510 | 4.2M      | 51,084           |
-| Ukrainian| 25 MB     | 418,983 | 4.0M      | 418,983          |
-| English  | 94 MB     | 444,755 | ~2.5M     | 13,933           |
-| German   | 12 MB     | 218,950 | 1.5M      | 0 (empty)        |
+| Language | Total Size | Lemmas | Word Forms | WordData Entries | Status |
+|----------|-----------|--------|------------|------------------|--------|
+| Russian  | 25 MB     | 298,510 | 4.2M      | 51,084           | ✅ rebuilt (May 14) |
+| Ukrainian| 25 MB     | 418,983 | 4.0M      | 418,983          | ✅ rebuilt (May 14) |
+| English  | 94 MB     | 444,755 | ~2.5M     | 13,933           | ✅ up-to-date |
+| German   | 12 MB     | 218,950 | 1.5M      | 0 (empty)        | ✅ rebuilt (May 14) |
 
 **Source data** (in `Source/morph_dict/data/<Language>/`):
 - `morphs.json` — morphological models + lemmas (20–40 MB per language)
@@ -447,8 +447,8 @@ RML/
 - `*wordweight.bin` & `*homoweight.bin` — frequency tables (German files are minimal/empty — expected due to empty WordData.txt)
 
 **German-specific notes:**
-- Has **no frequency corpus** — `WordData.txt` is empty (0 bytes)
-- Frequency binary files (`*wordweight.bin`) are therefore minimal (60–200 bytes each)
+- Has **no frequency corpus** — `WordData.txt` is empty (0 bytes, rebuilt May 14, 2026)
+- Frequency binary files (`*wordweight.bin`) are therefore minimal (60–200 bytes each) — **this is expected and normal**
 - Syntactic support provided separately via `Dicts/GerSynan/` (German grammar tables for Synan parser)
 - Morphological coverage: ~219k lemmas, ~1.5M word forms — adequate for general text but less comprehensive than Russian/Ukrainian
 - Best for: morphological analysis, lemmatization, basic syntactic parsing
