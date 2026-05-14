@@ -1,0 +1,336 @@
+/* ═══════════════════════════════════════════════
+   AOT Juridical Theme
+   Profile: legal / jurisprudence / contract
+   Palette: deep navy, burgundy, antique gold
+   ═══════════════════════════════════════════════ */
+
+:root {
+	--jur-navy:       #1B2A4A;
+	--jur-navy-light: #2C3E5A;
+	--jur-burgundy:   #6B2737;
+	--jur-burgundy-dk:#4A1A26;
+	--jur-gold:       #B8860B;
+	--jur-gold-light: #D4A843;
+	--jur-parchment:  #FAF8F5;
+	--jur-paper:      #F5F0E8;
+	--jur-ink:        #1E1E1E;
+	--jur-ink-light:  #4A4A4A;
+	--jur-border:     #D4C5A9;
+	--jur-border-dk:  #A89880;
+	--jur-seal:       #8B6914;
+	--jur-red-seal:   #8B1A1A;
+}
+
+/* ── Base ── */
+
+body {
+	background: var(--jur-parchment) !important;
+	color: var(--jur-ink);
+}
+
+h1, h2, h3, h4, h5, h6 {
+	font-family: Georgia, "Times New Roman", "Noto Serif", serif;
+	letter-spacing: -0.01em;
+}
+
+/* ── Navigation ── */
+
+.aot-nav {
+	background: var(--jur-navy) !important;
+	border-bottom: 2px solid var(--jur-gold) !important;
+	backdrop-filter: none !important;
+	-webkit-backdrop-filter: none !important;
+}
+
+.nav-brand {
+	color: #fff !important;
+}
+
+.brand-accent {
+	color: var(--jur-gold-light) !important;
+}
+
+.brand-dot {
+	color: rgba(255,255,255,0.7) !important;
+}
+
+.nav-links a {
+	color: rgba(255,255,255,0.65) !important;
+	font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+
+.nav-links a:hover {
+	color: var(--jur-gold-light) !important;
+	background: rgba(184,134,11,0.1) !important;
+}
+
+.nav-links a.active {
+	color: var(--jur-gold-light) !important;
+	background: rgba(184,134,11,0.15) !important;
+}
+
+.nav-toggle span {
+	background: var(--jur-gold-light) !important;
+}
+
+@media screen and (max-width: 640px) {
+	.nav-links {
+		background: var(--jur-navy) !important;
+		border-bottom: 2px solid var(--jur-gold) !important;
+	}
+}
+
+/* ── Hero ── */
+
+.aot-hero {
+	background: linear-gradient(160deg, var(--jur-navy) 0%, var(--jur-navy-light) 40%, var(--jur-burgundy-dk) 100%) !important;
+	border-bottom: 3px solid var(--jur-gold);
+}
+
+.hero-glow {
+	background: radial-gradient(circle, rgba(184,134,11,0.12) 0%, transparent 70%) !important;
+}
+
+.hero-badge {
+	color: var(--jur-gold-light) !important;
+	background: rgba(184,134,11,0.12) !important;
+	border-color: rgba(184,134,11,0.3) !important;
+	font-family: Georgia, "Times New Roman", serif;
+	letter-spacing: 2px;
+}
+
+.aot-hero h1 {
+	font-family: Georgia, "Times New Roman", "Noto Serif", serif;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+}
+
+.aot-hero p {
+	color: rgba(255,255,255,0.6) !important;
+	font-family: Georgia, "Times New Roman", serif;
+	font-style: italic;
+}
+
+/* ── Card ── */
+
+.ui.card.aot-card {
+	border: 1px solid var(--jur-border) !important;
+	border-radius: 2px !important;
+	box-shadow: 0 1px 4px rgba(27,42,74,0.08), 0 0 0 1px rgba(212,197,169,0.3) !important;
+	background: #fff;
+}
+
+.ui.card.aot-card:hover {
+	box-shadow: 0 4px 16px rgba(27,42,74,0.12), 0 0 0 1px var(--jur-gold) !important;
+}
+
+.ui.card.aot-card .header {
+	color: var(--jur-navy) !important;
+	font-family: Georgia, "Times New Roman", serif !important;
+	border-left: 4px solid var(--jur-gold) !important;
+	background: var(--jur-paper) !important;
+	font-size: 1.2rem !important;
+	letter-spacing: 0.5px;
+}
+
+/* ── Form elements ── */
+
+.ui.form .field label {
+	color: var(--jur-navy) !important;
+	font-weight: 600 !important;
+	font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+	font-size: 0.85rem;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+textarea {
+	background: var(--jur-parchment) !important;
+	border: 1px solid var(--jur-border) !important;
+	border-radius: 2px !important;
+	font-family: Georgia, "Times New Roman", serif !important;
+	font-size: 1rem !important;
+	line-height: 1.8 !important;
+	color: var(--jur-ink) !important;
+	transition: border-color 0.2s;
+}
+
+textarea:focus {
+	border-color: var(--jur-gold) !important;
+	box-shadow: 0 0 0 2px rgba(184,134,11,0.15) !important;
+}
+
+/* ── Buttons ── */
+
+.ui.button.aot-primary {
+	background: var(--jur-navy) !important;
+	color: #fff !important;
+	border-radius: 2px !important;
+	font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	font-size: 0.85rem;
+	border: 1px solid var(--jur-navy) !important;
+	transition: all 0.2s;
+}
+
+.ui.button.aot-primary:hover {
+	background: var(--jur-navy-light) !important;
+	border-color: var(--jur-gold) !important;
+	box-shadow: 0 2px 8px rgba(27,42,74,0.2);
+}
+
+.ui.button.aot-primary:active {
+	background: var(--jur-burgundy-dk) !important;
+}
+
+/* Secondary / example buttons */
+.ui.buttons .ui.button {
+	border-radius: 2px !important;
+	font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+	font-size: 0.8rem;
+	color: var(--jur-ink-light) !important;
+	border: 1px solid var(--jur-border) !important;
+	background: #fff !important;
+	transition: all 0.2s;
+}
+
+.ui.buttons .ui.button:hover {
+	color: var(--jur-navy) !important;
+	border-color: var(--jur-gold) !important;
+	background: var(--jur-parchment) !important;
+}
+
+.ui.buttons .ui.button:active {
+	background: var(--jur-paper) !important;
+	color: var(--jur-burgundy) !important;
+}
+
+/* Clear button */
+.ui.button:not(.aot-primary):not(.ui.buttons .ui.button) {
+	border-radius: 2px !important;
+	font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+
+/* ── Canvas / SVG output ── */
+
+.ui.canvas.segment {
+	background: #fff !important;
+	border-top: 2px solid var(--jur-gold) !important;
+	border-radius: 0 !important;
+	position: relative;
+}
+
+.ui.canvas.segment::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 2px;
+	background: linear-gradient(90deg, var(--jur-gold) 0%, var(--jur-navy) 50%, var(--jur-gold) 100%);
+	opacity: 0.3;
+}
+
+/* ── Info segment ── */
+
+.ui.info.segment {
+	background: var(--jur-paper) !important;
+	border-top: 2px solid var(--jur-gold) !important;
+	border-radius: 2px !important;
+}
+
+.ui.info.segment h3 {
+	color: var(--jur-navy) !important;
+	font-family: Georgia, "Times New Roman", serif !important;
+	border-bottom: 1px solid var(--jur-border);
+	padding-bottom: 0.75rem;
+}
+
+.ui.info.segment p {
+	color: var(--jur-ink-light);
+	font-family: Georgia, "Times New Roman", serif;
+}
+
+.ui.info.segment .item {
+	color: var(--jur-ink-light) !important;
+	font-family: Georgia, "Times New Roman", serif;
+}
+
+.ui.info.segment .item::before {
+	color: var(--jur-gold) !important;
+}
+
+/* ── Footer ── */
+
+.aot-footer {
+	background: var(--jur-navy) !important;
+	border-top: 3px solid var(--jur-gold);
+}
+
+.footer-brand .brand-accent {
+	color: var(--jur-gold-light) !important;
+}
+
+.footer-desc {
+	font-family: Georgia, "Times New Roman", serif;
+}
+
+.footer-col h4 {
+	font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+	letter-spacing: 2px;
+	color: var(--jur-gold-light) !important;
+}
+
+.footer-col a:hover {
+	color: var(--jur-gold-light) !important;
+}
+
+.footer-bottom {
+	border-top: 1px solid rgba(184,134,11,0.15) !important;
+}
+
+/* ── Seal decoration ── */
+
+.hero-badge::before {
+	content: '\00A7';
+	margin-right: 0.4rem;
+	font-weight: 400;
+}
+
+/* ── Scrollbar (Webkit) ── */
+
+::-webkit-scrollbar {
+	width: 8px;
+	height: 8px;
+}
+
+::-webkit-scrollbar-track {
+	background: var(--jur-parchment);
+}
+
+::-webkit-scrollbar-thumb {
+	background: var(--jur-border-dk);
+	border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: var(--jur-gold);
+}
+
+/* ── Selection ── */
+
+::selection {
+	background: rgba(184,134,11,0.25);
+	color: var(--jur-ink);
+}
+
+/* ── Print ── */
+
+@media print {
+	.aot-nav, .aot-hero, .aot-footer { display: none !important; }
+	body { background: #fff !important; }
+	.ui.card.aot-card { box-shadow: none !important; border: 1px solid #ccc !important; }
+}
