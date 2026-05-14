@@ -1236,7 +1236,11 @@ void CMAPost::Rule_ExpandIndeclinableGramcodes()
 			if (W.GetHomonym(HomNo)->HasPos(NOUN) && W.GetHomonym(HomNo)->HasGrammem(rIndeclinable) && !W.GetHomonym(HomNo)->HasGrammem(rInitialism))
 			{
 				CHomonym* pH = W.GetHomonym(HomNo);
-				pH->m_CommonGramCode += pH->GetGramCodes();
+				if (pH->m_CommonGramCode == "??") {
+					pH->m_CommonGramCode = pH->GetGramCodes();
+				} else {
+					pH->m_CommonGramCode += pH->GetGramCodes();
+				}
 				auto ancodes = m_pRusGramTab->GleicheAncode1(GenderNumber0, m_pRusGramTab->GramCodes().m_ProductiveNoun, pH->GetGramCodes());
                 LOGV  << "set gramcodes " << ancodes << " to " << W.m_strWord;
 				pH->SetGramCodes(ancodes);
@@ -1274,7 +1278,11 @@ void CMAPost::Rule_Abbreviation()
 					CFormInfo P;
 					std::string AnCodes;
 					m_pRusLemmatizer->CreateParadigmFromID(pH->m_lPradigmID, P);
-					pH->m_CommonGramCode += pH->GetGramCodes();
+					if (pH->m_CommonGramCode == "??") {
+						pH->m_CommonGramCode = pH->GetGramCodes();
+					} else {
+						pH->m_CommonGramCode += pH->GetGramCodes();
+					}
 					AnCodes = pH->GetGramCodes();
 					pH->SetGramCodes("");
 					std::string xx = P.GetAncode(0);

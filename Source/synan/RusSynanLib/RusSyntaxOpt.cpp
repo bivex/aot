@@ -174,7 +174,7 @@ void CRusSyntaxOpt::InitOptionsLanguageSpecific() {
 
     // MasSingNomNounGramCode is needed by all languages that use gender/number/case
     uint64_t grs = _QM(rMasculinum) | _QM(rSingular) | _QM(rNominativ);
-    m_MasSingNomNounGramCode = GetGramTab()->GetAllGramCodes(NOUN, grs, GrammemsEqu);
+    m_MasSingNomNounGramCode = GetGramTab()->GetAllGramCodes(NOUN, grs, GrammemsInclusion);
     if (m_MasSingNomNounGramCode.length() < 2) {
         LOGE << "Failed to find MasSingNomNounGramCode for language " << m_Language;
         // fallback
