@@ -79,6 +79,24 @@
 [VP] -> [TOKEN grm="VERB"] [TOKEN grm="ADVERB"];
 [VP] -> [TOKEN grm="VERB"] [TOKEN grm="ADVERB"] [NP];
 [VP] -> [TOKEN grm="ADVERB"] [TOKEN grm="VERB"] [NP];
+[VP] -> [TOKEN grm="ADVERB"] [TOKEN grm="VERB"];
+
+%% ========== Questions (wh-inversion) ==========
+[SP] -> [TOKEN grm="PRON"] [TOKEN grm="VBE"] [TOKEN grm="ADJECTIVE"];
+[SP] -> [TOKEN grm="PRON"] [TOKEN grm="VBE"] [NP];
+[SP] -> [TOKEN grm="PRON"] [TOKEN grm="VBE"] [PP];
+[SP] -> [TOKEN grm="PRON"] [TOKEN grm="VBE"] [TOKEN grm="ADVERB"];
+[SP] -> [TOKEN grm="ADVERB"] [TOKEN grm="VBE"] [NP] [TOKEN grm="VERB"];
+[SP] -> [TOKEN grm="ADVERB"] [TOKEN grm="VBE"] [NP] [TOKEN grm="VERB"] [TOKEN grm="ADVERB"];
+[SP] -> [TOKEN grm="ADVERB"] [TOKEN grm="MOD"] [NP] [TOKEN grm="VERB"];
+[SP] -> [TOKEN grm="ADVERB"] [TOKEN grm="MOD"] [NP] [TOKEN grm="VERB"] [TOKEN grm="ADVERB"];
+[SP] -> [TOKEN grm="PRON"] [TOKEN grm="VBE"] [NP] [TOKEN grm="VERB"];
+[SP] -> [TOKEN grm="PRON"] [TOKEN grm="MOD"] [NP] [TOKEN grm="VERB"];
+
+%% ========== Existential "there" ==========
+[SP] -> [TOKEN grm="ADVERB"] [TOKEN grm="VBE"] [NP];
+[SP] -> [TOKEN grm="ADVERB"] [TOKEN grm="VBE"] [TOKEN grm="ADJECTIVE"];
+[SP] -> [TOKEN grm="ADVERB"] [TOKEN grm="VBE"] [NP] [PP];
 
 %% ========== Coordination (CONJ) ==========
 [NP] -> [NP] [TOKEN grm="CONJ"] [NP];
