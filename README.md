@@ -387,10 +387,10 @@ RML/
 ├── build/                  # CMake build directory ( created during build )
 ├── Dicts/                  # Dictionary data ( generated during build )
 │   ├── Morph/              # Morphological dictionaries
-│   │   ├── Russian/        # ~25 MB  | 298k lemmas | 4.2M forms
-│   │   ├── Ukrainian/      # ~25 MB  | 419k lemmas | 4.0M forms
-│   │   ├── English/        # ~94 MB  | 145k lemmas | 2.5M forms
-│   │   └── German/         # ~12 MB  | 80k lemmas  | 1.5M forms
+│   │   ├── Russian/        # 25 MB  | 298k lemmas | 4.2M word forms
+│   │   ├── Ukrainian/      # 25 MB  | 419k lemmas | 4.0M word forms
+│   │   ├── English/        # 94 MB  | 445k lemmas | ~2.5M word forms
+│   │   └── German/         # 12 MB  | 219k lemmas | 1.5M word forms (no frequency corpus)
 │   ├── Bigrams/            # Bigram statistics
 │   ├── Ross/               # Thesaurus
 │   ├── Aoss/               # Semantic dictionary
@@ -425,22 +425,34 @@ RML/
 
 | Language | Total Size | Lemmas | Word Forms | WordData Entries |
 |----------|-----------|--------|------------|------------------|
-| Russian  | 25 MB     | ~298k  | ~4.2M      | 51,084           |
-| Ukrainian| 25 MB     | ~419k  | ~4.0M      | 418,983          |
-| English  | 94 MB     | ~145k  | ~2.5M      | 13,933           |
-| German   | 12 MB     | ~80k   | ~1.5M      | 0 (empty)        |
+| Russian  | 25 MB     | 298,510 | 4.2M      | 51,084           |
+| Ukrainian| 25 MB     | 418,983 | 4.0M      | 418,983          |
+| English  | 94 MB     | 444,755 | ~2.5M     | 13,933           |
+| German   | 12 MB     | 218,950 | 1.5M      | 0 (empty)        |
 
 **Source data** (in `Source/morph_dict/data/<Language>/`):
-- `morphs.json` — morphological models (20–40 MB per language)
-- `gramtab.json` — grammatical codes
-- `WordData.txt` — words with frequency corpus (Ukrainian has the richest: 418k entries)
+- `morphs.json` — morphological models + lemmas (20–40 MB per language)
+  - Russian: 2,767 models → 298,510 lemmas → 4.2M word forms (33 MB file)
+  - Ukrainian: 5,855 models → 418,983 lemmas → 4.0M word forms (38 MB)
+  - English: 2,639 models → 444,755 lemmas → ~2.5M word forms (27 MB)
+  - German: 1,319 models → 218,950 lemmas → 1.5M word forms (21 MB)
+- `gramtab.json` — grammatical codes (20–174 KB)
+- `WordData.txt` — words with frequency corpus (Ukrainian richest: 418k; German empty)
 
 **Binary output** (in `Dicts/Morph/<Language>/`):
-- `morph.bases` — lemmas base (2–5 MB)
-- `morph.annot` — annotations (3–6 MB)
-- `morph.forms_autom` — morphological automaton (4–9 MB)
+- `morph.bases` — lemmas base (2–5 MB): RU 2.6M, UA 4.0M, EN 4.8M, DE 2.8M
+- `morph.annot` — annotations (3–6 MB): RU 4.7M, UA 5.6M, EN 4.9M, DE 3.6M
+- `morph.forms_autom` — morphological automaton (4–9 MB): RU 6.4M, UA 7.0M, EN 4.0M, DE 4.9M
 - `npredict.bin` — unknown word predictor (0.8–3.4 MB)
-- `*wordweight.bin` & `*homoweight.bin` — frequency tables (empty for German)
+- `*wordweight.bin` & `*homoweight.bin` — frequency tables (German files are minimal/empty — expected due to empty WordData.txt)
+
+**German-specific notes:**
+- Has **no frequency corpus** — `WordData.txt` is empty (0 bytes)
+- Frequency binary files (`*wordweight.bin`) are therefore minimal (60–200 bytes each)
+- Syntactic support provided separately via `Dicts/GerSynan/` (German grammar tables for Synan parser)
+- Morphological coverage: ~219k lemmas, ~1.5M word forms — adequate for general text but less comprehensive than Russian/Ukrainian
+- Best for: morphological analysis, lemmatization, basic syntactic parsing
+- Not suitable for: frequency-based ranking, collocation extraction, corpus linguistics requiring frequency data
 
 ### Rebuild Scripts
 
