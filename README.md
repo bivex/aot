@@ -50,9 +50,11 @@ RML is a comprehensive linguistic processing framework developed for natural lan
 The project includes a web-based interface for visualizing linguistic analysis:
 
 - **Unified Interface**: `modern/index.html` — A modern SPA for general morphology and syntax.
+- **Russian Legal Demo**: `demo/rus_legal.html` — Specialized for Russian legal documents.
 - **English Legal Demo**: `demo/eng_legal.html` — Optimized for complex contract analysis with original casing preservation.
 - **Ukrainian Legal Demo**: `demo/ukr_legal.html` — Specialized for Ukrainian legal documents.
 
+![Russian Legal Demo](Docs/images/rus_legal_demo.png)
 ![English Legal Demo](Docs/images/eng_legal_demo.png)
 ![Ukrainian Legal Demo](Docs/images/ukr_legal_demo.png)
 
