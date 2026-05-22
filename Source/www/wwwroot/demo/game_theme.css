@@ -1,0 +1,426 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   Game Design Theme — Dark creative palette for narrative tools
+   ═══════════════════════════════════════════════════════════════════════ */
+
+:root {
+    --gd-bg: #0f172a;
+    --gd-surface: #1e293b;
+    --gd-surface-2: #253449;
+    --gd-border: #334155;
+    --gd-text: #e2e8f0;
+    --gd-muted: #94a3b8;
+    --gd-accent: #8b5cf6;
+    --gd-accent-light: #a78bfa;
+    --gd-cyan: #06b6d4;
+    --gd-green: #10b981;
+    --gd-amber: #f59e0b;
+    --gd-rose: #f43f5e;
+}
+
+body {
+    background: var(--gd-bg) !important;
+    color: var(--gd-text);
+}
+
+h1, h2, h3, h4 {
+    font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    letter-spacing: -0.02em;
+}
+
+/* ── Navigation ── */
+
+.aot-nav {
+    background: var(--gd-surface) !important;
+    border-bottom: 1px solid var(--gd-border) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+.nav-brand { color: #fff !important; }
+.brand-accent { color: var(--gd-accent-light) !important; }
+.brand-dot { color: var(--gd-muted) !important; }
+
+.nav-links a {
+    color: var(--gd-muted) !important;
+    font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+.nav-links a:hover {
+    color: var(--gd-accent-light) !important;
+    background: rgba(139, 92, 246, 0.1) !important;
+}
+.nav-links a.active {
+    color: var(--gd-accent-light) !important;
+    background: rgba(139, 92, 246, 0.15) !important;
+}
+.nav-toggle span { background: var(--gd-accent-light) !important; }
+
+@media screen and (max-width: 640px) {
+    .nav-links {
+        background: var(--gd-surface) !important;
+        border-bottom: 1px solid var(--gd-border) !important;
+    }
+}
+
+/* ── Hero ── */
+
+.aot-hero {
+    background: linear-gradient(160deg, #0f172a 0%, #1e1b4b 40%, #312e81 100%) !important;
+    border-bottom: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+.hero-glow {
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%) !important;
+}
+
+.hero-badge {
+    color: var(--gd-accent-light) !important;
+    background: rgba(139, 92, 246, 0.12) !important;
+    border-color: rgba(139, 92, 246, 0.3) !important;
+    letter-spacing: 2px;
+}
+
+.aot-hero h1 {
+    font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-weight: 700;
+}
+
+.aot-hero p {
+    color: rgba(226, 232, 240, 0.5) !important;
+}
+
+/* ── Card ── */
+
+.ui.card.aot-card {
+    background: var(--gd-surface) !important;
+    border: 1px solid var(--gd-border) !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3) !important;
+}
+
+.ui.card.aot-card:hover {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+}
+
+.ui.card.aot-card .header {
+    color: var(--gd-text) !important;
+    font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif !important;
+    border-left: 4px solid var(--gd-accent) !important;
+    background: var(--gd-surface-2) !important;
+    padding: 0.75rem 1rem;
+    border-radius: 4px;
+}
+
+/* ── Form ── */
+
+.ui.form .field label {
+    color: var(--gd-muted) !important;
+    font-weight: 600 !important;
+    font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+textarea {
+    background: var(--gd-surface-2) !important;
+    border: 1px solid var(--gd-border) !important;
+    color: var(--gd-text) !important;
+    font-family: 'SF Mono', 'Menlo', 'Monaco', monospace !important;
+    font-size: 0.9rem !important;
+    line-height: 1.7 !important;
+    border-radius: 6px !important;
+    resize: vertical;
+    transition: border-color 0.2s;
+}
+
+textarea:focus {
+    border-color: var(--gd-accent) !important;
+    box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2) !important;
+}
+
+textarea::placeholder {
+    color: var(--gd-muted);
+    opacity: 0.6;
+}
+
+/* ── Buttons ── */
+
+.ui.button.gd-primary {
+    background: var(--gd-accent) !important;
+    color: #fff !important;
+    border-radius: 6px !important;
+    font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+.ui.button.gd-primary:hover {
+    background: var(--gd-accent-light) !important;
+}
+
+.ui.button.gd-primary.loading {
+    position: relative;
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.ui.button.gd-secondary {
+    background: var(--gd-surface-2) !important;
+    color: var(--gd-text) !important;
+    border: 1px solid var(--gd-border) !important;
+    border-radius: 6px !important;
+}
+
+.ui.button.gd-secondary:hover {
+    border-color: var(--gd-accent) !important;
+    background: rgba(139, 92, 246, 0.1) !important;
+}
+
+.ui.button.gd-export {
+    background: var(--gd-green) !important;
+    color: #fff !important;
+    border-radius: 6px !important;
+    font-weight: 600;
+}
+
+.ui.button.gd-export:hover {
+    background: #059669 !important;
+}
+
+/* ── Results area ── */
+
+#results {
+    min-height: 100px;
+}
+
+.gd-loading, .gd-empty {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--gd-muted);
+    font-size: 1rem;
+}
+
+.gd-error {
+    padding: 1.5rem;
+    background: rgba(244, 63, 94, 0.1);
+    border: 1px solid rgba(244, 63, 94, 0.3);
+    border-radius: 6px;
+    color: var(--gd-rose);
+}
+
+/* Stats cards */
+.gd-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.gd-stat-card {
+    background: var(--gd-surface-2);
+    border: 1px solid var(--gd-border);
+    border-radius: 8px;
+    padding: 1.25rem;
+    text-align: center;
+}
+
+.gd-stat-num {
+    display: block;
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--gd-accent-light);
+    line-height: 1;
+    margin-bottom: 0.35rem;
+}
+
+.gd-stat-label {
+    display: block;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--gd-muted);
+}
+
+/* Scene table */
+.gd-table-wrap {
+    overflow-x: auto;
+    margin-bottom: 2rem;
+    border-radius: 8px;
+    border: 1px solid var(--gd-border);
+}
+
+.gd-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+
+.gd-table thead {
+    background: var(--gd-surface-2);
+}
+
+.gd-table th {
+    padding: 0.75rem 0.65rem;
+    text-align: left;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--gd-muted);
+    font-weight: 700;
+    border-bottom: 1px solid var(--gd-border);
+}
+
+.gd-table td {
+    padding: 0.6rem 0.65rem;
+    border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+    vertical-align: top;
+    color: var(--gd-text);
+}
+
+.gd-table tbody tr:hover {
+    background: rgba(139, 92, 246, 0.05);
+}
+
+.gd-num {
+    color: var(--gd-muted);
+    font-weight: 700;
+    font-size: 0.75rem;
+    width: 30px;
+}
+
+.gd-char {
+    color: var(--gd-cyan);
+    font-weight: 600;
+}
+
+.gd-act {
+    color: var(--gd-accent-light);
+    font-weight: 600;
+}
+
+.gd-target {
+    color: var(--gd-green);
+}
+
+.gd-set {
+    color: var(--gd-amber);
+}
+
+.gd-text {
+    color: var(--gd-muted);
+    font-size: 0.8rem;
+    line-height: 1.4;
+    max-width: 300px;
+}
+
+/* Sections */
+.gd-section {
+    margin-bottom: 2rem;
+}
+
+.gd-h3 {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--gd-muted);
+    margin: 0 0 0.75rem;
+    font-weight: 700;
+}
+
+/* Chips */
+.gd-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.gd-chip {
+    display: inline-block;
+    padding: 0.3rem 0.7rem;
+    border-radius: 100px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.gd-chip small {
+    opacity: 0.6;
+    font-weight: 400;
+}
+
+.gd-chip-char {
+    background: rgba(6, 182, 212, 0.12);
+    color: var(--gd-cyan);
+    border: 1px solid rgba(6, 182, 212, 0.2);
+}
+
+.gd-chip-act {
+    background: rgba(139, 92, 246, 0.12);
+    color: var(--gd-accent-light);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+/* ── Info segment ── */
+
+.ui.info.segment {
+    background: var(--gd-surface) !important;
+    border: 1px solid var(--gd-border) !important;
+    border-radius: 8px !important;
+    color: var(--gd-text);
+}
+
+.ui.info.segment h3 {
+    color: var(--gd-accent-light) !important;
+    border-bottom: 1px solid var(--gd-border);
+    padding-bottom: 0.75rem;
+}
+
+.ui.info.segment p,
+.ui.info.segment .item {
+    color: var(--gd-muted) !important;
+}
+
+.ui.info.segment .item::before {
+    color: var(--gd-accent) !important;
+}
+
+/* ── Footer ── */
+
+.aot-footer {
+    background: var(--gd-surface) !important;
+    border-top: 1px solid var(--gd-border);
+}
+
+.footer-brand .brand-accent { color: var(--gd-accent-light) !important; }
+
+.footer-col h4 {
+    color: var(--gd-accent-light) !important;
+    letter-spacing: 2px;
+}
+
+.footer-col a:hover { color: var(--gd-accent-light) !important; }
+
+.footer-bottom {
+    border-top: 1px solid rgba(139, 92, 246, 0.1) !important;
+}
+
+/* ── Mobile ── */
+
+@media screen and (max-width: 640px) {
+    .gd-stats { grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
+    .gd-stat-card { padding: 0.75rem; }
+    .gd-stat-num { font-size: 1.5rem; }
+
+    .gd-table { font-size: 0.75rem; }
+    .gd-table th, .gd-table td { padding: 0.45rem 0.4rem; }
+    .gd-text { max-width: 150px; }
+}
+
+/* ── Print ── */
+
+@media print {
+    .aot-nav, .aot-hero, .aot-footer { display: none !important; }
+    body { background: #fff !important; color: #000 !important; }
+    .gd-surface, .gd-surface-2 { background: #fff !important; }
+    .gd-table td, .gd-table th { color: #000 !important; border-color: #ccc !important; }
+}

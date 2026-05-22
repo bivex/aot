@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>AOT :: Game Design :: Narrative Extractor</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="Extract narrative skeleton from English text — characters, actions, scenes for game design">
+	<meta name="theme-color" content="#0f172a">
+
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fomantic-ui@2.9.3/dist/semantic.min.css">
+	<link rel="stylesheet" href="../aot.css">
+	<link rel="stylesheet" href="custom.css?v=2">
+	<link rel="stylesheet" href="game_theme.css">
+</head>
+
+<body>
+
+<!-- ═══ Navigation ═══ -->
+<nav class="aot-nav" role="navigation" aria-label="Main navigation">
+	<div class="nav-inner">
+		<a href="/index.html" class="nav-brand">
+			<span class="brand-accent">AOT</span><span class="brand-dot">.ru</span>
+		</a>
+		<button class="nav-toggle" aria-label="Menu" aria-expanded="false"
+			onclick="this.setAttribute('aria-expanded', this.getAttribute('aria-expanded')==='true'?'false':'true'); document.querySelector('.nav-links').classList.toggle('open')">
+			<span></span><span></span><span></span>
+		</button>
+		<div class="nav-links">
+			<a href="/index.html">Home</a>
+			<a href="/onlinedemo.html" class="active">Demo</a>
+			<a href="/technology.html">Technology</a>
+		</div>
+	</div>
+</nav>
+
+<!-- ═══ Hero ═══ -->
+<header class="aot-hero" id="top">
+	<div class="hero-glow"></div>
+	<div class="hero-inner">
+		<div class="hero-badge">Game Design Tool</div>
+		<h1>Narrative Extractor</h1>
+		<p>Extract characters, actions and scene structure from English text to build game narrative skeletons.</p>
+	</div>
+</header>
+
+<!-- ═══ Main content ═══ -->
+<main id="main-content" class="ui main container" style="padding-top: 3rem;">
+
+	<div class="ui stackable grid">
+		<div class="sixteen wide column">
+			<section class="ui card aot-card" style="width: 100%;">
+				<div class="content">
+					<h2 class="header">Paste your text</h2>
+
+					<form class="ui form" id="extract-form" onsubmit="return false">
+						<div class="field">
+							<label for="InputText">Book chapter, scene or full text:</label>
+							<textarea
+								id="InputText"
+								rows="12"
+								placeholder="Paste a chapter, scene or full book text here..."
+							></textarea>
+						</div>
+
+						<div class="field">
+							<label>Sample texts:</label>
+							<div class="ui buttons small">
+								<button type="button" class="ui button gd-secondary" onclick="loadSample(0)">Fantasy</button>
+								<button type="button" class="ui button gd-secondary" onclick="loadSample(1)">Sci-Fi</button>
+								<button type="button" class="ui button gd-secondary" onclick="loadSample(2)">Detective</button>
+							</div>
+						</div>
+
+						<div class="field">
+							<button type="button" class="ui button gd-primary" id="btnExtract" onclick="window.runExtract()">
+								Extract Narrative Skeleton
+							</button>
+							<button type="button" class="ui button gd-secondary" onclick="clearAll()">Clear</button>
+							<button type="button" class="ui button gd-export" id="btnExport" style="display:none" onclick="window.exportTxt()">
+								Export TXT
+							</button>
+						</div>
+					</form>
+				</div>
+
+				<!-- Results -->
+				<div class="content" style="border-top: 1px solid var(--gd-border); background: var(--gd-surface-2); border-radius: 0 0 8px 8px;">
+					<div id="results"></div>
+				</div>
+			</section>
+		</div>
+
+		<div class="sixteen wide column">
+			<section class="ui info segment">
+				<h3 class="ui header">How it works</h3>
+				<p>The tool uses syntactic analysis to extract the narrative skeleton from your text:</p>
+				<div class="ui bulleted list">
+					<div class="item"><strong>Characters</strong> — subjects identified by the parser (who performs actions)</div>
+					<div class="item"><strong>Actions</strong> — predicates and main verbs (what happens)</div>
+					<div class="item"><strong>Targets</strong> — direct objects (who/what receives the action)</div>
+					<div class="item"><strong>Settings</strong> — adverbial phrases (where/when it happens)</div>
+				</div>
+				<p style="margin-top:1rem;">Export the result as TXT and use it as a game scenario skeleton for writing quests, dialogues, and cutscenes.</p>
+			</section>
+		</div>
+	</div>
+
+</main>
+
+<!-- ═══ Footer ═══ -->
+<footer class="aot-footer" role="contentinfo">
+	<div class="footer-inner">
+		<div class="footer-grid">
+			<div class="footer-col">
+				<div class="footer-brand">
+					<span class="brand-accent">AOT</span><span class="brand-dot">.ru</span>
+				</div>
+				<p class="footer-desc">Automatic text analysis system. Syntactic parsing for Russian, Ukrainian, English and German.</p>
+			</div>
+			<div class="footer-col">
+				<h4>Project</h4>
+				<a href="/index.html">Home</a>
+				<a href="/history.html">History</a>
+				<a href="/onlinedemo.html">Demos</a>
+				<a href="/technology.html">Technology</a>
+			</div>
+			<div class="footer-col">
+				<h4>Demos</h4>
+				<a href="rus_legal.html">Legal RU</a>
+				<a href="ukr_legal.html">Legal UA</a>
+				<a href="eng_legal.html">Legal EN</a>
+				<a href="game_design_eng.html">Game Design</a>
+			</div>
+		</div>
+		<div class="footer-bottom">
+			<p>&copy; 2003&ndash;2026 AOT Project. All rights reserved.</p>
+		</div>
+	</div>
+</footer>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fomantic-ui@2.9.3/dist/semantic.min.js"></script>
+<script src="game_design_eng.js"></script>
+
+<script>
+var samples = [
+	"Arthur drew the sword from the stone. Merlin watched silently from the shadows. The kingdom rejoiced as the true king emerged. Sir Lancelot rode through the dark forest, searching for the holy grail. Guinevere waited in the castle, gazing at the horizon. A dragon descended from the mountains and attacked the village. Arthur rallied his knights and charged into battle. The dragon breathed fire upon the shields of the brave warriors. Merlin cast a powerful spell that weakened the beast. With one final strike, Arthur pierced the dragon's heart. The people cheered and celebrated their victory. Peace returned to the kingdom at last.",
+
+	"The crew of the Aurora detected a distress signal from the abandoned station. Captain Chen ordered the ship to change course immediately. Dr. Vasquez prepared the medical bay for possible casualties. The engineer Park detected unusual energy readings near the station's reactor. Lieutenant Torres led the boarding party through the airlock. The station was dark and cold, its systems completely offline. Torres found the survivors hiding in the cargo bay. Something had breached the hull from the outside. The creature moved silently through the ventilation shafts. Chen sealed the ship and prepared for emergency departure. Park rigged the station's reactor to overload, buying them time to escape. The Aurora jumped to hyperspace just as the station exploded behind them.",
+
+	"Detective Harper examined the broken glass on the library floor. The victim had been struck from behind sometime between ten and midnight. Mrs. Blackwell, the housekeeper, discovered the body early that morning. Harper interviewed the three suspects in the drawing room. Colonel Ashford denied being anywhere near the library that evening. Professor Quinn claimed he was working in his study all night. Lady Ashford nervously adjusted her gloves during questioning. Harper noticed fresh scratches on the Colonel's walking stick. The forensic team found traces of mud from the garden path. A torn fragment of silk fabric clung to the broken window latch. Harper connected the clues and confronted the killer. The motive was an old inheritance dispute hidden for twenty years."
+];
+
+function loadSample(i) {
+	document.getElementById('InputText').value = samples[i];
+}
+
+function clearAll() {
+	document.getElementById('InputText').value = '';
+	document.getElementById('results').innerHTML = '';
+	document.getElementById('btnExport').style.display = 'none';
+	extractedScenes = [];
+}
+</script>
+
+</body>
+</html>
