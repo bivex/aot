@@ -53,10 +53,12 @@ The project includes a web-based interface for visualizing linguistic analysis:
 - **Russian Legal Demo**: `demo/rus_legal.html` — Specialized for Russian legal documents.
 - **English Legal Demo**: `demo/eng_legal.html` — Optimized for complex contract analysis with original casing preservation.
 - **Ukrainian Legal Demo**: `demo/ukr_legal.html` — Specialized for Ukrainian legal documents.
+- **Game Narrative Extractor**: `demo/game_design_eng.html` — Extract characters, actions and scene structure from English text for game design.
 
 ![Russian Legal Demo](Docs/images/rus_legal_demo.png)
 ![English Legal Demo](Docs/images/eng_legal_demo.png)
 ![Ukrainian Legal Demo](Docs/images/ukr_legal_demo.png)
+![Game Narrative Extractor](Docs/images/game_design_demo.png)
 
 To run the demos locally, see the [Web Interface Guide](Docs/web_interface.md).
 
