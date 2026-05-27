@@ -130,10 +130,44 @@ function status(msg, isErr) {
 
 function renderOnPage() {
   var text = document.getElementById('text').value.trim();
-  if (!text) { status('Paste or extract text first', true); return; }
 
+  if (text) {
+    doRenderOnPage(text);
+    return;
+  }
+
+  // No text in textarea — grab selection or full page text automatically
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    if (!tabs[0] || !isSupportedPage(tabs[0].url)) {
+      status('Cannot access this page', true);
+      return;
+    }
+    chrome.scripting.executeScript({
+      target: { tabId: tabs[0].id },
+      func: () => {
+        var sel = window.getSelection().toString().trim();
+        if (sel.length > 20) return sel;
+        var main = document.querySelector('main, article, [role="main"], .post-content, .entry-content, .article-body');
+        return ((main || document.body).innerText || '').trim();
+      }
+    }, (results) => {
+      if (chrome.runtime.lastError || !results || !results[0]) {
+        status('Cannot extract text from page', true);
+        return;
+      }
+      var extracted = (results[0].result || '').trim();
+      if (!extracted) {
+        status('No text found on page', true);
+        return;
+      }
+      doRenderOnPage(extracted);
+    });
+  });
+}
+
+function doRenderOnPage(text) {
   var lang = getLang() || detectLang(text);
-  status('Rendering on page...');
+  status('Rendering on page (' + lang + ')...');
 
   chrome.runtime.sendMessage({ action: 'render-page', text: text, lang: lang }, (resp) => {
     if (chrome.runtime.lastError) {
