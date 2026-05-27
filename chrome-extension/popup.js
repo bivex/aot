@@ -29,37 +29,71 @@ function getLang() {
   return v === 'auto' ? null : v;
 }
 
+function isSupportedPage(url) {
+  if (!url) return false;
+  return url.startsWith('http://') || url.startsWith('https://');
+}
+
 function extractFull() {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    if (!tabs[0] || !isSupportedPage(tabs[0].url)) {
+      status('Cannot extract from this page', true);
+      return;
+    }
+
+    // Try content script first, fall back to scripting API
     chrome.tabs.sendMessage(tabs[0].id, { action: 'extract' }, (resp) => {
-      if (chrome.runtime.lastError) {
-        status('Error: cannot access page', true);
+      if (chrome.runtime.lastError || !resp) {
+        // Content script not loaded — inject on the fly
+        chrome.scripting.executeScript({
+          target: { tabId: tabs[0].id },
+          files: ['content.js']
+        }, () => {
+          if (chrome.runtime.lastError) {
+            status('Cannot access this page', true);
+            return;
+          }
+          chrome.tabs.sendMessage(tabs[0].id, { action: 'extract' }, (resp2) => {
+            if (chrome.runtime.lastError || !resp2 || !resp2.text) {
+              status('Failed to extract text', true);
+              return;
+            }
+            fillText(resp2.text, resp2.lang);
+          });
+        });
         return;
       }
-      if (resp && resp.text) {
-        document.getElementById('text').value = resp.text.substring(0, 10000);
-        if (!getLang() && resp.lang) {
-          document.getElementById('lang').value = resp.lang;
-        }
-        status('Extracted ' + resp.text.length + ' characters');
+      if (resp.text) {
+        fillText(resp.text, resp.lang);
       }
     });
   });
 }
 
+function fillText(text, lang) {
+  document.getElementById('text').value = text.substring(0, 10000);
+  if (!getLang() && lang) {
+    document.getElementById('lang').value = lang;
+  }
+  status('Extracted ' + text.length + ' characters');
+}
+
 function extractSelection() {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    if (!tabs[0] || !isSupportedPage(tabs[0].url)) {
+      status('Cannot access this page', true);
+      return;
+    }
     chrome.scripting.executeScript({
       target: { tabId: tabs[0].id },
       func: () => window.getSelection().toString()
     }, (results) => {
       var sel = results && results[0] && results[0].result;
       if (sel && sel.trim().length > 0) {
-        document.getElementById('text').value = sel.trim().substring(0, 10000);
+        fillText(sel.trim(), null);
         if (!getLang()) {
           document.getElementById('lang').value = detectLang(sel);
         }
-        status('Extracted selection: ' + sel.length + ' chars');
       } else {
         status('No text selected on page', true);
       }
