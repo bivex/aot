@@ -14,6 +14,7 @@
   - [Linux](#linux)
   - [macOS](#macos)
   - [Windows](#windows)
+- [Chrome Extension](#chrome-extension)
 - [Running the Daemons](#running-the-daemons)
 - [API Reference](#api-reference)
 - [Documentation](#documentation)
@@ -61,6 +62,55 @@ The project includes a web-based interface for visualizing linguistic analysis:
 ![Game Narrative Extractor](Docs/images/game_design_demo.png)
 
 To run the demos locally, see the [Web Interface Guide](Docs/web_interface.md).
+
+---
+
+## Chrome Extension
+
+A Chrome browser extension (`chrome-extension/`) for in-browser syntactic analysis of web page text using the SynanDaemon API.
+
+### Features
+
+- **Popup panel** — extract text from the current page (full page or selection), choose language, analyze
+- **Analyze in new tab** — opens a full-screen SVG visualization with zoom/pan and Save SVG
+- **Render on Page** — slides an overlay panel on the current page for quick analysis without leaving the tab
+- **Right-click context menus** — "Analyze with AOT (new tab)" and "Render Subj-Pred on Page" on selected text
+- **Auto language detection** — English, Russian, Ukrainian based on Cyrillic/Latin character ratios
+
+### Installation
+
+1. Start SynanDaemon on `localhost:8089`:
+   ```bash
+   RML=$RML ./Bin/SynanDaemon --host 127.0.0.1 --port 8089
+   ```
+
+2. Open `chrome://extensions/`, enable **Developer mode**
+
+3. Click **Load unpacked** and select the `chrome-extension/` directory
+
+### Usage
+
+| Action | How |
+|--------|-----|
+| Extract page text | Click the extension icon → "Extract from page" |
+| Analyze selection | Select text on page → click icon → "Selection only" |
+| Analyze in new tab | Click "Analyze (new tab)" in the popup |
+| Overlay on current page | Click "Render on Page" in the popup |
+| Right-click analysis | Select text → right-click → "Analyze with AOT" or "Render Subj-Pred on Page" |
+
+### Files
+
+```
+chrome-extension/
+├── manifest.json      # Manifest V3
+├── background.js      # Service worker (context menus, message routing)
+├── popup.html/js      # Extension popup UI
+├── content.js         # Content script for text extraction
+├── result.html/js     # Full-screen result tab
+├── synan_viz.js       # D3.js SVG visualization (multi-language)
+├── libs/d3.min.js     # D3 library
+└── icons/             # Extension icons (16, 48, 128)
+```
 
 ---
 
