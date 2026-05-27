@@ -115,6 +115,33 @@ chrome-extension/
 
 ---
 
+## Safari Extension
+
+A Safari browser extension (`safari-extension/`) with the same functionality as the Chrome extension, built using Apple's WebExtensions API.
+
+Requires **Safari 16.4+** (macOS 13 Ventura or later) and **Xcode 14+**.
+
+### Installation
+
+1. Start SynanDaemon on `localhost:8089`:
+   ```bash
+   RML=$RML ./Bin/SynanDaemon --host 127.0.0.1 --port 8089
+   ```
+
+2. Build the extension:
+   ```bash
+   cd safari-extension
+   ./build.sh          # Opens Xcode — press Cmd+R to run
+   # or
+   ./build.sh run      # Build and launch automatically
+   ```
+
+3. Enable the extension: **Safari → Settings → Extensions → AOT Syntax Analyzer**
+
+The `build.sh` script uses `xcrun safari-web-extension-converter` to create an Xcode project that wraps the extension in a macOS app. The same source files (`background.js`, `popup.html`, `synan_viz.js`, etc.) work in both Chrome and Safari.
+
+---
+
 ## License
 
 This project is distributed under the **GNU Lesser General Public License (LGPL)**. See the file `COPYING` for details.
