@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { width: 360px; font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif; padding: 16px; background: #fafafa; }
+    h1 { font-size: 16px; color: #1a252f; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    h1 .dot { color: #6B2737; }
+    label { display: block; font-size: 12px; color: #555; margin-bottom: 4px; font-weight: 600; }
+    select, textarea { width: 100%; font-size: 13px; border: 1px solid #ddd; border-radius: 6px; padding: 8px; outline: none; }
+    select:focus, textarea:focus { border-color: #2C3E5A; }
+    textarea { height: 120px; resize: vertical; font-family: inherit; margin-bottom: 10px; }
+    .btn-row { display: flex; gap: 8px; margin-bottom: 10px; }
+    button { flex: 1; padding: 10px; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity 0.15s; }
+    button:hover { opacity: 0.85; }
+    .btn-primary { background: #1a252f; color: #fff; }
+    .btn-secondary { background: #6B2737; color: #fff; }
+    .btn-extract { background: #4A6480; color: #fff; }
+    .status { font-size: 11px; color: #888; margin-top: 8px; text-align: center; }
+    .status.error { color: #c00; }
+    .hint { font-size: 11px; color: #999; margin-top: 10px; line-height: 1.5; }
+    .server-status { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-left: 6px; vertical-align: middle; }
+    .server-ok { background: #059669; }
+    .server-err { background: #dc2626; }
+  </style>
+</head>
+<body>
+  <h1>AOT<span class="dot">.</span> Syntax Analyzer <span id="serverDot" class="server-status"></span></h1>
+
+  <label for="lang">Language</label>
+  <select id="lang">
+    <option value="auto">Auto-detect</option>
+    <option value="English">English</option>
+    <option value="Russian">Русский</option>
+    <option value="Ukrainian">Українська</option>
+  </select>
+
+  <br><br>
+
+  <label for="text">Text to analyze</label>
+  <textarea id="text" placeholder="Paste text or click Extract to get it from the current page..."></textarea>
+
+  <div class="btn-row">
+    <button class="btn-extract" id="btnExtract">Extract from page</button>
+    <button class="btn-secondary" id="btnSelection">Selection only</button>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn-primary" id="btnAnalyze">Analyze</button>
+  </div>
+
+  <div class="status" id="status"></div>
+
+  <div class="hint">
+    Requires SynanDaemon running on localhost:8089.<br>
+    Start with: <code>./start_all.sh</code>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

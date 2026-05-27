@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>AOT Syntax Analysis</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif; background: #fafafa; }
+    .toolbar {
+      position: sticky; top: 0; z-index: 100;
+      background: #1a252f; color: #fff; padding: 10px 20px;
+      display: flex; align-items: center; gap: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    .toolbar h1 { font-size: 16px; font-weight: 700; }
+    .toolbar .dot { color: #c98; }
+    .toolbar .lang-badge {
+      font-size: 11px; padding: 3px 8px; border-radius: 4px;
+      background: rgba(255,255,255,0.15); font-weight: 600;
+    }
+    .toolbar .spacer { flex: 1; }
+    .toolbar button {
+      background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+      color: #fff; padding: 6px 14px; border-radius: 5px; cursor: pointer;
+      font-size: 12px; font-weight: 600; transition: background 0.15s;
+    }
+    .toolbar button:hover { background: rgba(255,255,255,0.2); }
+    #svgContainer { width: 100%; min-height: 400px; background: #fff; }
+    .loading {
+      text-align: center; padding: 80px 20px; color: #888;
+    }
+    .loading .spinner {
+      width: 32px; height: 32px; border: 3px solid #ddd;
+      border-top-color: #1a252f; border-radius: 50%;
+      animation: spin 0.8s linear infinite; margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <h1>AOT<span class="dot">.</span> Syntax</h1>
+    <span class="lang-badge" id="langBadge"></span>
+    <div class="spacer"></div>
+    <button onclick="saveSvg()">Save SVG</button>
+    <button onclick="window.close()">Close</button>
+  </div>
+  <div id="svgContainer">
+    <div class="loading">
+      <div class="spinner"></div>
+      <div>Rendering syntax tree...</div>
+    </div>
+  </div>
+
+  <script src="libs/d3.min.js"></script>
+  <script src="synan_viz.js"></script>
+  <script src="result.js"></script>
+</body>
+</html>
