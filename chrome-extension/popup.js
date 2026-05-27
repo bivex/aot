@@ -74,27 +74,17 @@ function analyze() {
   var lang = getLang() || detectLang(text);
   status('Analyzing (' + lang + ')...');
 
-  fetch(DAEMON + '&action=syntax&langua=' + lang, { method: 'POST', body: text })
-    .then(r => {
-      if (!r.ok) throw new Error('Server returned ' + r.status);
-      return r.json();
-    })
-    .then(json => {
-      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        chrome.storage.local.set({
-          aotResult: JSON.stringify(json),
-          aotLang: lang
-        }, () => {
-          chrome.tabs.create({
-            url: chrome.runtime.getURL('result.html'),
-            openerTabId: tabs[0].id
-          });
-        });
-      });
-    })
-    .catch(err => {
-      status('Error: ' + err.message, true);
-    });
+  chrome.runtime.sendMessage({ action: 'analyze', text: text, lang: lang }, (resp) => {
+    if (chrome.runtime.lastError) {
+      status('Error: ' + chrome.runtime.lastError.message, true);
+      return;
+    }
+    if (resp && resp.ok) {
+      status('Opening result...');
+    } else if (resp && resp.error) {
+      status('Error: ' + resp.error, true);
+    }
+  });
 }
 
 function status(msg, isErr) {

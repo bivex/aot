@@ -1,7 +1,23 @@
+function clearLoading() {
+  var container = document.getElementById('svgContainer');
+  var loading = container.querySelector('.loading');
+  if (loading) loading.remove();
+}
+
+function showError(msg) {
+  clearLoading();
+  document.getElementById('svgContainer').innerHTML =
+    '<div style="text-align:center;padding:80px;color:#c00">' + msg + '</div>';
+}
+
 chrome.storage.local.get(['aotResult', 'aotLang'], function(data) {
+  if (chrome.runtime.lastError) {
+    showError('Storage error: ' + chrome.runtime.lastError.message);
+    return;
+  }
+
   if (!data.aotResult) {
-    document.getElementById('svgContainer').innerHTML =
-      '<div style="text-align:center;padding:80px;color:#888">No analysis data. Open the extension popup and analyze text first.</div>';
+    showError('No analysis data. Open the extension popup and analyze text first.');
     return;
   }
 
@@ -11,12 +27,12 @@ chrome.storage.local.get(['aotResult', 'aotLang'], function(data) {
 
   try {
     var json = JSON.parse(data.aotResult);
+    clearLoading();
     initCanvas();
     parseSynanJson(json);
     drawAll();
   } catch (e) {
-    document.getElementById('svgContainer').innerHTML =
-      '<div style="text-align:center;padding:80px;color:#c00">Parse error: ' + e.message + '</div>';
+    showError('Parse error: ' + e.message);
   }
 
   chrome.storage.local.remove(['aotResult', 'aotLang']);
