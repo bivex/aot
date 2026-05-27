@@ -14,6 +14,7 @@ cd "$(dirname "$0")"
 EXT_DIR="$(pwd)"
 BUILD_DIR="$EXT_DIR/build"
 APP_NAME="AOT Syntax Analyzer"
+PROJ_DIR="$BUILD_DIR/$APP_NAME"
 
 echo "=== AOT Safari Web Extension Builder ==="
 echo ""
@@ -45,7 +46,6 @@ xcrun safari-web-extension-converter "$EXT_DIR" \
   --bundle-identifier com.aot.syntaxanalyzer
 
 echo ""
-echo "Converted successfully. Project at: $BUILD_DIR/$APP_NAME"
 
 # Handle subcommand
 CMD="${1:-open}"
@@ -53,34 +53,41 @@ CMD="${1:-open}"
 case "$CMD" in
   open)
     echo "Opening in Xcode..."
-    open "$BUILD_DIR/$APP_NAME.xcodeproj"
+    open "$PROJ_DIR/$APP_NAME.xcodeproj"
     echo ""
     echo "In Xcode:"
-    echo "  1. Select the '$APP_NAME' scheme (macOS target)"
+    echo "  1. Select the '$APP_NAME (macOS)' scheme"
     echo "  2. Build & Run (Cmd+R)"
     echo "  3. Safari > Settings > Extensions > enable '$APP_NAME'"
     ;;
   build)
     echo "Building release..."
-    cd "$BUILD_DIR"
+    cd "$PROJ_DIR"
     xcodebuild -project "$APP_NAME.xcodeproj" \
       -scheme "$APP_NAME (macOS)" \
       -configuration Release \
-      CONFIGURATION_BUILD_DIR="$BUILD_DIR/output"
+      CONFIGURATION_BUILD_DIR="$BUILD_DIR/output" \
+      build
     echo ""
     echo "Built to: $BUILD_DIR/output/"
     echo "Run the app to install the extension into Safari."
     ;;
   run)
     echo "Building and running..."
-    cd "$BUILD_DIR"
+    cd "$PROJ_DIR"
     xcodebuild -project "$APP_NAME.xcodeproj" \
       -scheme "$APP_NAME (macOS)" \
       -configuration Debug \
       build 2>&1 | tail -5
     echo ""
-    echo "Launching..."
-    open "$BUILD_DIR/build/Debug/$APP_NAME.app"
+    # Find the built app
+    APP_PATH=$(find "$PROJ_DIR" -name "$APP_NAME.app" -type d 2>/dev/null | head -1)
+    if [ -n "$APP_PATH" ]; then
+      echo "Launching $APP_PATH ..."
+      open "$APP_PATH"
+    else
+      echo "App not found. Build may have failed."
+    fi
     echo ""
     echo "Safari > Settings > Extensions > enable '$APP_NAME'"
     ;;
