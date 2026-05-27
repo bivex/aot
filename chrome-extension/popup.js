@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btnExtract').onclick = extractFull;
   document.getElementById('btnSelection').onclick = extractSelection;
   document.getElementById('btnAnalyze').onclick = analyze;
+  document.getElementById('btnRenderPage').onclick = renderOnPage;
 });
 
 function checkServer() {
@@ -125,4 +126,24 @@ function status(msg, isErr) {
   var el = document.getElementById('status');
   el.textContent = msg;
   el.className = isErr ? 'status error' : 'status';
+}
+
+function renderOnPage() {
+  var text = document.getElementById('text').value.trim();
+  if (!text) { status('Paste or extract text first', true); return; }
+
+  var lang = getLang() || detectLang(text);
+  status('Rendering on page...');
+
+  chrome.runtime.sendMessage({ action: 'render-page', text: text, lang: lang }, (resp) => {
+    if (chrome.runtime.lastError) {
+      status('Error: ' + chrome.runtime.lastError.message, true);
+      return;
+    }
+    if (resp && resp.ok) {
+      status('Rendered on page');
+    } else if (resp && resp.error) {
+      status('Error: ' + resp.error, true);
+    }
+  });
 }
