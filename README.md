@@ -15,6 +15,7 @@
   - [macOS](#macos)
   - [Windows](#windows)
 - [Chrome Extension](#chrome-extension)
+- [Safari Extension](#safari-extension)
 - [Running the Daemons](#running-the-daemons)
 - [API Reference](#api-reference)
 - [Documentation](#documentation)
