@@ -11,6 +11,7 @@ class CSyntaxHolder : public  CLemTextCreator
 public:
 	CSentencesCollection			m_Synan;
 	CPostMorphInteface*				m_pPostMorph;
+	bool							m_bSyntaxLoaded;
 
 
 	CSyntaxHolder(MorphLanguageEnum l);

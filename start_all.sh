@@ -67,8 +67,8 @@ stop_services() {
 start_services() {
     echo "Starting services in background..."
     
-    SYNAN_BIN="${BUILD_DIR}/Source/www/SynanDaemon/SynanDaemon"
-    SEMAN_BIN="${BUILD_DIR}/Source/www/SemanDaemon/SemanDaemon"
+    SYNAN_BIN="${PROJECT_ROOT}/Bin/SynanDaemon"
+    SEMAN_BIN="${PROJECT_ROOT}/Bin/SemanDaemon"
 
     if [ ! -f "$SYNAN_BIN" ]; then
         echo "ERROR: SynanDaemon not found at $SYNAN_BIN. Please build it first."

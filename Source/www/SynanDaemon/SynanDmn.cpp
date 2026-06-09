@@ -9,7 +9,8 @@ TSynanHttpServer::TSynanHttpServer() :
     RussianSyntaxHolder(morphRussian),
     GermanSyntaxHolder(morphGerman),
     UkrainianSyntaxHolder(morphUkrainian),
-    EnglishSyntaxHolder(morphEnglish)
+    EnglishSyntaxHolder(morphEnglish),
+    SpanishSyntaxHolder(morphSpanish)
 {
 
 }
@@ -35,7 +36,7 @@ std::string TSynanHttpServer::ProcessMorphology(TDaemonParsedRequest &request) {
     bool withParadigms = evhttp_find_header(&request.headers, "withparadigms") != nullptr;
     const CMorphanHolder &h  = GetMHolder(request.Langua);
     std::string wordForm = request.Query;
-    if (request.Langua == morphEnglish) {
+    if (request.Langua == morphEnglish || request.Langua == morphSpanish) {
         MakeUpperUtf8(wordForm);
     }
     return h.LemmatizeJson(wordForm, withParadigms);
@@ -52,6 +53,8 @@ std::string TSynanHttpServer::ProcessSyntax(TDaemonParsedRequest &request) {
         P = &UkrainianSyntaxHolder;
     } else if (request.Langua == morphEnglish) {
         P = &EnglishSyntaxHolder;
+    } else if (request.Langua == morphSpanish) {
+        P = &SpanishSyntaxHolder;
     }
 
     if (P == nullptr) {
@@ -60,12 +63,16 @@ std::string TSynanHttpServer::ProcessSyntax(TDaemonParsedRequest &request) {
 
     std::string query = request.Query;
     std::string originalQuery;
-    if (request.Langua == morphEnglish) {
+    if (request.Langua == morphEnglish || request.Langua == morphSpanish) {
         originalQuery = query;
         MakeUpperUtf8(query);
     }
     auto t0 = std::chrono::steady_clock::now();
     if (!P->GetSentencesFromSynAn(query, false)) {
+        if (request.Langua == morphSpanish) {
+            LOGW << "Spanish Syntax analysis failed (possibly due to missing dictionaries)";
+            return "[]";
+        }
         throw CExpc("Synan has crushed\n");
     }
     auto t1 = std::chrono::steady_clock::now();
@@ -114,6 +121,18 @@ void TSynanHttpServer::LoadSynan(bool loadBigrams) {
         EnglishSyntaxHolder.LoadSyntax();
     } catch (CExpc& e) {
         LOGE << "Failed to load English Syntax: " << e.what();
+    }
+    try {
+        LOGI <<"Loading Spanish Morphology";
+        SpanishMorphHolder.LoadMorphology(morphSpanish);
+    } catch (CExpc& e) {
+        LOGE << "Failed to load Spanish Morphology: " << e.what();
+    }
+    try {
+        LOGI <<"Loading Spanish Syntax";
+        SpanishSyntaxHolder.LoadSyntax();
+    } catch (CExpc& e) {
+        LOGE << "Failed to load Spanish Syntax: " << e.what();
     }
 
     if (loadBigrams) {

@@ -5,8 +5,14 @@ project(SynanLib)
 add_library(SynanLib
         SentencesCollection.cpp
         SyntaxHolder.cpp
+        SpaSyntaxOpt.cpp
+        SpaSentence.cpp
+        SpaFormatCaller.cpp
         SentencesCollection.h
         SyntaxHolder.h
+        SpaSyntaxOpt.h
+        SpaSentence.h
+        SpaFormatCaller.h
 )
 
 target_link_libraries(SynanLib

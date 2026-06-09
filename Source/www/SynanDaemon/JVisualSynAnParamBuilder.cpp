@@ -324,6 +324,10 @@ void JVisualSynAnParamBuilder::BuildJson(const CSentence& piSent, CJsonObject& o
     GetTopClauses(piSent, topClauses);
 
     auto* gramTab = GetMHolder(m_pSyntaxHolder->m_LemText.GetDictLanguage()).m_pGramTab;
+    if (!gramTab) {
+        LOGE << "gramTab is null in JVisualSynAnParamBuilder::BuildJson";
+        return;
+    }
 
     for(long i = 0; i < topClauses.size() ; i++ ) {
         const CClause& C = 	piSent.m_Clauses[topClauses[i]];
@@ -353,6 +357,9 @@ void JVisualSynAnParamBuilder::BuildJson(const CSentence& piSent, CJsonObject& o
 
 std::string BuildJson(CSyntaxHolder* pSyntaxHolder, const std::string& query, const std::string& originalQuery) {
 	JVisualSynAnParamBuilder builder(pSyntaxHolder);
+	if (!pSyntaxHolder->m_Synan.GetOpt()) {
+		return "[]";
+	}
 	if (!originalQuery.empty()) {
 		builder.TokenizeOriginal(originalQuery);
 	}

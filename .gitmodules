@@ -11,3 +11,6 @@
 [submodule "Dicts/EngSynan/ud-ewt"]
 	path = Dicts/EngSynan/ud-ewt
 	url = https://github.com/UniversalDependencies/UD_English-EWT
+[submodule "Dicts/Morph/Spanish/unimorph"]
+	path = Dicts/Morph/Spanish/unimorph
+	url = https://github.com/unimorph/spa.git

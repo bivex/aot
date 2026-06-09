@@ -1,0 +1,36 @@
+%% ========== Spanish Syntax Rules ==========
+%% Single root: SYN_GROUP
+
+%% ========== Noun Phrase (NP) ==========
+[NP] -> [TOKEN grm="NOUN"];
+[NP] -> [TOKEN grm="PRON"];
+[NP] -> [TOKEN grm="DET"] [TOKEN grm="NOUN"];
+[NP] -> [TOKEN grm="DET"] [TOKEN grm="ADJ"] [TOKEN grm="NOUN"];
+[NP] -> [TOKEN grm="DET"] [TOKEN grm="NOUN"] [TOKEN grm="ADJ"];
+[NP] -> [TOKEN grm="NOUN"] [TOKEN grm="ADJ"];
+[NP] -> [TOKEN grm="NUM"] [TOKEN grm="NOUN"];
+
+%% ========== Prepositional Phrase (PP) ==========
+[PP] -> [TOKEN grm="PREP"] [NP];
+[PP] -> [TOKEN grm="PREP"] [PP];
+
+%% ========== Simple Verb Phrase (VP) ==========
+[VP] -> [TOKEN grm="VERB"];
+[VP] -> [TOKEN grm="VERB"] [NP];
+[VP] -> [TOKEN grm="VERB"] [PP];
+[VP] -> [TOKEN grm="VERB"] [TOKEN grm="ADJ"];
+[VP] -> [TOKEN grm="VERB"] [TOKEN grm="ADV"];
+[VP] -> [TOKEN grm="ADV"] [TOKEN grm="VERB"];
+
+%% ========== Coordination (CONJ) ==========
+[NP] -> [NP] [TOKEN grm="CONJ"] [NP];
+[VP] -> [VP] [TOKEN grm="CONJ"] [VP];
+[PP] -> [PP] [TOKEN grm="CONJ"] [PP];
+
+%% ========== Subject-Predicate (Root) ==========
+[SP] -> [NP] [VP];
+[SP] -> [SP] [PP];
+[SP] -> [SP] [TOKEN grm="CONJ"] [SP];
+
+%% ========== Root ==========
+[SYN_GROUP] -> [NP] | [VP] | [PP] | [SP] | [TOKEN grm="NOUN"] | [TOKEN grm="VERB"];

@@ -9,6 +9,7 @@ extern CPostMorphInteface* NewGermanPostMorph();
 CSyntaxHolder::CSyntaxHolder(MorphLanguageEnum l) : CLemTextCreator(l)
 {
 	m_pPostMorph = 0;
+	m_bSyntaxLoaded = false;
 };
 
 
@@ -23,6 +24,7 @@ void CSyntaxHolder::ClearHolder() {
 		delete m_pPostMorph;
 		m_pPostMorph = nullptr;
 	}
+	m_bSyntaxLoaded = false;
 	m_Synan.ClearSentences();
 	m_Synan.ClearOptions();
 }
@@ -43,7 +45,7 @@ void CSyntaxHolder::LoadSyntax()
 		else
 			m_pPostMorph = nullptr;
 
-		if (!m_pPostMorph && m_Language != morphUkrainian && m_Language != morphEnglish)
+		if (!m_pPostMorph && m_Language != morphUkrainian && m_Language != morphEnglish && m_Language != morphSpanish)
 		{
 			throw CExpc("Cannot load postmorphology\n");
 		}
@@ -58,32 +60,41 @@ void CSyntaxHolder::LoadSyntax()
 		m_Synan.SetOborDic(m_Graphan.GetOborDic());
 		m_Synan.SetLemmatizer(GetMHolder(m_Language).m_pLemmatizer);
 		m_Synan.InitializeProcesser();
+		m_bSyntaxLoaded = true;
 	}
 	catch (CExpc& e) {
 		LOGE << "LoadSyntax failed: " << e.what();
-		if (m_Language != morphUkrainian && m_Language != morphEnglish) throw;
+		if (m_Language != morphUkrainian && m_Language != morphEnglish && m_Language != morphSpanish) throw;
 	}
 	catch (...) {
 		LOGE << "LoadSyntax failed with unknown error";
-		if (m_Language != morphUkrainian && m_Language != morphEnglish) throw;
+		if (m_Language != morphUkrainian && m_Language != morphEnglish && m_Language != morphSpanish) throw;
 	}
 };
 
 
 bool CSyntaxHolder::GetSentencesFromSynAn(std::string utf8str, bool bFile)
 {
+	if (!m_bSyntaxLoaded) {
+		return false;
+	}
 	try {
 		m_Synan.ClearSentences();
 		m_LemText.m_LemWords.clear();
 		int CountOfWords;
 
 		auto t0 = std::chrono::steady_clock::now();
-		if (!BuildLemText(utf8str, bFile, CountOfWords))
-			return false;;
+		if (!BuildLemText(utf8str, bFile, CountOfWords) || !m_Synan.GetOpt()) {
+			return false;
+		}
 
         #ifdef _DEBUG
 				m_LemText.SaveToFile("before.lem");
         #endif
+
+		if (m_Synan.GetOpt()->m_Language == morphSpanish && !m_Synan.GetOpt()->IsValid()) {
+			return false;
+		}
 
 		auto t1 = std::chrono::steady_clock::now();
 		if (m_pPostMorph) {
