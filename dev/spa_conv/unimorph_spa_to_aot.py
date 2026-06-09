@@ -136,7 +136,7 @@ def convert():
 
             # Spanish: allow A-Z, accented chars, ñ, ü, -
             def clean_text(t):
-                allowed = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                allowed = "ABCDEFGHIJKLMNOPQRSTUVWXYZÁÉÍÓÚÑÜ-"
                 t2 = ''.join(c for c in t if c in allowed)
                 return t2 if t2 else None
 
@@ -146,8 +146,8 @@ def convert():
                 skipped += 1
                 continue
 
-            lemma = strip_accents(lemma_clean)
-            word = strip_accents(word_clean)
+            lemma = lemma_clean
+            word = word_clean
 
             tags_raw = parts[2].split(';')
             pos = tags_raw[0]
