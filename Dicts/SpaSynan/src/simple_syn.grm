@@ -9,6 +9,7 @@
 [NP] -> [TOKEN grm="DET"] [TOKEN grm="NOUN"] [TOKEN grm="ADJ"];
 [NP] -> [TOKEN grm="NOUN"] [TOKEN grm="ADJ"];
 [NP] -> [TOKEN grm="NUM"] [TOKEN grm="NOUN"];
+[NP] -> [NP] [PP];
 
 %% ========== Prepositional Phrase (PP) ==========
 [PP] -> [TOKEN grm="PREP"] [NP];
@@ -21,6 +22,10 @@
 [VP] -> [TOKEN grm="VERB"] [TOKEN grm="ADJ"];
 [VP] -> [TOKEN grm="VERB"] [TOKEN grm="ADV"];
 [VP] -> [TOKEN grm="ADV"] [TOKEN grm="VERB"];
+[VP] -> [VP] [PP];
+[VP] -> [VP] [NP];
+[VP] -> [VP] [TOKEN grm="ADV"];
+[VP] -> [TOKEN grm="ADV"] [VP];
 
 %% ========== Coordination (CONJ) ==========
 [NP] -> [NP] [TOKEN grm="CONJ"] [NP];
