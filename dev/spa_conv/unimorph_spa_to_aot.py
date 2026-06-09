@@ -159,6 +159,144 @@ def convert():
 
     print(f"Read {total_lines} lines, {len(data)} lemmas, skipped {skipped}")
 
+    # Auto-generate singular base forms where only plural forms are in UniMorph
+    for lemma in list(data.keys()):
+        for pos in list(data[lemma].keys()):
+            forms = data[lemma][pos]
+            words_in_forms = {w for w, _ in forms}
+            if lemma not in words_in_forms:
+                if pos == 'ADJ':
+                    has_fem = any('FEM' in t for _, t in forms)
+                    if has_fem:
+                        tags = ['ADJ', 'MASC', 'SG']
+                    else:
+                        tags = ['ADJ', 'SG']
+                elif pos == 'N':
+                    has_fem = any('FEM' in t for _, t in forms)
+                    if has_fem:
+                        tags = ['N', 'FEM', 'SG']
+                    else:
+                        tags = ['N', 'MASC', 'SG']
+                elif pos == 'V':
+                    tags = ['V', 'NFIN']
+                else:
+                    tags = [pos, 'SG']
+                data[lemma][pos].append((lemma, tags))
+
+    # Add Spanish closed-class words dictionary
+    CLOSED_CLASS = {
+        'EL': ('DET', ['SG', 'MASC']),
+        'LA': ('DET', ['SG', 'FEM']),
+        'LOS': ('DET', ['PL', 'MASC']),
+        'LAS': ('DET', ['PL', 'FEM']),
+        'UN': ('DET', ['SG', 'MASC']),
+        'UNA': ('DET', ['SG', 'FEM']),
+        'UNOS': ('DET', ['PL', 'MASC']),
+        'UNAS': ('DET', ['PL', 'FEM']),
+        'SU': ('DET', ['SG']),
+        'SUS': ('DET', ['PL']),
+        'ESTE': ('DET', ['SG', 'MASC']),
+        'ESTA': ('DET', ['SG', 'FEM']),
+        'ESTOS': ('DET', ['PL', 'MASC']),
+        'ESTAS': ('DET', ['PL', 'FEM']),
+        'ESE': ('DET', ['SG', 'MASC']),
+        'ESA': ('DET', ['SG', 'FEM']),
+        'ESOS': ('DET', ['PL', 'MASC']),
+        'ESAS': ('DET', ['PL', 'FEM']),
+        'AQUEL': ('DET', ['SG', 'MASC']),
+        'AQUELLA': ('DET', ['SG', 'FEM']),
+        'AQUELLOS': ('DET', ['PL', 'MASC']),
+        'AQUELLAS': ('DET', ['PL', 'FEM']),
+        'MI': ('DET', ['SG']),
+        'MIS': ('DET', ['PL']),
+        'TU': ('DET', ['SG']),
+        'TUS': ('DET', ['PL']),
+        'LO': ('DET', ['SG', 'NEUT']),
+
+        'A': ('PREP', []),
+        'ANTE': ('PREP', []),
+        'BAJO': ('PREP', []),
+        'CON': ('PREP', []),
+        'CONTRA': ('PREP', []),
+        'DE': ('PREP', []),
+        'DESDE': ('PREP', []),
+        'DURANTE': ('PREP', []),
+        'EN': ('PREP', []),
+        'ENTRE': ('PREP', []),
+        'HACIA': ('PREP', []),
+        'HASTA': ('PREP', []),
+        'MEDIANTE': ('PREP', []),
+        'PARA': ('PREP', []),
+        'POR': ('PREP', []),
+        'SEGÚN': ('PREP', []),
+        'SIN': ('PREP', []),
+        'SO': ('PREP', []),
+        'SOBRE': ('PREP', []),
+        'TRAS': ('PREP', []),
+        'DEL': ('PREP', []),
+        'AL': ('PREP', []),
+
+        'Y': ('CONJ', []),
+        'E': ('CONJ', []),
+        'O': ('CONJ', []),
+        'U': ('CONJ', []),
+        'PERO': ('CONJ', []),
+        'SINO': ('CONJ', []),
+        'AUNQUE': ('CONJ', []),
+        'PORQUE': ('CONJ', []),
+        'COMO': ('CONJ', []),
+        'CUANDO': ('CONJ', []),
+        'SI': ('CONJ', []),
+        'QUE': ('CONJ', []),
+        'MAS': ('CONJ', []),
+        'NI': ('CONJ', []),
+        'SIQUIERA': ('CONJ', []),
+
+        'ÉL': ('PRON', ['SG', 'MASC']),
+        'ELLA': ('PRON', ['SG', 'FEM']),
+        'ELLOS': ('PRON', ['PL', 'MASC']),
+        'ELLAS': ('PRON', ['PL', 'FEM']),
+        'YO': ('PRON', []),
+        'TÚ': ('PRON', []),
+        'NOSOTROS': ('PRON', ['PL', 'MASC']),
+        'NOSOTRAS': ('PRON', ['PL', 'FEM']),
+        'VOSOTROS': ('PRON', ['PL', 'MASC']),
+        'VOSOTRAS': ('PRON', ['PL', 'FEM']),
+        'ME': ('PRON', []),
+        'TE': ('PRON', []),
+        'SE': ('PRON', []),
+        'NOS': ('PRON', []),
+        'OS': ('PRON', []),
+        'LE': ('PRON', ['SG']),
+        'LES': ('PRON', ['PL']),
+        'MÍ': ('PRON', []),
+        'TI': ('PRON', []),
+        'SÍ': ('PRON', []),
+
+        'ÚNICAMENTE': ('ADV', []),
+        'NO': ('ADV', []),
+        'SÍ': ('ADV', []),
+        'BIEN': ('ADV', []),
+        'MAL': ('ADV', []),
+        'MUY': ('ADV', []),
+        'MUCHO': ('ADV', []),
+        'POCO': ('ADV', []),
+        'MÁS': ('ADV', []),
+        'MENOS': ('ADV', []),
+        'HOY': ('ADV', []),
+        'AYER': ('ADV', []),
+        'MAÑANA': ('ADV', []),
+        'AHORA': ('ADV', []),
+        'ANTES': ('ADV', []),
+        'DESPUÉS': ('ADV', []),
+        'SIEMPRE': ('ADV', []),
+        'NUNCA': ('ADV', []),
+        'JAMÁS': ('ADV', []),
+    }
+
+    for word, (pos, tags) in CLOSED_CLASS.items():
+        data[word][pos].append((word, [pos] + tags))
+
     flexia_models = []
     paradigm_to_id = {}
     lemmas_list = []
