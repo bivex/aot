@@ -205,6 +205,8 @@ bool CGraLine::is_lowercase(int ch) const
 {
     if (m_Language == morphGerman)
         return is_german_lower(ch);
+    else if (m_Language == morphSpanish)
+        return is_spanish_lower(ch);
     else
         return is_russian_lower(ch) || is_english_lower(ch);
 
@@ -214,6 +216,8 @@ bool CGraLine::is_uppercase(int ch) const
 {
     if (m_Language == morphGerman)
         return is_german_upper(ch);
+    else if (m_Language == morphSpanish)
+        return is_spanish_upper(ch);
     else
         return is_russian_upper(ch) || is_english_upper(ch);
 
@@ -430,6 +434,8 @@ bool CGraLine::is_latin_alpha(int ch) const
 {
     if (m_Language == morphGerman)
         return is_german_alpha(ch);
+    else if (m_Language == morphSpanish)
+        return is_spanish_lower(ch) || is_spanish_upper(ch);
     else
         return is_english_alpha(ch);
 };
@@ -635,6 +641,8 @@ MorphLanguageEnum CGraLine::GetTokenLanguage() const
         {
             if (m_Language == morphGerman)
                 return morphGerman;
+            else if (m_Language == morphSpanish)
+                return morphSpanish;
             else
                 return morphEnglish;
 
