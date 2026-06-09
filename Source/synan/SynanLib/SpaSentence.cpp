@@ -16,16 +16,35 @@ void CSpaSentence::ReadNextFromPlmLinesLanguageSpecific()
 
 void CSpaSentence::BuildSubjAndPredRelation(CMorphVariant& synVariant, long RootWordNo, EClauseType ClauseType)
 {
-	// Find the index of the predicate unit
-	long iPred = -1;
-	for (long i = 0; i < (long)synVariant.m_SynUnits.size(); i++) {
-		if (synVariant.m_SynUnits[i].m_SentPeriod.m_iFirstWord == RootWordNo) {
-			iPred = i;
-			break;
+	synVariant.ResetSubj();
+
+	long iPred = RootWordNo;
+	if (iPred >= 0 && iPred < (long)synVariant.m_SynUnits.size()) {
+		const CSynUnit& PU = synVariant.m_SynUnits[iPred];
+		const CSynWord& PW = m_Words[PU.m_SentPeriod.m_iFirstWord];
+		if (!PW.m_Homonyms.empty() && PU.m_iHomonymNum < (int)PW.m_Homonyms.size()) {
+			const CSynHomonym& PH = PW.m_Homonyms[PU.m_iHomonymNum];
+			if (!GetSpaGramTab()->is_verb_form(PH.m_iPoses)) {
+				iPred = -1;
+			}
 		}
 	}
 
-	if (iPred == -1) return;
+	if (iPred == -1 || iPred >= (long)synVariant.m_SynUnits.size()) {
+		for (long i = 0; i < (long)synVariant.m_SynUnits.size(); i++) {
+			const CSynUnit& U = synVariant.m_SynUnits[i];
+			if (U.m_Type != EWord) continue;
+			const CSynWord& W = m_Words[U.m_SentPeriod.m_iFirstWord];
+			if (W.m_Homonyms.empty() || U.m_iHomonymNum >= (int)W.m_Homonyms.size()) continue;
+			const CSynHomonym& H = W.m_Homonyms[U.m_iHomonymNum];
+			if (GetSpaGramTab()->is_verb_form(H.m_iPoses)) {
+				iPred = i;
+				break;
+			}
+		}
+	}
+
+	if (iPred == -1 || iPred >= (long)synVariant.m_SynUnits.size()) return;
 	synVariant.m_iPredk = iPred;
 
 	const CSynUnit& PU = synVariant.m_SynUnits[iPred];
@@ -33,8 +52,8 @@ void CSpaSentence::BuildSubjAndPredRelation(CMorphVariant& synVariant, long Root
 	if (PW.m_Homonyms.empty() || PU.m_iHomonymNum >= (int)PW.m_Homonyms.size()) return;
 	const CSynHomonym& PH = PW.m_Homonyms[PU.m_iHomonymNum];
 
-	// Forward scan (inverted subjects)
-	for (long i = iPred + 1; i < (long)synVariant.m_SynUnits.size(); i++) {
+	// Normal SVO (Subject before verb) - Backward scan
+	for (long i = iPred - 1; i >= 0; i--) {
 		const CSynUnit& U = synVariant.m_SynUnits[i];
 		if (U.m_Type != EWord) continue;
 
@@ -53,9 +72,9 @@ void CSpaSentence::BuildSubjAndPredRelation(CMorphVariant& synVariant, long Root
 		}
 	}
 
+	// Inverted subjects (Subject after verb) - Forward scan
 	if (!synVariant.m_bGoodSubject) {
-		// Backward scan (normal SVO)
-		for (long i = iPred - 1; i >= 0; i--) {
+		for (long i = iPred + 1; i < (long)synVariant.m_SynUnits.size(); i++) {
 			const CSynUnit& U = synVariant.m_SynUnits[i];
 			if (U.m_Type != EWord) continue;
 
