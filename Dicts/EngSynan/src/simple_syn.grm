@@ -72,18 +72,25 @@
 [VP] -> [TOKEN grm="VERB"] [TOKEN grm="PART"];
 
 %% ========== Infinitive with PARTICLE (to) ==========
+[VP] -> [TOKEN grm="PART"] [TOKEN grm="VERB"];
+[VP] -> [TOKEN grm="PART"] [TOKEN grm="VERB"] [NP];
+[VP] -> [TOKEN grm="PART"] [TOKEN grm="VERB"] [PP];
+[VP] -> [TOKEN grm="PART"] [TOKEN grm="VBE"] [TOKEN grm="VERB" grm="ing"];
+[VP] -> [TOKEN grm="PART"] [TOKEN grm="VBE"] [TOKEN grm="VERB" grm="pp"];
+
 [VP] -> [TOKEN grm="VBE"] [TOKEN grm="PART"] [TOKEN grm="VERB"];
 [VP] -> [TOKEN grm="VBE"] [TOKEN grm="PART"] [TOKEN grm="VERB"] [NP];
 [VP] -> [TOKEN grm="MOD"] [TOKEN grm="PART"] [TOKEN grm="VBE"] [TOKEN grm="VERB" grm="pp"];
-[VP] -> [TOKEN grm="VBE"] [TOKEN grm="PART"] [TOKEN grm="VERB" grm="pp"];
-[VP] -> [TOKEN grm="VBE"] [TOKEN grm="PART"] [TOKEN grm="VERB" grm="ing"];
+
+%% ========== Infinitive Phrase as Subject (NP) ==========
+[NP] -> [TOKEN grm="PART"] [TOKEN grm="VERB"];
+[NP] -> [TOKEN grm="PART"] [TOKEN grm="VERB"] [NP];
+[NP] -> [TOKEN grm="PART"] [TOKEN grm="VERB"] [PP];
+
+%% ========== Verb taking Verb Phrase complement ==========
+[VP] -> [TOKEN grm="VERB"] [VP];
 
 %% ========== Adverbial in VP ==========
-[VP] -> [TOKEN grm="VERB"];
-[VP] -> [TOKEN grm="VBE"] [TOKEN grm="ADJECTIVE"];
-[VP] -> [TOKEN grm="MOD"] [VP];
-[VP] -> [TOKEN grm="VERB"] [NP];
-
 [VP] -> [TOKEN grm="VERB"] [TOKEN grm="ADVERB"];
 [VP] -> [TOKEN grm="VERB"] [TOKEN grm="ADVERB"] [NP];
 [VP] -> [TOKEN grm="ADVERB"] [TOKEN grm="VERB"] [NP];
