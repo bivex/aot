@@ -40,7 +40,7 @@
 
 
 
-[SYN_GROUP] -> [AP] | [NP] | [MODIF-NUM] | [VP] | [PP] | [VERB-MODIF];
+[SYN_GROUP] -> [AP] | [NP] | [MODIF-NUM] | [VP] | [PP] | [VERB-MODIF] | [SP] | [SUB-CLAUSE];
 
 
 %% ==========   common parenthetic   =
@@ -365,7 +365,193 @@
 [NP] -> [NP] 'von' [NP grm="dat"];
 
 
-%% tst
+%% =====================================================
+%% =====================================================
+%% ==========   Extended VP rules   ====================
+%% =====================================================
+%% =====================================================
 
+%% ==========  Modal and Auxiliary verbs  ==============
 
-[NP] -> 'test' 'test';
+[MODAL-VERB] -> [TOKEN grm="VER mod"];
+[AUX-VERB] -> [TOKEN grm="VER aux"];
+[INF-VERB] -> [TOKEN grm="VER inf"];
+
+%% ==========  Simple VP: verb alone  ==================
+
+[VP] -> [VER root];
+
+%% ==========  Verb + NP object  =======================
+%% unterschreibt den Vertrag
+%% erfüllt die Verpflichtungen
+
+[VP] -> [VER root] [NP];
+
+%% ==========  Verb + PP  ==============================
+%% tritt in Kraft
+%% handelt gemäß der Verfassung
+
+[VP] -> [VER root] [PP];
+
+%% ==========  Verb + predicative adjective  ===========
+%% bleibt wirksam
+%% ist gültig
+
+[VP] -> [VER root] [ADJ-PREDK];
+
+%% ==========  Verb + NP + PP  =========================
+%% unterschreibt den Vertrag mit den Parteien
+
+[VP] -> [VER root] [NP] [PP];
+
+%% ==========  Verb + ADV + NP  ========================
+
+[VP] -> [VER root] [ADV] [NP];
+
+%% ==========  Passive: AUX + PA2  =====================
+%% wird geschlossen
+%% ist genehmigt
+
+[VP] -> [AUX-VERB] [PA2 root];
+
+%% ==========  Passive + NP  ===========================
+%% wird von den Parteien geschlossen
+
+[VP] -> [AUX-VERB] [PA2 root] [NP];
+
+%% ==========  Passive + PP  ===========================
+%% wird durch den Vertreter genehmigt
+
+[VP] -> [AUX-VERB] [PA2 root] [PP];
+
+%% ==========  Passive + PP + PP  ======================
+
+[VP] -> [AUX-VERB] [PA2 root] [PP] [PP];
+
+%% ==========  Modal + infinitive  =====================
+%% kann genehmigen
+%% muss erfüllt werden
+
+[VP] -> [MODAL-VERB] [INF-VERB root];
+
+%% ==========  Modal + infinitive + NP  =================
+
+[VP] -> [MODAL-VERB] [INF-VERB root] [NP];
+
+%% ==========  Modal + infinitive + PP  =================
+
+[VP] -> [MODAL-VERB] [INF-VERB root] [PP];
+
+%% ==========  Modal + infinitive + NP + PP  ============
+
+[VP] -> [MODAL-VERB] [INF-VERB root] [NP] [PP];
+
+%% ==========  Modal + negation + infinitive  ============
+
+[VP] -> [MODAL-VERB] 'nicht' [INF-VERB root];
+
+%% ==========  Modal + AUX + PA2 (Passiv mit Modal)  ====
+%% kann genehmigt werden
+%% muss geschlossen werden
+
+[VP] -> [MODAL-VERB] [AUX-VERB] [PA2 root];
+
+%% ==========  Modal + AUX + PA2 + NP  ===================
+
+[VP] -> [MODAL-VERB] [AUX-VERB] [PA2 root] [NP];
+
+%% ==========  Modal + AUX + PA2 + PP  ===================
+
+[VP] -> [MODAL-VERB] [AUX-VERB] [PA2 root] [PP];
+
+%% ==========  Modal + AUX + PA2 + NP + PP  ==============
+
+[VP] -> [MODAL-VERB] [AUX-VERB] [PA2 root] [NP] [PP];
+
+%% ==========  Modal + negation + AUX + PA2  =============
+
+[VP] -> [MODAL-VERB] 'nicht' [AUX-VERB] [PA2 root];
+
+%% ==========  AUX + infinitive (Perfekt)  ===============
+%% hat genehmigt
+%% ist in Kraft getreten
+
+[VP] -> [AUX-VERB] [INF-VERB root];
+
+%% ==========  AUX + infinitive + NP  ====================
+
+[VP] -> [AUX-VERB] [INF-VERB root] [NP];
+
+%% ==========  AUX + infinitive + PP  ====================
+
+[VP] -> [AUX-VERB] [INF-VERB root] [PP];
+
+%% ==========  zu + infinitive  ==========================
+%% zu genehmigen
+%% zu erfüllen
+
+[ZU-INF] -> 'zu' [INF-VERB root];
+
+[VP] -> [VER root] [ZU-INF];
+
+[VP] -> [AUX-VERB] [ZU-INF];
+
+[VP] -> [MODAL-VERB] [ZU-INF];
+
+%% ==========  VP coordination  ==========================
+%% unterschreibt oder genehmigt
+
+[VP] -> [VP] [C-CONJ] [VP];
+
+%% =====================================================
+%% ==========   Subordinate clauses   ==================
+%% =====================================================
+
+%% ==========  Subordinate conjunctions  ================
+
+[SUB-CONJ] -> 'dass' | 'ob' | 'wenn' | 'sofern' | 'falls' | 'obwohl'
+			| 'weil' | 'da' | 'nachdem' | 'sobald' | 'sowie';
+
+%% ==========  dass-Satz  ===============================
+%% dass der Vertrag unterschrieben wird
+%% ob die Partei zustimmt
+
+[SUB-CLAUSE] -> [SUB-CONJ] [NP] [VP];
+
+%% ==========  Subordinate with PP  =====================
+
+[SUB-CLAUSE] -> [SUB-CONJ] [NP] [VP] [PP];
+
+%% ==========  Subordinate with NP + PP  ================
+
+[SUB-CLAUSE] -> [SUB-CONJ] [NP] [VP] [NP];
+
+%% =====================================================
+%% ==========   Subject-Predicate (SP)  ================
+%% =====================================================
+
+%% ==========  Basic SP  ================================
+%% Der Vertrag tritt in Kraft
+%% Die Partei unterschreibt das Dokument
+
+[SP] -> [NP] [VP];
+
+%% ==========  SP + PP  =================================
+
+[SP] -> [NP] [VP] [PP];
+
+%% ==========  SP + NP (accusative object)  ==============
+
+[SP] -> [NP] [VP] [NP];
+
+%% ==========  SP + PP + PP  ============================
+
+[SP] -> [NP] [VP] [PP] [PP];
+
+%% ==========  SP coordination  =========================
+
+[SP] -> [SP] [C-CONJ] [SP];
+
+%% ==========  SP with subordinate clause  ===============
+
+[SP] -> [SP] [SUB-CLAUSE];
