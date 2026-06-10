@@ -13,8 +13,32 @@
 [NP] -> [TOKEN grm="ARTICLE"] [TOKEN grm="ADJECTIVE"] [TOKEN grm="ADJECTIVE"] [TOKEN grm="NOUN"];
 [NP] -> [TOKEN grm="NUMERAL"] [TOKEN grm="NOUN"];
 
+%% Recursive / Modifier Noun Phrase rules
+[NP] -> [TOKEN grm="ARTICLE"] [NP];
+[NP] -> [TOKEN grm="ADJECTIVE"] [NP];
+[NP] -> [TOKEN grm="POSS"] [NP];
+[NP] -> [TOKEN grm="NUMERAL"] [NP];
+[NP] -> [TOKEN grm="NOUN"] [NP];
+[NP] -> [TOKEN grm="PN"] [NP];
+[NP] -> [TOKEN grm="CONJ"] [NP];
+
+%% Post-nominal modifiers
+[NP] -> [NP] [PP];
+
+%% Participle Phrase (non-finite)
+[VP_PART] -> [TOKEN grm="VERB" grm="pp"];
+[VP_PART] -> [TOKEN grm="VERB" grm="pp"] [PP];
+[VP_PART] -> [TOKEN grm="VERB" grm="pp"] [NP];
+[VP_PART] -> [TOKEN grm="VERB" grm="ing"];
+[VP_PART] -> [TOKEN grm="VERB" grm="ing"] [PP];
+[VP_PART] -> [TOKEN grm="VERB" grm="ing"] [NP];
+
+[NP] -> [NP] [VP_PART];
+
 %% ========== Prepositional Phrase (PP) ==========
 [PP] -> [TOKEN grm="PREP"] [NP];
+[PP] -> [TOKEN grm="CONJ"] [PP];
+[PP] -> [PP] [TOKEN grm="CONJ"] [PP];
 
 %% ========== Simple Verb Phrase (VP) ==========
 [VP] -> [TOKEN grm="VERB"];
@@ -24,6 +48,14 @@
 
 [VP] -> [TOKEN grm="VERB"] [NP] [PP];
 [VP] -> [TOKEN grm="VERB"] [PP];
+
+%% Recursive / Modifier Verb Phrase rules
+[VP] -> [VP] [PP];
+[VP] -> [VP] [TOKEN grm="ADVERB"];
+[VP] -> [TOKEN grm="ADVERB"] [VP];
+[VP] -> [TOKEN grm="VERB"] [TOKEN grm="ADVERB"] [PP];
+[VP] -> [TOKEN grm="VERB"] [TOKEN grm="ADVERB"] [NP];
+[VP] -> [TOKEN grm="ADVERB"] [TOKEN grm="VERB"] [PP];
 
 %% ========== Copula (VBE) constructions ==========
 [VP] -> [TOKEN grm="VBE"] [TOKEN grm="ADJECTIVE"];
@@ -128,4 +160,4 @@
 [SP] -> [NP] [VP];
 
 %% ========== Root ==========
-[SYN_GROUP] -> [NP] | [VP] | [PP] | [TOKEN grm="ADVERB"] | [TOKEN grm="PART"] | [SP];
+[SYN_GROUP] -> [NP] | [VP] | [PP] | [TOKEN grm="ADVERB"] | [TOKEN grm="PART"] | [SP] | [VP_PART];
