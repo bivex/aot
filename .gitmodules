@@ -14,3 +14,6 @@
 [submodule "Dicts/Morph/Spanish/unimorph"]
 	path = Dicts/Morph/Spanish/unimorph
 	url = https://github.com/unimorph/spa.git
+[submodule "Dicts/Morph/German/unimorph"]
+	path = Dicts/Morph/German/unimorph
+	url = https://github.com/unimorph/deu.git
