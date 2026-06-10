@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="fr">
 <head>
-	<title>AOT :: Online-Demo :: Rechtsanalyse (DE)</title>
+	<title>AOT :: Démo en ligne :: Analyse Juridique (FR)</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta name="description" content="Demonstration der syntaktischen Analyse deutscher Rechtsdokumente im AOT-System">
+	<meta name="description" content="Démonstration de l'analyse syntaxique de documents juridiques français dans le système AOT">
 	<meta name="theme-color" content="#1a252f">
 
 	<link rel="stylesheet" href="../aot.css">
@@ -16,18 +16,18 @@
 <body>
 
 <!-- Navigation -->
-<nav class="aot-nav" role="navigation" aria-label="Hauptnavigation">
+<nav class="aot-nav" role="navigation" aria-label="Navigation principale">
 	<div class="nav-inner">
 		<a href="/index.html" class="nav-brand">
 			<span class="brand-accent">AOT</span><span class="brand-dot">.ru</span>
 		</a>
-		<button class="nav-toggle" aria-label="Menü" aria-expanded="false"
+		<button class="nav-toggle" aria-label="Menu" aria-expanded="false"
 			onclick="this.setAttribute('aria-expanded', this.getAttribute('aria-expanded')==='true'?'false':'true'); document.querySelector('.nav-links').classList.toggle('open')">
 			<span></span><span></span><span></span>
 		</button>
 		<div class="nav-links">
-			<a href="/index.html">Startseite</a>
-			<a href="/onlinedemo.html" class="active">Demo</a>
+			<a href="/index.html">Accueil</a>
+			<a href="/onlinedemo.html" class="active">Démo</a>
 			<a href="/technology.html">Technologie</a>
 		</div>
 	</div>
@@ -37,60 +37,60 @@
 <header class="aot-hero" id="top">
 	<div class="hero-glow"></div>
 	<div class="hero-inner">
-		<div class="hero-badge">Deutsch</div>
-		<h1>Analyse von Rechtsdokumenten</h1>
-		<p>Automatische Analyse der Struktur deutscher Rechts- und Amtsdokumente.</p>
+		<div class="hero-badge">Français</div>
+		<h1>Analyse de Documents Juridiques</h1>
+		<p>Analyse automatique de la structure de documents juridiques et officiels en français.</p>
 	</div>
 </header>
 
-<!-- Hauptinhalt -->
+<!-- Contenu principal -->
 <main id="main-content" class="ui main container" style="padding-top: 3rem;">
 
 	<div class="ui stackable grid">
 		<div class="sixteen wide column">
-			<!-- Demo-Karte -->
+			<!-- Carte de Démo -->
 			<section class="ui card aot-card" style="width: 100%;">
 				<div class="content">
-					<h2 class="header">Rechtstext-Analyse</h2>
+					<h2 class="header">Analyse de Texte Juridique</h2>
 
 					<form class="ui form" id="syntax-form">
 						<div class="field">
-							<label for="InputText">Dokumenttext:</label>
+							<label for="InputText">Texte du document :</label>
 							<textarea
 								id="InputText"
 								rows="8"
-								placeholder="Fügen Sie einen Rechtstext ein (Vertrag, Gesetz, Verordnung)..."
-							>Der vorliegende Vertrag tritt im Zeitpunkt der Unterzeichnung durch die Vertragsparteien in Kraft und bleibt bis zur vollständigen Erfüllung der Verpflichtungen wirksam.</textarea>
+								placeholder="Collez un fragment de texte juridique (contrat, loi, règlement)..."
+							>Le présent Contrat entrera en vigueur dès sa signature par les deux Parties et restera en vigueur jusqu'à l'exécution complète de toutes les obligations.</textarea>
 						</div>
 
 						<div class="field">
-							<label>Beispieltexte:</label>
+							<label>Exemples de textes juridiques :</label>
 							<div class="ui buttons small">
-								<button type="button" class="ui button" onclick="setExample(0)">Vertrag</button>
-								<button type="button" class="ui button" onclick="setExample(1)">Gesetz</button>
-								<button type="button" class="ui button" onclick="setExample(2)">Haftung</button>
+								<button type="button" class="ui button" onclick="setExample(0)">Contrat</button>
+								<button type="button" class="ui button" onclick="setExample(1)">Loi</button>
+								<button type="button" class="ui button" onclick="setExample(2)">Responsabilité</button>
 							</div>
 						</div>
 
 						<div class="field" style="display: none;">
 							<select id="Language">
-								<option value="German" selected>German</option>
+								<option value="French" selected>French</option>
 							</select>
 						</div>
 
 						<div class="field">
 							<button type="button" class="ui primary button aot-primary" onclick="window.syntax_request()">
-								Struktur analysieren
+								Analyser la Structure
 							</button>
-							<button type="button" class="ui button" onclick="clearForm()">Löschen</button>
+							<button type="button" class="ui button" onclick="clearForm()">Effacer</button>
 							<button type="button" class="ui button" onclick="window.saveSvg()" id="btnSaveSvg" style="display:none">
-								SVG speichern
+								Enregistrer SVG
 							</button>
 						</div>
 					</form>
 				</div>
 
-				<!-- Canvas-Ausgabe -->
+				<!-- Sortie du Canvas -->
 				<div class="ui canvas segment" id="canvasWrapper" style="border: none; border-top: 1px solid var(--border-color); border-radius: 0; min-height: 400px; background: #fff; overflow: hidden;">
 					<div id="svgContainer" style="width:100%;min-height:400px;"></div>
 				</div>
@@ -99,12 +99,12 @@
 
 		<div class="sixteen wide column">
 			<section class="ui info segment">
-				<h3 class="ui header">Funktionen der Rechtsanalyse</h3>
-				<p>Dieses Modul verwendet eine spezialisierte Grammatik zur Erkennung komplexer Konstruktionen des juristischen Stils:</p>
+				<h3 class="ui header">Fonctionnalités de l'Analyse Juridique</h3>
+				<p>Ce module utilise une grammaire spécialisée pour détecter les constructions complexes typiques du style juridique :</p>
 				<div class="ui bulleted list">
-					<div class="item">Analyse von Partizipial- und Infinitivkonstruktionen in komplexen Satzgefügen.</div>
-					<div class="item">Erkennung von Subjekten und Objekten in Sätzen mit mehreren Nebensätzen.</div>
-					<div class="item">Analyse logischer Verbindungen zwischen Normteilen.</div>
+					<div class="item">Analyse des phrases participiales et des constructions au gérondif complexes.</div>
+					<div class="item">Détection des sujets et des objets dans les phrases à plusieurs propositions.</div>
+					<div class="item">Analyse des connexions logiques entre les parties des normes juridiques.</div>
 				</div>
 			</section>
 		</div>
@@ -112,7 +112,7 @@
 
 </main>
 
-<!-- Fußzeile -->
+<!-- Pied de page -->
 <footer class="aot-footer" role="contentinfo">
 	<div class="footer-inner">
 		<div class="footer-grid">
@@ -120,29 +120,29 @@
 				<div class="footer-brand">
 					<span class="brand-accent">AOT</span><span class="brand-dot">.ru</span>
 				</div>
-				<p class="footer-desc">System zur automatischen Textanalyse. Syntaktische Analyse von Dokumenten auf Russisch, Ukrainisch, Englisch, Deutsch, Spanisch, Französisch und Latein.</p>
+				<p class="footer-desc">Système d'analyse automatique de texte. Analyse syntaxique de documents en russe, ukrainien, anglais, allemand, espagnol, français et latin.</p>
 			</div>
 			<div class="footer-col">
-				<h4>Projekt</h4>
-				<a href="/index.html">Startseite</a>
-				<a href="/history.html">Geschichte</a>
-				<a href="/onlinedemo.html">Demos</a>
+				<h4>Projet</h4>
+				<a href="/index.html">Accueil</a>
+				<a href="/history.html">Historique</a>
+				<a href="/onlinedemo.html">Démos</a>
 				<a href="/technology.html">Technologie</a>
 			</div>
 			<div class="footer-col">
-				<h4>Demo</h4>
-				<a href="rus_legal.html">Legal RU</a>
-				<a href="ukr_legal.html">Legal UA</a>
-				<a href="eng_legal.html">Legal EN</a>
-			<a href="ger_legal.html">Legal DE</a>
-			<a href="spa_legal.html">Legal ES</a>
-				<a href="fre_legal.html">Legal FR</a>
-			<a href="lat_legal.html">Legal LA</a>
-			<a href="game_design_eng.html">Game Design</a>
+				<h4>Démo</h4>
+				<a href="rus_legal.html">Juridique RU</a>
+				<a href="ukr_legal.html">Juridique UA</a>
+				<a href="eng_legal.html">Juridique EN</a>
+				<a href="spa_legal.html">Juridique ES</a>
+				<a href="fre_legal.html">Juridique FR</a>
+				<a href="ger_legal.html">Juridique DE</a>
+				<a href="lat_legal.html">Juridique LA</a>
+				<a href="game_design_eng.html">Game Design</a>
 			</div>
 		</div>
 		<div class="footer-bottom">
-			<p>&copy; 2003&ndash;2026 AOT-Projekt. Alle Rechte vorbehalten.</p>
+			<p>&copy; 2003&ndash;2026 Projet AOT. Tous droits réservés.</p>
 		</div>
 	</div>
 </footer>
@@ -150,13 +150,13 @@
 <script src="libs/d3.min.js"></script>
 <script src="libs/jquery-3.3.1.min.js"></script>
 <script src="libs/semantic.min.js"></script>
-<script src="synan_ger_legal.js?v=2"></script>
+<script src="synan_fre_legal.js?v=1"></script>
 
 <script>
 	const examples = [
-		"Der vorliegende Vertrag tritt im Zeitpunkt der Unterzeichnung durch die Vertragsparteien in Kraft und bleibt bis zur vollständigen Erfüllung der Verpflichtungen wirksam.",
-		"Die öffentlichen Behörden und die Organe der örtlichen Selbstverwaltung handeln ausschließlich gemäß der Verfassung und den geltenden Gesetzen.",
-		"Die Parteien haften für die Nichterfüllung oder die nicht ordnungsgemäße Erfüllung der sich aus dem vorliegenden Vertrag ergebenden Verpflichtungen gemäß der anwendbaren Gesetzgebung."
+		"Le présent Contrat entrera en vigueur dès sa signature par les deux Parties et restera en vigueur jusqu'à l'exécution complète de toutes les obligations.",
+		"Les autorités de l'État et les organes de l'administration locale agiront uniquement sur les fondements, dans les limites de leurs compétences et selon les modalités prévues par la Constitution et les lois.",
+		"Les Parties seront responsables de l'inexécution ou de la mauvaise exécution des obligations découlant du présent Contrat conformément à la législation applicable."
 	];
 
 	function setExample(i) {
@@ -181,7 +181,7 @@
 		var url = URL.createObjectURL(blob);
 		var a = document.createElement('a');
 		a.href = url;
-		a.download = 'synan_ger_legal.svg';
+		a.download = 'synan_fre_legal.svg';
 		document.body.appendChild(a);
 		a.click();
 		document.body.removeChild(a);
