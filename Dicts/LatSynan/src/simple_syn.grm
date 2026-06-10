@@ -1,0 +1,87 @@
+%% ========== Latin Syntax Rules ==========
+%% Single root: SYN_GROUP
+%% Designed for legal/official document analysis
+
+%% ========== Atomic categories ==========
+
+[NOUN] -> [TOKEN grm="NOUN"];
+[ADJ] -> [TOKEN grm="ADJ"];
+[PRON] -> [TOKEN grm="PRON"];
+[VERB] -> [TOKEN grm="VERB"];
+[PREP] -> [TOKEN grm="PREP" | grm="ADP"];
+[CONJ] -> [TOKEN grm="CONJ" | grm="CCONJ" | grm="SCONJ"];
+[ADV] -> [TOKEN grm="ADV"];
+[NUM] -> [TOKEN grm="NUM"];
+
+%% ========== Adjective Phrase (AP) ==========
+
+[AP] -> [ADJ];
+[AP] -> [ADV] [AP root];
+
+%% ========== Noun Phrase (NP) ==========
+
+[NP] -> [NOUN];
+[NP] -> [PRON];
+[NP] -> [ADJ] [NOUN];
+[NP] -> [NOUN] [ADJ];
+[NP] -> [NUM] [NOUN];
+
+%% NP with PP attachment
+[NP] -> [NP] [PP];
+
+%% ========== Prepositional Phrase (PP) ==========
+
+[PP] -> [PREP] [NP];
+[PP] -> [PREP] [PP];
+
+%% ========== Verb Phrase (VP) ==========
+
+%% Simple verb
+[VP] -> [VERB root];
+
+%% Verb + NP object
+[VP] -> [VERB root] [NP];
+[VP] -> [NP] [VERB root];
+
+%% Verb + PP
+[VP] -> [VERB root] [PP];
+[VP] -> [PP] [VERB root];
+
+%% Verb + predicative adjective
+[VP] -> [VERB root] [ADJ];
+[VP] -> [ADJ] [VERB root];
+
+%% Verb + adverb
+[VP] -> [VERB root] [ADV];
+[VP] -> [ADV] [VERB root];
+
+%% Verb + NP + PP
+[VP] -> [VERB root] [NP] [PP];
+[VP] -> [NP] [PP] [VERB root];
+
+%% Verb + PP + PP
+[VP] -> [VERB root] [PP] [PP];
+
+%% VP extensions
+[VP] -> [VP] [PP];
+[VP] -> [VP] [NP];
+[VP] -> [VP] [ADV];
+[VP] -> [ADV] [VP];
+
+%% ========== Coordination ==========
+
+[NP] -> [NP] [CONJ] [NP];
+[NP] -> [NP] ',' [CONJ] [NP];
+[VP] -> [VP] [CONJ] [VP];
+[VP] -> [VP] ',' [CONJ] [VP];
+[PP] -> [PP] [CONJ] [PP];
+
+%% ========== Subject-Predicate (SP) ==========
+
+[SP] -> [NP] [VP];
+[SP] -> [VP] [NP];
+[SP] -> [SP] [PP];
+[SP] -> [SP] [CONJ] [SP];
+
+%% ========== Root ==========
+[SYN_GROUP] -> [NP] | [VP] | [PP] | [SP] | [AP];

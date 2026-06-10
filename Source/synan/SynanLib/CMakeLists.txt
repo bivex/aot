@@ -8,11 +8,17 @@ add_library(SynanLib
         SpaSyntaxOpt.cpp
         SpaSentence.cpp
         SpaFormatCaller.cpp
+        LatSyntaxOpt.cpp
+        LatSentence.cpp
+        LatFormatCaller.cpp
         SentencesCollection.h
         SyntaxHolder.h
         SpaSyntaxOpt.h
         SpaSentence.h
         SpaFormatCaller.h
+        LatSyntaxOpt.h
+        LatSentence.h
+        LatFormatCaller.h
 )
 
 target_link_libraries(SynanLib

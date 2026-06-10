@@ -10,7 +10,8 @@ TSynanHttpServer::TSynanHttpServer() :
     GermanSyntaxHolder(morphGerman),
     UkrainianSyntaxHolder(morphUkrainian),
     EnglishSyntaxHolder(morphEnglish),
-    SpanishSyntaxHolder(morphSpanish)
+    SpanishSyntaxHolder(morphSpanish),
+    LatinSyntaxHolder(morphLatin)
 {
 
 }
@@ -55,6 +56,8 @@ std::string TSynanHttpServer::ProcessSyntax(TDaemonParsedRequest &request) {
         P = &EnglishSyntaxHolder;
     } else if (request.Langua == morphSpanish) {
         P = &SpanishSyntaxHolder;
+    } else if (request.Langua == morphLatin) {
+        P = &LatinSyntaxHolder;
     }
 
     if (P == nullptr) {
@@ -71,6 +74,10 @@ std::string TSynanHttpServer::ProcessSyntax(TDaemonParsedRequest &request) {
     if (!P->GetSentencesFromSynAn(query, false)) {
         if (request.Langua == morphSpanish) {
             LOGW << "Spanish Syntax analysis failed (possibly due to missing dictionaries)";
+            return "[]";
+        }
+        if (request.Langua == morphLatin) {
+            LOGW << "Latin Syntax analysis failed (possibly due to missing dictionaries)";
             return "[]";
         }
         throw CExpc("Synan has crushed\n");
@@ -133,6 +140,12 @@ void TSynanHttpServer::LoadSynan(bool loadBigrams) {
         SpanishSyntaxHolder.LoadSyntax();
     } catch (CExpc& e) {
         LOGE << "Failed to load Spanish Syntax: " << e.what();
+    }
+    try {
+        LOGI <<"Loading Latin Syntax";
+        LatinSyntaxHolder.LoadSyntax();
+    } catch (CExpc& e) {
+        LOGE << "Failed to load Latin Syntax: " << e.what();
     }
 
     if (loadBigrams) {

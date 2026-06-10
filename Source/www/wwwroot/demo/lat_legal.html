@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="la">
+<head>
+	<title>AOT Latin Legal Text Analysis</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="Automated syntactico-legal analysis of Latin legal texts — Roman law, classical legal documents, and constitutional Latin — powered by the AOT system">
+	<meta name="theme-color" content="#1a252f">
+
+	<link rel="stylesheet" href="../aot.css">
+	<link rel="stylesheet" href="libs/semantic.min.css">
+	<link rel="stylesheet" href="custom.css">
+	<link rel="stylesheet" href="legal_theme.css">
+
+	<style>
+		/* ── Latin Legal Theme Overrides ─────────────────────────────── */
+		.lat-theme .hero-badge {
+			background: linear-gradient(135deg, #E3B448, #C8960C);
+			color: #1a1a00;
+		}
+		.lat-theme .aot-nav { border-bottom: 3px solid #E3B448; }
+		.lat-theme .nav-brand .brand-accent { color: #E3B448; }
+		.lat-theme .aot-hero { border-bottom: 1px solid #E3B44833; }
+		.lat-theme aot-primary,
+		.lat-theme .aot-primary {
+			background: linear-gradient(135deg, #7B3FA0, #5A2D85) !important;
+		}
+		.lat-theme .aot-primary:hover {
+			background: linear-gradient(135deg, #5A2D85, #46206A) !important;
+		}
+
+		/* ── Morph Analysis Table ─────────────────────────────────────── */
+		.morph-table {
+			width: 100%;
+			border-collapse: collapse;
+			margin-top: 10px;
+			font-size: 13px;
+		}
+		.morph-table thead th {
+			background: #2C3E5A;
+			color: #E3B448;
+			text-align: left;
+			padding: 8px 12px;
+			font-weight: bold;
+			letter-spacing: 0.03em;
+		}
+		.morph-table tbody tr:nth-child(even) { background: #f8f6f0; }
+		.morph-table tbody tr:nth-child(odd)  { background: #fff; }
+		.morph-table tbody td {
+			padding: 6px 12px;
+			border-bottom: 1px solid #e0d8c8;
+		}
+		.morph-table tbody tr:hover { background: #f4f0e4; }
+		.morph-table .pos-badge {
+			display: inline-block;
+			padding: 2px 8px;
+			border-radius: 10px;
+			font-size: 11px;
+			font-weight: bold;
+			color: #fff;
+		}
+
+		/* ── Legal Entity Tabs ───────────────────────────────────────── */
+		.entity-panel { display: none; }
+		.entity-panel.active { display: block; }
+		.entity-tabs { display: flex; gap: 4px; margin-bottom: 0; flex-wrap: wrap; }
+		.entity-tab {
+			padding: 6px 14px;
+			border-radius: 6px 6px 0 0;
+			background: #e8e0cc;
+			border: 1px solid #c8be98;
+			cursor: pointer;
+			font-size: 12px;
+			font-weight: bold;
+			color: #5a4a20;
+			transition: background 0.15s;
+		}
+		.entity-tab.active {
+			background: #2C3E5A;
+			color: #E3B448;
+			border-color: #2C3E5A;
+		}
+		.entity-tab:hover:not(.active) { background: #d4cab0; }
+		.entity-content {
+			border: 1px solid #c8be98;
+			border-radius: 0 6px 6px 6px;
+			padding: 14px 18px;
+			background: #fffef9;
+			min-height: 90px;
+		}
+		.entity-chip {
+			display: inline-block;
+			padding: 3px 10px;
+			border-radius: 12px;
+			font-size: 12px;
+			font-weight: bold;
+			margin: 2px 4px 2px 0;
+		}
+		.entity-chip.subject      { background: #E3B44830; color: #7A5800; border: 1px solid #E3B44880; }
+		.entity-chip.predicate    { background: #3CB37130; color: #1A5C32; border: 1px solid #3CB37180; }
+		.entity-chip.object       { background: #5B9BD530; color: #1A3F6E; border: 1px solid #5B9BD580; }
+		.entity-chip.circumstance { background: #8064A230; color: #4A2060; border: 1px solid #8064A280; }
+		.entity-chip.undefined    { background: #B4B4B430; color: #5A5A5A; border: 1px solid #B4B4B480; }
+
+		/* ── Syntax highlight spans ───────────────────────────────────── */
+		.hl-subject      { background: #E3B44830; border-bottom: 2px solid #E3B448; }
+		.hl-predicate    { background: #3CB37130; border-bottom: 2px solid #3CB371; }
+		.hl-object       { background: #5B9BD530; border-bottom: 2px solid #5B9BD5; }
+		.hl-circumstance { background: #8064A230; border-bottom: 2px solid #8064A2; }
+		.hl-undefined    { background: #B4B4B430; border-bottom: 2px solid #B4B4B4; }
+		.role-label {
+			font-size: 10px;
+			font-weight: bold;
+			display: block;
+			margin-top: 2px;
+		}
+
+		/* ── Section Cards ───────────────────────────────────────────── */
+		.section-card {
+			margin-top: 1.5rem;
+		}
+		.section-card .ui.card .content {
+			padding: 1.5rem;
+		}
+		.sub-header {
+			color: #2C3E5A;
+			border-bottom: 2px solid #E3B448;
+			padding-bottom: 6px;
+			margin-bottom: 12px;
+		}
+
+		/* ── SVG legend overrides ─────────────────────────────────────── */
+		.lat-synan-legend .legend-color-subj   { fill: #E3B448; }
+		.lat-synan-legend .legend-color-pred   { fill: #3CB371; }
+		.lat-synan-legend .legend-color-obj    { fill: #5B9BD5; }
+		.lat-synan-legend .legend-color-circ   { fill: #8064A2; }
+		.lat-synan-legend .legend-color-undef  { fill: #B4B4B4; }
+
+		/* ── Responsive ──────────────────────────────────────────────── */
+		@media (max-width: 700px) {
+			.ui.stackable.grid .column { padding-left: 0.5rem; padding-right: 0.5rem; }
+			.entity-tabs { gap: 2px; }
+			.entity-tab { padding: 5px 10px; font-size: 11px; }
+		}
+	</style>
+</head>
+
+<body class="lat-theme">
+
+<!-- Navigation -->
+<nav class="aot-nav" role="navigation" aria-label="Main navigation">
+	<div class="nav-inner">
+		<a href="/index.html" class="nav-brand">
+			<span class="brand-accent">AOT</span><span class="brand-dot">.ru</span>
+		</a>
+		<button class="nav-toggle" aria-label="Menu" aria-expanded="false"
+			onclick="this.setAttribute('aria-expanded', this.getAttribute('aria-expanded')==='true'?'false':'true'); document.querySelector('.nav-links').classList.toggle('open')">
+			<span></span><span></span><span></span>
+		</button>
+		<div class="nav-links">
+			<a href="/index.html">Home</a>
+			<a href="/onlinedemo.html" class="active">Demo</a>
+			<a href="/technology.html">Technology</a>
+		</div>
+	</div>
+</nav>
+
+<!-- Hero -->
+<header class="aot-hero" id="top">
+	<div class="hero-glow"></div>
+	<div class="hero-inner">
+		<div class="hero-badge">Latin</div>
+		<h1>Latin Legal Text Analysis</h1>
+		<p>Automated syntactic parsing and legal-entity mapping of classical Latin legal documents — Roman law, consitutional texts, contracts, and jurisprudential prose.</p>
+	</div>
+</header>
+
+<!-- Main Content -->
+<main id="main-content" class="ui main container" style="padding-top: 3rem;">
+
+	<div class="ui stackable grid">
+
+		<!-- ── SYNTAX ANALYSIS CARD ─────────────────────────────────── -->
+		<div class="sixteen wide column">
+			<section class="ui card aot-card" style="width: 100%;">
+				<div class="content">
+					<h2 class="header">Legal Text Analysis</h2>
+
+					<form class="ui form" id="syntax-form">
+						<div class="field">
+							<label for="InputText">Latin Legal Text:</label>
+							<textarea
+								id="InputText"
+								rows="8"
+								placeholder="Enter a Latin legal passage (contract, statute, juristic commentary)..."
+							>Hic contractus inter partes constituitur et vigorem suum obtinet.</textarea>
+							<div class="ui pointing label" style="margin-top:4px;">
+								Roman law style · Classical Latin · First example pre-loaded
+							</div>
+						</div>
+
+						<div class="field">
+							<label>Latin Legal Examples:</label>
+							<div class="ui buttons small">
+								<button type="button" class="ui button" onclick="setExample(0)">Contract (Contractus)</button>
+								<button type="button" class="ui button" onclick="setExample(1)">Roman Authority (Leges)</button>
+								<button type="button" class="ui button" onclick="setExample(2)">Obligation (Obligatio)</button>
+							</div>
+						</div>
+
+						<div class="field" style="display: none;">
+							<select id="Language">
+								<option value="Latin" selected>Latin</option>
+							</select>
+						</div>
+
+						<div class="field">
+							<button type="button" class="ui primary button aot-primary" onclick="window.syntax_request()">
+								Analyze Structure
+							</button>
+							<button type="button" class="ui button" onclick="clearForm()">Clear</button>
+							<button type="button" class="ui button" onclick="window.saveSvg()" id="btnSaveSvg" style="display:none">
+								Save SVG
+							</button>
+						</div>
+					</form>
+				</div>
+
+				<!-- SVG Canvas Output -->
+				<div class="ui canvas segment" id="canvasWrapper" style="border: none; border-top: 1px solid var(--border-color); border-radius: 0; min-height: 400px; background: #fff; overflow: hidden;">
+					<div id="svgContainer" style="width:100%;min-height:400px;"></div>
+				</div>
+			</section>
+		</div>
+
+		<!-- ── MORPHOLOGICAL ANALYSIS ─────────────────────────────────── -->
+		<div class="sixteen wide column">
+			<section class="ui segment" style="background: #fffef9; border: 1px solid #d4cab0;">
+				<h3 class="ui header sub-header">Morphological Analysis</h3>
+				<p style="color:#5a4a20; font-size:13px; margin-bottom:10px;">
+					Word-by-word breakdown of Latin legal vocabulary: lemma, part of speech, case, number, tense, mood, and person.
+					Data drawn from the AOT Latin morphological dictionary.
+				</p>
+				<div id="morphContainer">
+					<div class="ui placeholder segment" style="min-height:80px;">
+						<div class="ui icon header">
+							<i class="book icon" style="color:#E3B448;"></i>
+							Run the analysis above to see morphological breakdown
+						</div>
+					</div>
+				</div>
+				<div id="morphTableWrapper" style="display:none;">
+					<table class="morph-table" id="morphTable">
+						<thead>
+							<tr>
+								<th>#</th>
+								<th>Token</th>
+								<th>Lemma</th>
+								<th>POS</th>
+								<th>Case / Number</th>
+								<th> Tense / Mood</th>
+								<th>Person</th>
+								<th>Full Grammatical Form</th>
+							</tr>
+						</thead>
+						<tbody id="morphTableBody"></tbody>
+					</table>
+				</div>
+			</section>
+		</div>
+
+		<!-- ── LEGAL ENTITY MAPPING ───────────────────────────────────── -->
+		<div class="sixteen wide column">
+			<section class="ui segment" style="background: #fffef9; border: 1px solid #d4cab0;">
+				<h3 class="ui header sub-header">Legal Entity Mapping</h3>
+				<p style="color:#5a4a20; font-size:13px; margin-bottom:14px;">
+					Entities identified in the current text according to Roman legal syntax:
+					<strong style="color:#7A5800;">Subject</strong> —
+					<strong style="color:#1A5C32;">Predicate</strong> —
+					<strong style="color:#1A3F6E;">Object</strong> —
+					<strong style="color:#4A2060;">Circumstance</strong>
+				</p>
+
+				<div class="entity-tabs" id="entityTabs">
+					<div class="entity-tab active" data-tab="tab-subject"      onclick="switchEntityTab('subject', this)">Subject</div>
+					<div class="entity-tab"        data-tab="tab-predicate"    onclick="switchEntityTab('predicate', this)">Predicate</div>
+					<div class="entity-tab"        data-tab="tab-object"       onclick="switchEntityTab('object', this)">Object</div>
+					<div class="entity-tab"        data-tab="tab-circumstance" onclick="switchEntityTab('circumstance', this)">Circumstance</div>
+				</div>
+				<div class="entity-content" id="entityContent">
+					<div class="entity-panel active" id="tab-subject">
+						<span style="color:#9a8a60;">Subject entities appear here after analysis.</span>
+					</div>
+					<div class="entity-panel" id="tab-predicate">
+						<span style="color:#9a8a60;">Predicate entities appear here after analysis.</span>
+					</div>
+					<div class="entity-panel" id="tab-object">
+						<span style="color:#9a8a60;">Object entities appear here after analysis.</span>
+					</div>
+					<div class="entity-panel" id="tab-circumstance">
+						<span style="color:#9a8a60;">Circumstances appear here after analysis.</span>
+					</div>
+				</div>
+			</section>
+		</div>
+
+		<!-- ── FEATURES INFO ──────────────────────────────────────────── -->
+		<div class="sixteen wide column">
+			<section class="ui info segment">
+				<h3 class="ui header">Latin Legal Analysis Features</h3>
+				<p>This module uses a specialized grammar for Roman-law construction types and classical legal Latin:</p>
+				<div class="ui bulleted list">
+					<div class="item">Analysis of ablative absolute constructions, gerundives, and supine phrases common in legal Latin.</div>
+					<div class="item">Detection of subjects and objects in subjunctive clauses of obligation and stipulation.</div>
+					<div class="item">Mapping of legal entity types: <em>personae</em> (parties), <em>obligationes</em> (obligations), <em>actiones</em> (legal actions), <em>res</em> (subject matter).</div>
+					<div class="item">Cross-referencing Roman jurisprudential concepts: <em>contractus</em>, <em>stipulatio</em>, <em>legatum</em>, <em>tutela</em>.</div>
+				</div>
+				<div style="margin-top:10px;">
+					<strong>Color Legend (Syntax Roles):</strong>
+					<span class="entity-chip subject">Subject</span>
+					<span class="entity-chip predicate">Predicate</span>
+					<span class="entity-chip object">Object</span>
+					<span class="entity-chip circumstance">Circumstance</span>
+					<span class="entity-chip undefined">Undefined</span>
+				</div>
+			</section>
+		</div>
+
+	</div><!-- /grid -->
+
+</main>
+
+<!-- Footer -->
+<footer class="aot-footer" role="contentinfo">
+	<div class="footer-inner">
+		<div class="footer-grid">
+			<div class="footer-col">
+				<div class="footer-brand">
+					<span class="brand-accent">AOT</span><span class="brand-dot">.ru</span>
+				</div>
+				<p class="footer-desc">Automatic text analysis system. Syntactic analysis of documents in Russian, Ukrainian, English, German, Spanish, and Latin.</p>
+			</div>
+			<div class="footer-col">
+				<h4>Project</h4>
+				<a href="/index.html">Home</a>
+				<a href="/history.html">History</a>
+				<a href="/onlinedemo.html">Demos</a>
+				<a href="/technology.html">Technology</a>
+			</div>
+			<div class="footer-col">
+				<h4>Demo</h4>
+				<a href="rus_legal.html">Legal RU</a>
+				<a href="ukr_legal.html">Legal UA</a>
+				<a href="eng_legal.html">Legal EN</a>
+				<a href="ger_legal.html">Legal DE</a>
+				<a href="spa_legal.html">Legal ES</a>
+				<a href="lat_legal.html">Legal LA</a>
+				<a href="game_design_eng.html">Game Design</a>
+			</div>
+		</div>
+		<div class="footer-bottom">
+			<p>&copy; 2003&ndash;2026 AOT Project. All rights reserved.</p>
+		</div>
+	</div>
+</footer>
+
+<!-- Libraries -->
+<script src="libs/d3.min.js"></script>
+<script src="libs/jquery-3.3.1.min.js"></script>
+<script src="libs/semantic.min.js"></script>
+
+<!-- ★ Synan parser for Latin Legal -->
+<script src="synan_lat_legal.js?v=2"></script>
+
+<script>
+// ═══ Inline helpers: examples, UI form logic ══════════════════════════
+
+const examples = [
+	"Hic contractus inter partes constituitur et vigorem suum obtinet.",
+	"Leges Romani populi auctoritate confirmantur et observantur.",
+	"Partes conventione obligantur et obligationes suas implere tenentur."
+];
+
+function setExample(i) {
+	$('#InputText').val(examples[i]);
+	window.syntax_request();
+}
+
+function clearForm() {
+	$('#InputText').val('');
+	$('#svgContainer').empty();
+	$('#btnSaveSvg').hide();
+	$('#morphTableWrapper').hide();
+	$('#morphContainer').show();
+	$('#morphContainer').empty().append(
+		'<div class="ui placeholder segment" style="min-height:80px;">' +
+		'<div class="ui icon header"><i class="book icon" style="color:#E3B448;"></i>Run the analysis above to see morphological breakdown</div></div>'
+	);
+	resetEntityTabs();
+	if (window.reinitCanvas) window.reinitCanvas();
+}
+
+window.saveSvg = function() {
+	var svgEl = document.querySelector('#svgContainer svg');
+	if (!svgEl) return;
+	var clone = svgEl.cloneNode(true);
+	clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+	var svgStr = new XMLSerializer().serializeToString(clone);
+	var blob = new Blob([svgStr], {type: 'image/svg+xml;charset=utf-8'});
+	var url = URL.createObjectURL(blob);
+	var a = document.createElement('a');
+	a.href = url;
+	a.download = 'synan_lat_legal.svg';
+	document.body.appendChild(a);
+	a.click();
+	document.body.removeChild(a);
+	URL.revokeObjectURL(url);
+};
+
+var _origSyntaxRequest = window.syntax_request;
+window.syntax_request = function() {
+	_origSyntaxRequest();
+	var check = setInterval(function() {
+		if (document.querySelector('#svgContainer svg')) {
+			$('#btnSaveSvg').show();
+			clearInterval(check);
+		}
+	}, 400);
+};
+
+// ═══ Morph Table Logic ═══════════════════════════════════════════════
+
+window.renderMorphTable = function(wordsData) {
+	if (!wordsData || !wordsData.length) {
+		$('#morphTableWrapper').hide();
+		$('#morphContainer').show();
+		return;
+	}
+	$('#morphContainer').hide();
+	$('#morphTableWrapper').show();
+	var tbody = document.getElementById('morphTableBody');
+	tbody.innerHTML = '';
+	wordsData.forEach(function(wd, idx) {
+		var pos = wd.pos || 'UNKNOWN';
+		var posColor = getPosColorForLatin(pos);
+		var tr = document.createElement('tr');
+		tr.innerHTML =
+			'<td>' + (idx + 1) + '</td>' +
+			'<td><strong>' + escapeHtml(wd.word) + '</strong></td>' +
+			'<td>' + escapeHtml(wd.lemma || '—') + '</td>' +
+			'<td><span class="pos-badge" style="background:' + posColor + ';">' + escapeHtml(pos) + '</span></td>' +
+			'<td>' + escapeHtml(wd.caseNum || '—') + '</td>' +
+			'<td>' + escapeHtml(wd.tenseMood || '—') + '</td>' +
+			'<td>' + escapeHtml(wd.person || '—') + '</td>' +
+			'<td><em>' + escapeHtml(wd.gram || '—') + '</em></td>';
+		tbody.appendChild(tr);
+	});
+};
+
+window.updateLegalEntities = function(entities) {
+	// entities = { subject: [], predicate: [], object: [], circumstance: [] }
+	['subject','predicate','object','circumstance'].forEach(function(role) {
+		var panel = document.getElementById('tab-' + role);
+		if (!panel) return;
+		var items = entities[role] || [];
+		if (!items.length) {
+			panel.innerHTML = '<span style="color:#9a8a60;">No ' + role + ' entities detected.</span>';
+		} else {
+			panel.innerHTML = items.map(function(txt) {
+				return '<span class="entity-chip ' + role + '">' + escapeHtml(txt) + '</span>';
+			}).join(' ');
+		}
+	});
+};
+
+function switchEntityTab(role, tabEl) {
+	document.querySelectorAll('#entityTabs .entity-tab').forEach(function(t) { t.classList.remove('active'); });
+	if (tabEl) tabEl.classList.add('active');
+	document.querySelectorAll('.entity-panel').forEach(function(p) { p.classList.remove('active'); });
+	var panel = document.getElementById('tab-' + role);
+	if (panel) panel.classList.add('active');
+}
+
+function resetEntityTabs() {
+	document.querySelectorAll('#entityTabs .entity-tab').forEach(function(t, i) {
+		t.classList.toggle('active', i === 0);
+	});
+	document.querySelectorAll('.entity-panel').forEach(function(p, i) {
+		p.classList.toggle('active', i === 0);
+	});
+	['tab-subject','tab-predicate','tab-object','tab-circumstance'].forEach(function(id) {
+		var panel = document.getElementById(id);
+		if (panel) panel.innerHTML = '<span style="color:#9a8a60;">No entities detected yet.</span>';
+	});
+}
+
+function escapeHtml(str) {
+	if (!str) return '';
+	return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function getPosColorForLatin(pos) {
+	var map = {
+		NOUN:'#1B2A4A', ADJ:'#7B5800', VERB:'#6B2737',
+		ADV:'#4A5568', DET:'#718096', PRON:'#4A6480',
+		PREP:'#276749', CONJ:'#744210', INT:'#8B1A1A',
+		NUM:'#5F370E', PARTICIPLE:'#2C4878', PARTICIPLE_P:'#2C4878',
+		UNKNOWN:'#9E9E9E'
+	};
+	return map[pos] || map.UNKNOWN;
+}
+
+$(document).ready(function() {
+	// Pre-init
+});
+</script>
+</body>
+</html>

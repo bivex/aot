@@ -29,6 +29,11 @@ int	main(int argc, const char **argv) {
         } catch (std::exception& e) {
             LOGE << "Failed to load Spanish Morphology: " << e.what();
         }
+        try {
+            GlobalLoadMorphHolder(morphLatin);
+        } catch (std::exception& e) {
+            LOGE << "Failed to load Latin Morphology: " << e.what();
+        }
 		DealWithLockFile("SynanDaemon.lck");
 		Server.Initialize(args.Retrieve("host"), atoi(args.Retrieve("port").c_str()));
 		Server.LoadSynan(!skipBigrams);
