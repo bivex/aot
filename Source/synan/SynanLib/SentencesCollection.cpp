@@ -9,6 +9,7 @@
 #include "synan/UkrSynanLib/UkrSyntaxOpt.h"
 #include "synan/SynanLib/LatSyntaxOpt.h"
 #include "SpaSyntaxOpt.h"
+#include "FreSyntaxOpt.h"
 
 
 CSyntaxOpt *NewOptions(MorphLanguageEnum langua) {
@@ -26,6 +27,9 @@ CSyntaxOpt *NewOptions(MorphLanguageEnum langua) {
 
     if (langua == morphLatin)
         return new CLatSyntaxOpt(langua);
+
+    if (langua == morphFrench)
+        return new CFreSyntaxOpt(langua);
 
     return new CRusSyntaxOpt(morphRussian);
 }

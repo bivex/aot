@@ -11,6 +11,9 @@ add_library(SynanLib
         LatSyntaxOpt.cpp
         LatSentence.cpp
         LatFormatCaller.cpp
+        FreSyntaxOpt.cpp
+        FreSentence.cpp
+        FreFormatCaller.cpp
         SentencesCollection.h
         SyntaxHolder.h
         SpaSyntaxOpt.h
@@ -19,6 +22,9 @@ add_library(SynanLib
         LatSyntaxOpt.h
         LatSentence.h
         LatFormatCaller.h
+        FreSyntaxOpt.h
+        FreSentence.h
+        FreFormatCaller.h
 )
 
 target_link_libraries(SynanLib
