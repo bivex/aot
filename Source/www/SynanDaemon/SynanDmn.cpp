@@ -11,7 +11,8 @@ TSynanHttpServer::TSynanHttpServer() :
     UkrainianSyntaxHolder(morphUkrainian),
     EnglishSyntaxHolder(morphEnglish),
     SpanishSyntaxHolder(morphSpanish),
-    LatinSyntaxHolder(morphLatin)
+    LatinSyntaxHolder(morphLatin),
+    FrenchSyntaxHolder(morphFrench)
 {
 
 }
@@ -58,6 +59,8 @@ std::string TSynanHttpServer::ProcessSyntax(TDaemonParsedRequest &request) {
         P = &SpanishSyntaxHolder;
     } else if (request.Langua == morphLatin) {
         P = &LatinSyntaxHolder;
+    } else if (request.Langua == morphFrench) {
+        P = &FrenchSyntaxHolder;
     }
 
     if (P == nullptr) {
@@ -66,7 +69,7 @@ std::string TSynanHttpServer::ProcessSyntax(TDaemonParsedRequest &request) {
 
     std::string query = request.Query;
     std::string originalQuery;
-    if (request.Langua == morphEnglish || request.Langua == morphSpanish || request.Langua == morphLatin) {
+    if (request.Langua == morphEnglish || request.Langua == morphSpanish || request.Langua == morphLatin || request.Langua == morphFrench) {
         originalQuery = query;
         MakeUpperUtf8(query);
     }
@@ -146,6 +149,18 @@ void TSynanHttpServer::LoadSynan(bool loadBigrams) {
         LatinSyntaxHolder.LoadSyntax();
     } catch (CExpc& e) {
         LOGE << "Failed to load Latin Syntax: " << e.what();
+    }
+    try {
+        LOGI <<"Loading French Morphology";
+        FrenchMorphHolder.LoadMorphology(morphFrench);
+    } catch (CExpc& e) {
+        LOGE << "Failed to load French Morphology: " << e.what();
+    }
+    try {
+        LOGI <<"Loading French Syntax";
+        FrenchSyntaxHolder.LoadSyntax();
+    } catch (CExpc& e) {
+        LOGE << "Failed to load French Syntax: " << e.what();
     }
 
     if (loadBigrams) {
