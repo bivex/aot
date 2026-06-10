@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 	<title>AOT :: Online Demo :: Legal Analysis (EN)</title>
 	<meta charset="utf-8">
@@ -15,192 +16,195 @@
 
 <body>
 
-<!-- Navigation -->
-<nav class="aot-nav" role="navigation" aria-label="Main navigation">
-	<div class="nav-inner">
-		<a href="/index.html" class="nav-brand">
-			<span class="brand-accent">AOT</span><span class="brand-dot">.ru</span>
-		</a>
-		<button class="nav-toggle" aria-label="Menu" aria-expanded="false"
-			onclick="this.setAttribute('aria-expanded', this.getAttribute('aria-expanded')==='true'?'false':'true'); document.querySelector('.nav-links').classList.toggle('open')">
-			<span></span><span></span><span></span>
-		</button>
-		<div class="nav-links">
-			<a href="/index.html">Home</a>
-			<a href="/onlinedemo.html" class="active">Demo</a>
-			<a href="/technology.html">Technology</a>
-		</div>
-	</div>
-</nav>
-
-<!-- Hero -->
-<header class="aot-hero" id="top">
-	<div class="hero-glow"></div>
-	<div class="hero-inner">
-		<div class="hero-badge">English</div>
-		<h1>Legal Document Analysis</h1>
-		<p>Automatic parsing of English legal and official document structure.</p>
-	</div>
-</header>
-
-<!-- Main content -->
-<main id="main-content" class="ui main container" style="padding-top: 3rem;">
-
-	<div class="ui stackable grid">
-		<div class="sixteen wide column">
-			<!-- Demo card -->
-			<section class="ui card aot-card" style="width: 100%;">
-				<div class="content">
-					<h2 class="header">Legal Text Analysis</h2>
-
-					<form class="ui form" id="syntax-form">
-						<div class="field">
-							<label for="InputText">Document text:</label>
-							<textarea
-								id="InputText"
-								rows="8"
-								placeholder="Paste a fragment of legal text (contract, statute, regulation)..."
-							>This Agreement shall enter into force upon signature by both Parties and shall remain in effect until all obligations have been fully discharged.</textarea>
-						</div>
-
-						<div class="field">
-							<label>Legal text examples:</label>
-							<div class="ui buttons small">
-								<button type="button" class="ui button" onclick="setExample(0)">Contract</button>
-								<button type="button" class="ui button" onclick="setExample(1)">Statute</button>
-								<button type="button" class="ui button" onclick="setExample(2)">Liability</button>
-							</div>
-						</div>
-
-						<div class="field" style="display: none;">
-							<select id="Language">
-								<option value="English" selected>English</option>
-							</select>
-						</div>
-
-						<div class="field">
-							<button type="button" class="ui primary button aot-primary" onclick="window.syntax_request()">
-								Analyze Structure
-							</button>
-							<button type="button" class="ui button" onclick="clearForm()">Clear</button>
-							<button type="button" class="ui button" onclick="window.saveSvg()" id="btnSaveSvg" style="display:none">
-								Save SVG
-							</button>
-						</div>
-					</form>
-				</div>
-
-				<!-- Canvas output -->
-				<div class="ui canvas segment" id="canvasWrapper" style="border: none; border-top: 1px solid var(--border-color); border-radius: 0; min-height: 400px; background: #fff; overflow: hidden;">
-					<div id="svgContainer" style="width:100%;min-height:400px;"></div>
-				</div>
-			</section>
-		</div>
-
-		<div class="sixteen wide column">
-			<section class="ui info segment">
-				<h3 class="ui header">Legal Parsing Features</h3>
-				<p>This module uses a specialized grammar to detect complex constructions typical of legal style:</p>
-				<div class="ui bulleted list">
-					<div class="item">Parsing of complex participial and gerund phrases.</div>
-					<div class="item">Detection of subjects and objects in multi-clause sentences.</div>
-					<div class="item">Analysis of logical connections between parts of legal norms.</div>
-				</div>
-			</section>
-		</div>
-	</div>
-
-</main>
-
-<!-- Footer -->
-<footer class="aot-footer" role="contentinfo">
-	<div class="footer-inner">
-		<div class="footer-grid">
-			<div class="footer-col">
-				<div class="footer-brand">
-					<span class="brand-accent">AOT</span><span class="brand-dot">.ru</span>
-				</div>
-				<p class="footer-desc">Automatic text analysis system. Syntactic parsing of Russian, Ukrainian, English, German, Spanish, and Latin documents.</p>
-			</div>
-			<div class="footer-col">
-				<h4>Project</h4>
+	<!-- Navigation -->
+	<nav class="aot-nav" role="navigation" aria-label="Main navigation">
+		<div class="nav-inner">
+			<a href="/index.html" class="nav-brand">
+				<span class="brand-accent">AOT</span><span class="brand-dot">.ru</span>
+			</a>
+			<button class="nav-toggle" aria-label="Menu" aria-expanded="false"
+				onclick="this.setAttribute('aria-expanded', this.getAttribute('aria-expanded')==='true'?'false':'true'); document.querySelector('.nav-links').classList.toggle('open')">
+				<span></span><span></span><span></span>
+			</button>
+			<div class="nav-links">
 				<a href="/index.html">Home</a>
-				<a href="/history.html">History</a>
-				<a href="/onlinedemo.html">Demos</a>
+				<a href="/onlinedemo.html" class="active">Demo</a>
 				<a href="/technology.html">Technology</a>
 			</div>
-			<div class="footer-col">
-				<h4>Demo</h4>
-				<a href="rus_legal.html">Legal RU</a>
-				<a href="ukr_legal.html">Legal UA</a>
-				<a href="eng_legal.html">Legal EN</a>
-				<a href="spa_legal.html">Legal ES</a>
-			<a href="ger_legal.html">Legal DE</a>
-			<a href="lat_legal.html">Legal LA</a>
-				<a href="game_design_eng.html">Game Design</a>
+		</div>
+	</nav>
+
+	<!-- Hero -->
+	<header class="aot-hero" id="top">
+		<div class="hero-glow"></div>
+		<div class="hero-inner">
+			<div class="hero-badge">English</div>
+			<h1>Legal Document Analysis</h1>
+			<p>Automatic parsing of English legal and official document structure.</p>
+		</div>
+	</header>
+
+	<!-- Main content -->
+	<main id="main-content" class="ui main container" style="padding-top: 3rem;">
+
+		<div class="ui stackable grid">
+			<div class="sixteen wide column">
+				<!-- Demo card -->
+				<section class="ui card aot-card" style="width: 100%;">
+					<div class="content">
+						<h2 class="header">Legal Text Analysis</h2>
+
+						<form class="ui form" id="syntax-form">
+							<div class="field">
+								<label for="InputText">Document text:</label>
+								<textarea id="InputText" rows="8"
+									placeholder="Paste a fragment of legal text (contract, statute, regulation)...">This Agreement shall enter into force upon signature by both Parties and shall remain in effect until all obligations have been fully discharged.</textarea>
+							</div>
+
+							<div class="field">
+								<label>Legal text examples:</label>
+								<div class="ui buttons small">
+									<button type="button" class="ui button" onclick="setExample(0)">Contract</button>
+									<button type="button" class="ui button" onclick="setExample(1)">Statute</button>
+									<button type="button" class="ui button" onclick="setExample(2)">Liability</button>
+								</div>
+							</div>
+
+							<div class="field" style="display: none;">
+								<select id="Language">
+									<option value="English" selected>English</option>
+								</select>
+							</div>
+
+							<div class="field">
+								<button type="button" class="ui primary button aot-primary"
+									onclick="window.syntax_request()">
+									Analyze Structure
+								</button>
+								<button type="button" class="ui button" onclick="clearForm()">Clear</button>
+								<button type="button" class="ui button" onclick="window.saveSvg()" id="btnSaveSvg"
+									style="display:none">
+									Save SVG
+								</button>
+							</div>
+						</form>
+					</div>
+
+					<!-- Canvas output -->
+					<div class="ui canvas segment" id="canvasWrapper"
+						style="border: none; border-top: 1px solid var(--border-color); border-radius: 0; min-height: 400px; background: #fff; overflow: hidden;">
+						<div id="svgContainer" style="width:100%;min-height:400px;"></div>
+					</div>
+				</section>
+			</div>
+
+			<div class="sixteen wide column">
+				<section class="ui info segment">
+					<h3 class="ui header">Legal Parsing Features</h3>
+					<p>This module uses a specialized grammar to detect complex constructions typical of legal style:
+					</p>
+					<div class="ui bulleted list">
+						<div class="item">Parsing of complex participial and gerund phrases.</div>
+						<div class="item">Detection of subjects and objects in multi-clause sentences.</div>
+						<div class="item">Analysis of logical connections between parts of legal norms.</div>
+					</div>
+				</section>
+			</div>
+		</div>
+
+	</main>
+
+	<!-- Footer -->
+	<footer class="aot-footer" role="contentinfo">
+		<div class="footer-inner">
+			<div class="footer-grid">
+				<div class="footer-col">
+					<div class="footer-brand">
+						<span class="brand-accent">AOT</span><span class="brand-dot">.ru</span>
+					</div>
+					<p class="footer-desc">Automatic text analysis system. Syntactic parsing of Russian, Ukrainian,
+						English, German, Spanish, and Latin documents.</p>
+				</div>
+				<div class="footer-col">
+					<h4>Project</h4>
+					<a href="/index.html">Home</a>
+					<a href="/history.html">History</a>
+					<a href="/onlinedemo.html">Demos</a>
+					<a href="/technology.html">Technology</a>
+				</div>
+				<div class="footer-col">
+					<h4>Demo</h4>
+					<a href="rus_legal.html">Legal RU</a>
+					<a href="ukr_legal.html">Legal UA</a>
+					<a href="eng_legal.html">Legal EN</a>
+					<a href="spa_legal.html">Legal ES</a>
+					<a href="ger_legal.html">Legal DE</a>
+					<a href="lat_legal.html">Legal LA</a>
+					<a href="game_design_eng.html">Game Design</a>
 				</div>
 			</div>
 			<div class="footer-bottom">
 				<p>&copy; 2003&ndash;2026 AOT Project. All rights reserved.</p>
+			</div>
 		</div>
-	</div>
-</footer>
+	</footer>
 
-<script src="libs/d3.min.js"></script>
-<script src="libs/jquery-3.3.1.min.js"></script>
-<script src="libs/semantic.min.js"></script>
-<script src="synan_eng_legal.js?v=2"></script>
+	<script src="libs/d3.min.js"></script>
+	<script src="libs/jquery-3.3.1.min.js"></script>
+	<script src="libs/semantic.min.js"></script>
+	<script src="synan_eng_legal.js?v=4"></script>
 
-<script>
-	const examples = [
-		"This Agreement shall enter into force upon signature by both Parties and shall remain in effect until all obligations have been fully discharged.",
-		"State authorities and local self-government bodies shall act only on the grounds, within the powers, and in the manner prescribed by the Constitution and the laws.",
-		"The Parties shall be liable for failure to perform or improper performance of the obligations under this Contract in accordance with the applicable legislation."
-	];
+	<script>
+		const examples = [
+			"This Agreement shall enter into force upon signature by both Parties and shall remain in effect until all obligations have been fully discharged.",
+			"State authorities and local self-government bodies shall act only on the grounds, within the powers, and in the manner prescribed by the Constitution and the laws.",
+			"The Parties shall be liable for failure to perform or improper performance of the obligations under this Contract in accordance with the applicable legislation."
+		];
 
-	function setExample(i) {
-		$('#InputText').val(examples[i]);
-		window.syntax_request();
-	}
+		function setExample(i) {
+			$('#InputText').val(examples[i]);
+			window.syntax_request();
+		}
 
-	function clearForm() {
-		$('#InputText').val('');
-		$('#svgContainer').empty();
-		$('#btnSaveSvg').hide();
-		if (window.reinitCanvas) window.reinitCanvas();
-	}
+		function clearForm() {
+			$('#InputText').val('');
+			$('#svgContainer').empty();
+			$('#btnSaveSvg').hide();
+			if (window.reinitCanvas) window.reinitCanvas();
+		}
 
-	window.saveSvg = function() {
-		var svgEl = document.querySelector('#svgContainer svg');
-		if (!svgEl) return;
-		var clone = svgEl.cloneNode(true);
-		clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-		var svgStr = new XMLSerializer().serializeToString(clone);
-		var blob = new Blob([svgStr], {type: 'image/svg+xml;charset=utf-8'});
-		var url = URL.createObjectURL(blob);
-		var a = document.createElement('a');
-		a.href = url;
-		a.download = 'synan_eng_legal.svg';
-		document.body.appendChild(a);
-		a.click();
-		document.body.removeChild(a);
-		URL.revokeObjectURL(url);
-	};
+		window.saveSvg = function () {
+			var svgEl = document.querySelector('#svgContainer svg');
+			if (!svgEl) return;
+			var clone = svgEl.cloneNode(true);
+			clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+			var svgStr = new XMLSerializer().serializeToString(clone);
+			var blob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
+			var url = URL.createObjectURL(blob);
+			var a = document.createElement('a');
+			a.href = url;
+			a.download = 'synan_eng_legal.svg';
+			document.body.appendChild(a);
+			a.click();
+			document.body.removeChild(a);
+			URL.revokeObjectURL(url);
+		};
 
-	var _origSyntaxRequest = window.syntax_request;
-	window.syntax_request = function() {
-		_origSyntaxRequest();
-		var check = setInterval(function() {
-			if (document.querySelector('#svgContainer svg')) {
-				$('#btnSaveSvg').show();
-				clearInterval(check);
-			}
-		}, 400);
-	};
+		var _origSyntaxRequest = window.syntax_request;
+		window.syntax_request = function () {
+			_origSyntaxRequest();
+			var check = setInterval(function () {
+				if (document.querySelector('#svgContainer svg')) {
+					$('#btnSaveSvg').show();
+					clearInterval(check);
+				}
+			}, 400);
+		};
 
-	$(document).ready(function() {
-		// Pre-init
-	});
-</script>
+		$(document).ready(function () {
+			// Pre-init
+		});
+	</script>
 </body>
+
 </html>
