@@ -1,6 +1,6 @@
 # RML — Russian Morphological Dictionary
 
-> **RML** (Russian Morphological Library) — a linguistic environment for processing Russian, English, German, Ukrainian, French, and Latin texts. Includes morphological analyzers, syntactic parsers, and semantic analysis tools.
+> **RML** (Russian Morphological Library) — a linguistic environment for processing Russian, English, German, Ukrainian, Spanish, French, and Latin texts. Includes morphological analyzers, syntactic parsers, and semantic analysis tools.
 
 ## 📖 Table of Contents
 
@@ -27,7 +27,7 @@
 
 ## About
 
-RML is a comprehensive linguistic processing framework developed for natural language processing (NLP) tasks in Russian, English, German, Ukrainian, French, and Latin. The project started in Moscow at Dialing Company, was later extended with German support at the Berlin-Brandenburg Academy of Sciences and Humanities (DWDS project), and has recently been updated to support Latin and French syntax/morphology.
+RML is a comprehensive linguistic processing framework developed for natural language processing (NLP) tasks in Russian, English, German, Ukrainian, Spanish, French, and Latin. The project started in Moscow at Dialing Company, was later extended with German support at the Berlin-Brandenburg Academy of Sciences and Humanities (DWDS project), and has recently been updated to support Spanish, Latin, and French syntax/morphology.
 
 **Official website:** [www.aot.ru](http://www.aot.ru) (Russian)
 
@@ -38,7 +38,7 @@ RML is a comprehensive linguistic processing framework developed for natural lan
 ## Features
 
 - **Morphological analysis** — lemmatization, part-of-speech tagging, inflection patterns
-- **Syntactic parsing** — dependency and constituency parsing (Russian, German, English, French, Latin)
+- **Syntactic parsing** — dependency and constituency parsing (Russian, German, English, Spanish, French, Latin)
 - **Semantic analysis** — semantic graph construction, Russian→English translation
 - **N-gram statistics** — collocation detection with bigram frequencies
 - **HTTP daemons** — REST-like API for integration into other applications
@@ -399,8 +399,8 @@ RML=$RML ./Bin/SynanDaemon --host 127.0.0.1 --port 8082
 
 | Action | Parameters | Description |
 |--------|-----------|-------------|
-| `morph` | `langua=<Russian\|German\|English\|Ukrainian\|French\|Latin>`, `query=<word>` | Morphological analysis of a word |
-| `syntax` | `langua=<Russian\|German\|English\|Ukrainian\|French\|Latin>`, `query=<sentence>` | Syntactic parsing of a sentence |
+| `morph` | `langua=<Russian\|German\|English\|Ukrainian\|Spanish\|French\|Latin>`, `query=<word>` | Morphological analysis of a word |
+| `syntax` | `langua=<Russian\|German\|English\|Ukrainian\|Spanish\|French\|Latin>`, `query=<sentence>` | Syntactic parsing of a sentence |
 | `bigrams` | `langua=Russian`, `query=<word>`, `minBigramsFreq=<N>`, `sortMode=<freq\|mi>` | Find collocations |
 
 **Example:**
@@ -473,6 +473,7 @@ RML/
 │   │   ├── Ukrainian/      # 25 MB  | 419k lemmas | 4.0M word forms
 │   │   ├── English/        # 94 MB  | 445k lemmas | ~2.5M word forms
 │   │   ├── German/         # 12 MB  | 219k lemmas | 1.5M word forms (no frequency corpus)
+│   │   ├── Spanish/        # 48 MB  | 72k lemmas  | 1.2M word forms (no frequency corpus)
 │   │   ├── French/         # 3.3 MB | 56k lemmas  | 520k word forms (no frequency corpus)
 │   │   └── Latin/          # 2.8 MB | 47k lemmas  | 968k word forms (no frequency corpus)
 │   ├── Bigrams/            # Bigram statistics
@@ -487,6 +488,7 @@ RML/
 │   │       ├── Ukrainian/  # Source: morphs.json (39 MB, 5,855 models)
 │   │       ├── English/    # Source: morphs.json (28 MB, 2,639 models)
 │   │       ├── German/     # Source: morphs.json (21 MB, 1,319 models)
+│   │       ├── Spanish/    # Source: morphs.json (72.7 MB, 7,051 models)
 │   │       ├── French/     # Source: morphs.json (5.7 MB, 932 models)
 │   │       └── Latin/      # Source: morphs.json (4.0 MB, 1,015 models)
 │   ├── dicts/              # Dictionary processing tools
@@ -515,15 +517,17 @@ RML/
 | Ukrainian| 25 MB     | 418,983 | 4.0M      | 418,983          | ✅ rebuilt (May 14) |
 | English  | 94 MB     | 444,755 | ~2.5M     | 13,933           | ✅ up-to-date |
 | German   | 12 MB     | 218,950 | 1.5M      | 0 (empty)        | ✅ rebuilt (May 14) |
+| Spanish  | 48 MB     | 72,093  | 1.2M      | 0 (empty)        | ✅ up-to-date |
 | French   | 3.3 MB    | 56,199  | 520k      | 0 (empty)        | ✅ up-to-date |
 | Latin    | 2.8 MB    | 47,786  | 968k      | 0 (empty)        | ✅ up-to-date |
 
 **Source data** (in `Source/morph_dict/data/<Language>/`):
-- `morphs.json` — morphological models + lemmas (4–40 MB per language)
+- `morphs.json` — morphological models + lemmas (4–80 MB per language)
   - Russian: 2,767 models → 298,510 lemmas → 4.2M word forms (33 MB file)
   - Ukrainian: 5,855 models → 418,983 lemmas → 4.0M word forms (38 MB)
   - English: 2,639 models → 444,755 lemmas → ~2.5M word forms (27 MB)
   - German: 1,319 models → 218,950 lemmas → 1.5M word forms (21 MB)
+  - Spanish: 7,051 models → 72,093 lemmas → 1.2M word forms (72.7 MB)
   - French: 932 models → 56,199 lemmas → 520k word forms (5.7 MB)
   - Latin: 1,015 models → 47,786 lemmas → 968k word forms (4.0 MB)
 - `gramtab.json` — grammatical codes (20–174 KB)
@@ -556,6 +560,7 @@ cd Scripts/dict_rebuild
 ./rebuild_ukrainian_dicts.sh    # Ukrainian
 ./rebuild_english_dicts.sh      # English
 ./rebuild_german_dicts.sh       # German
+./rebuild_spanish_dicts.sh      # Spanish
 ./rebuild_french_dicts.sh       # French
 ./rebuild_latin_dicts.sh        # Latin
 
