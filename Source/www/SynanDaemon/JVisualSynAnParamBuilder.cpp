@@ -99,6 +99,9 @@ void JVisualSynAnParamBuilder::TokenizeOriginal(const string& text) {
 		}
 		std::string word = text.substr(start, i - start);
 		std::string upper = word;
+		if (m_pSyntaxHolder->GetLanguage() == morphFrench) {
+			StripFrenchAccents(upper);
+		}
 		MakeUpperUtf8(upper);
 		m_OriginalWords.push_back(std::move(word));
 		m_UpperWords.push_back(std::move(upper));

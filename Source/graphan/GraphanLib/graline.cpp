@@ -645,6 +645,8 @@ MorphLanguageEnum CGraLine::GetTokenLanguage() const
                 return morphSpanish;
             else if (m_Language == morphLatin)
                 return morphLatin;
+            else if (m_Language == morphFrench)
+                return morphFrench;
             else
                 return morphEnglish;
 

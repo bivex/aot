@@ -38,7 +38,10 @@ std::string TSynanHttpServer::ProcessMorphology(TDaemonParsedRequest &request) {
     bool withParadigms = evhttp_find_header(&request.headers, "withparadigms") != nullptr;
     const CMorphanHolder &h  = GetMHolder(request.Langua);
     std::string wordForm = request.Query;
-    if (request.Langua == morphEnglish || request.Langua == morphSpanish || request.Langua == morphLatin) {
+    if (request.Langua == morphFrench) {
+        StripFrenchAccents(wordForm);
+    }
+    if (request.Langua == morphEnglish || request.Langua == morphSpanish || request.Langua == morphLatin || request.Langua == morphFrench) {
         MakeUpperUtf8(wordForm);
     }
     return h.LemmatizeJson(wordForm, withParadigms);
@@ -71,6 +74,9 @@ std::string TSynanHttpServer::ProcessSyntax(TDaemonParsedRequest &request) {
     std::string originalQuery;
     if (request.Langua == morphEnglish || request.Langua == morphSpanish || request.Langua == morphLatin || request.Langua == morphFrench) {
         originalQuery = query;
+        if (request.Langua == morphFrench) {
+            StripFrenchAccents(query);
+        }
         MakeUpperUtf8(query);
     }
     auto t0 = std::chrono::steady_clock::now();

@@ -52,7 +52,7 @@ def get_stem(lemma, forms):
 
 
 def convert():
-    input_file = 'Dicts/Morph/French/unimorph/fra'
+    input_files = ['Dicts/Morph/French/unimorph/fra', 'Dicts/Morph/French/unimorph/fra.um4']
     output_morphs = 'Source/morph_dict/data/French/morphs.json'
     output_gramtab = 'Source/morph_dict/data/French/gramtab.json'
 
@@ -109,48 +109,49 @@ def convert():
     # Group by (lemma, pos)
     data = defaultdict(lambda: defaultdict(list))
 
-    print(f"Reading {input_file}...")
     total_lines = 0
     skipped = 0
-    with open(input_file, 'r', encoding='utf-8') as f:
-        for line in f:
-            total_lines += 1
-            line = line.strip()
-            if not line:
-                continue
-            parts = line.split('\t')
-            if len(parts) < 3:
-                continue
+    for input_file in input_files:
+        print(f"Reading {input_file}...")
+        with open(input_file, 'r', encoding='utf-8') as f:
+            for line in f:
+                total_lines += 1
+                line = line.strip()
+                if not line:
+                    continue
+                parts = line.split('\t')
+                if len(parts) < 3:
+                    continue
 
-            lemma_raw = parts[0].strip().upper()
-            word_raw = parts[1].strip().upper()
+                lemma_raw = parts[0].strip().upper()
+                word_raw = parts[1].strip().upper()
 
-            def clean_text(t):
-                # Strip all accents — morph engine uses single-byte encoding (A-Z only)
-                nfkd = unicodedata.normalize('NFKD', t.upper())
-                result = []
-                for c in nfkd:
-                    if c in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
-                        result.append(c)
-                t2 = ''.join(result)
-                return t2 if t2 else None
+                def clean_text(t):
+                    # Strip all accents — morph engine uses single-byte encoding (A-Z only)
+                    nfkd = unicodedata.normalize('NFKD', t.upper())
+                    result = []
+                    for c in nfkd:
+                        if c in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
+                            result.append(c)
+                    t2 = ''.join(result)
+                    return t2 if t2 else None
 
-            lemma_clean = clean_text(lemma_raw)
-            word_clean = clean_text(word_raw)
-            if not lemma_clean or not word_clean:
-                skipped += 1
-                continue
+                lemma_clean = clean_text(lemma_raw)
+                word_clean = clean_text(word_raw)
+                if not lemma_clean or not word_clean:
+                    skipped += 1
+                    continue
 
-            lemma = lemma_clean
-            word = word_clean
+                lemma = lemma_clean
+                word = word_clean
 
-            tags_raw = parts[2].split(';')
-            pos = tags_raw[0]
-            if pos not in POS_MAP:
-                skipped += 1
-                continue
+                tags_raw = parts[2].split(';')
+                pos = tags_raw[0]
+                if pos not in POS_MAP:
+                    skipped += 1
+                    continue
 
-            data[lemma][pos].append((word, tags_raw))
+                data[lemma][pos].append((word, tags_raw))
 
     print(f"Read {total_lines} lines, {len(data)} lemmas, skipped {skipped}")
 
@@ -215,6 +216,8 @@ def convert():
         'JUSQUE': ('PREP', []),
         'CHEZ': ('PREP', []),
         'PARMI': ('PREP', []),
+        'SELON': ('PREP', []),
+        'DEVANT': ('PREP', []),
 
         # Conjunctions
         'ET': ('CONJ', []),
