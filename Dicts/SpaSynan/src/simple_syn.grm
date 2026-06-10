@@ -1,41 +1,114 @@
 %% ========== Spanish Syntax Rules ==========
 %% Single root: SYN_GROUP
+%% Designed for legal/official document analysis
+
+%% ========== Atomic categories ==========
+
+[NOUN] -> [TOKEN grm="NOUN"];
+[ADJ] -> [TOKEN grm="ADJ"];
+[DET] -> [TOKEN grm="DET"];
+[PRON] -> [TOKEN grm="PRON"];
+[VERB] -> [TOKEN grm="VERB"];
+[PREP] -> [TOKEN grm="PREP"];
+[CONJ] -> [TOKEN grm="CONJ"];
+[ADV] -> [TOKEN grm="ADV"];
+[NUM] -> [TOKEN grm="NUM"];
+
+%% ========== Adjective Phrase (AP) ==========
+
+[AP] -> [ADJ];
+[AP] -> [ADV] [AP root];
 
 %% ========== Noun Phrase (NP) ==========
-[NP] -> [TOKEN grm="NOUN"];
-[NP] -> [TOKEN grm="PRON"];
-[NP] -> [TOKEN grm="DET"] [TOKEN grm="NOUN"];
-[NP] -> [TOKEN grm="DET"] [TOKEN grm="ADJ"] [TOKEN grm="NOUN"];
-[NP] -> [TOKEN grm="DET"] [TOKEN grm="NOUN"] [TOKEN grm="ADJ"];
-[NP] -> [TOKEN grm="NOUN"] [TOKEN grm="ADJ"];
-[NP] -> [TOKEN grm="NUM"] [TOKEN grm="NOUN"];
+
+[NP] -> [NOUN];
+[NP] -> [PRON];
+[NP] -> [DET] [NOUN];
+[NP] -> [DET] [ADJ] [NOUN];
+[NP] -> [DET] [NOUN] [ADJ];
+[NP] -> [DET] [ADJ] [ADJ] [NOUN];
+[NP] -> [NOUN] [ADJ];
+[NP] -> [NOUN] [ADJ] [ADJ];
+[NP] -> [NUM] [NOUN];
+[NP] -> [DET] [NUM] [NOUN];
+[NP] -> [ADJ] [NOUN];
+
+%% NP with PP attachment
 [NP] -> [NP] [PP];
 
 %% ========== Prepositional Phrase (PP) ==========
-[PP] -> [TOKEN grm="PREP"] [NP];
-[PP] -> [TOKEN grm="PREP"] [PP];
 
-%% ========== Simple Verb Phrase (VP) ==========
-[VP] -> [TOKEN grm="VERB"];
-[VP] -> [TOKEN grm="VERB"] [NP];
-[VP] -> [TOKEN grm="VERB"] [PP];
-[VP] -> [TOKEN grm="VERB"] [TOKEN grm="ADJ"];
-[VP] -> [TOKEN grm="VERB"] [TOKEN grm="ADV"];
-[VP] -> [TOKEN grm="ADV"] [TOKEN grm="VERB"];
+[PP] -> [PREP] [NP];
+[PP] -> [PREP] [PP];
+
+%% "de + NP" genitival construction
+[PP-DE] -> 'de' [NP];
+[PP-EN] -> 'en' [NP];
+[PP-POR] -> 'por' [NP];
+[PP-PARA] -> 'para' [NP];
+[PP-CON] -> 'con' [NP];
+[PP-HASTA] -> 'hasta' [NP];
+[PP-SIN] -> 'sin' [NP];
+
+[PP] -> [PP-DE] | [PP-EN] | [PP-POR] | [PP-PARA] | [PP-CON] | [PP-HASTA] | [PP-SIN];
+
+%% ========== Verb Phrase (VP) ==========
+
+%% Simple verb
+[VP] -> [VERB root];
+
+%% Verb + NP object
+[VP] -> [VERB root] [NP];
+
+%% Verb + PP
+[VP] -> [VERB root] [PP];
+
+%% Verb + predicative adjective
+[VP] -> [VERB root] [ADJ];
+
+%% Verb + adverb
+[VP] -> [VERB root] [ADV];
+
+%% Verb + NP + PP
+[VP] -> [VERB root] [NP] [PP];
+
+%% Verb + PP + PP
+[VP] -> [VERB root] [PP] [PP];
+
+%% Verb + ADJ + PP (e.g. "permanecer vigente hasta...")
+[VP] -> [VERB root] [ADJ] [PP];
+
+%% Verb + ADV + NP
+[VP] -> [VERB root] [ADV] [NP];
+
+%% Adverb + verb
+[VP] -> [ADV] [VERB root];
+
+%% VP extensions
 [VP] -> [VP] [PP];
 [VP] -> [VP] [NP];
-[VP] -> [VP] [TOKEN grm="ADV"];
-[VP] -> [TOKEN grm="ADV"] [VP];
+[VP] -> [VP] [ADV];
+[VP] -> [ADV] [VP];
 
-%% ========== Coordination (CONJ) ==========
-[NP] -> [NP] [TOKEN grm="CONJ"] [NP];
-[VP] -> [VP] [TOKEN grm="CONJ"] [VP];
-[PP] -> [PP] [TOKEN grm="CONJ"] [PP];
+%% ========== Coordination ==========
 
-%% ========== Subject-Predicate (Root) ==========
+[NP] -> [NP] [CONJ] [NP];
+[NP] -> [NP] ',' [CONJ] [NP];
+[VP] -> [VP] [CONJ] [VP];
+[VP] -> [VP] ',' [CONJ] [VP];
+[PP] -> [PP] [CONJ] [PP];
+
+%% ========== Subject-Predicate (SP) ==========
+
 [SP] -> [NP] [VP];
+[SP] -> [NP] [VP] [PP];
+[SP] -> [NP] [VP] [NP];
+[SP] -> [NP] [VP] [PP] [PP];
+[SP] -> [NP] [VP] [NP] [PP];
+[SP] -> [NP] [VP] [ADJ];
+[SP] -> [NP] [VP] [ADJ] [PP];
 [SP] -> [SP] [PP];
-[SP] -> [SP] [TOKEN grm="CONJ"] [SP];
+[SP] -> [SP] [CONJ] [SP];
 
 %% ========== Root ==========
-[SYN_GROUP] -> [NP] | [VP] | [PP] | [SP] | [TOKEN grm="NOUN"] | [TOKEN grm="VERB"];
+[SYN_GROUP] -> [NP] | [VP] | [PP] | [SP] | [AP];
