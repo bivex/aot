@@ -66,7 +66,7 @@ std::string TSynanHttpServer::ProcessSyntax(TDaemonParsedRequest &request) {
 
     std::string query = request.Query;
     std::string originalQuery;
-    if (request.Langua == morphEnglish || request.Langua == morphSpanish) {
+    if (request.Langua == morphEnglish || request.Langua == morphSpanish || request.Langua == morphLatin) {
         originalQuery = query;
         MakeUpperUtf8(query);
     }

@@ -199,6 +199,17 @@ def convert():
                 data[lemma][pos].append((lemma, tags))
 
     closed_class = {
+        # Possessive Pronouns / Adjectives
+        "SUUS": ("PRON", []), "SUA": ("PRON", []), "SUUM": ("PRON", []), "SUI": ("PRON", []), "SUAE": ("PRON", []), "SUO": ("PRON", []), "SUAM": ("PRON", []), "SUORUM": ("PRON", []), "SUARUM": ("PRON", []), "SUIS": ("PRON", []),
+        "MEUS": ("PRON", []), "MEA": ("PRON", []), "MEUM": ("PRON", []), "MEI": ("PRON", []), "MEAE": ("PRON", []), "MEO": ("PRON", []), "MEAM": ("PRON", []), "MEORUM": ("PRON", []), "MEARUM": ("PRON", []), "MEIS": ("PRON", []),
+        "TUUS": ("PRON", []), "TUA": ("PRON", []), "TUUM": ("PRON", []), "TUI": ("PRON", []), "TUAE": ("PRON", []), "TUO": ("PRON", []), "TUAM": ("PRON", []), "TUORUM": ("PRON", []), "TUARUM": ("PRON", []), "TUIS": ("PRON", []),
+        "NOSTER": ("PRON", []), "NOSTRA": ("PRON", []), "NOSTRUM": ("PRON", []), "NOSTRI": ("PRON", []), "NOSTRAE": ("PRON", []), "NOSTRO": ("PRON", []), "NOSTRAM": ("PRON", []), "NOSTRORUM": ("PRON", []), "NOSTRARUM": ("PRON", []), "NOSTRIS": ("PRON", []),
+        "VESTER": ("PRON", []), "VESTRA": ("PRON", []), "VESTRUM": ("PRON", []), "VESTRI": ("PRON", []), "VESTRAE": ("PRON", []), "VESTRO": ("PRON", []), "VESTRAM": ("PRON", []), "VESTRORUM": ("PRON", []), "VESTRARUM": ("PRON", []), "VESTRIS": ("PRON", []),
+        # Reflexive Pronouns
+        "SIBI": ("PRON", []), "SE": ("PRON", []), "SESE": ("PRON", []),
+        # Intensive Pronouns
+        "IPSE": ("PRON", []), "IPSA": ("PRON", []), "IPSUM": ("PRON", []), "IPSIUS": ("PRON", []), "IPSI": ("PRON", []), "IPSO": ("PRON", []), "IPSAM": ("PRON", []), "IPSORUM": ("PRON", []), "IPSARUM": ("PRON", []), "IPSIS": ("PRON", []), "IPSOS": ("PRON", []), "IPSAS": ("PRON", []),
+
         "EGO": ("PRON", []),
         "MEI": ("PRON", []),
         "MIHI": ("PRON", []),
