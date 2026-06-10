@@ -8,8 +8,8 @@
 [ADJ] -> [TOKEN grm="ADJ"];
 [PRON] -> [TOKEN grm="PRON"];
 [VERB] -> [TOKEN grm="VERB"];
-[PREP] -> [TOKEN grm="PREP" | grm="ADP"];
-[CONJ] -> [TOKEN grm="CONJ" | grm="CCONJ" | grm="SCONJ"];
+[PREP] -> [TOKEN grm="PREP"];
+[CONJ] -> [TOKEN grm="CONJ"];
 [ADV] -> [TOKEN grm="ADV"];
 [NUM] -> [TOKEN grm="NUM"];
 
@@ -24,6 +24,8 @@
 [NP] -> [PRON];
 [NP] -> [ADJ] [NOUN];
 [NP] -> [NOUN] [ADJ];
+[NP] -> [PRON] [NOUN];
+[NP] -> [NOUN] [PRON];
 [NP] -> [NUM] [NOUN];
 
 %% NP with PP attachment

@@ -4,7 +4,7 @@ set(CMAKE_LEGACY_CYGWIN_WIN32 0)
 
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/BinDict)
 
-macro (CompileSimpleGrammar name grmFile tableFile)
+macro (CompileSimpleGrammar name grmFile tableFile language)
     add_custom_target( 
         ${name}
         SOURCES ${tableFile}                     
@@ -13,7 +13,7 @@ macro (CompileSimpleGrammar name grmFile tableFile)
 
     add_custom_command(
         OUTPUT ${tableFile}
-        COMMAND SimpleGrammarPrecompiled --language German --input ${grmFile}
+        COMMAND SimpleGrammarPrecompiled --language ${language} --input ${grmFile}
         DEPENDS SimpleGrammarPrecompiled ${grmFile}
         COMMENT "Compile ${grmFile} "
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
@@ -34,6 +34,7 @@ add_subdirectory (EngCollocs)
 add_subdirectory (TimeRoss)
 add_subdirectory (Trigram)
 add_subdirectory (GerSynan)
+add_subdirectory (LatSynan)
 add_subdirectory (SrcBinDict)
 
 add_custom_target ( 

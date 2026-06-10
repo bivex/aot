@@ -6,6 +6,7 @@ from datetime import datetime
 
 POS_MAP = {
     "N": "NOUN",
+    "NOUN": "NOUN",
     "PROPN": "NOUN",
     "ADJ": "ADJ",
     "ADV": "ADV",
@@ -16,6 +17,7 @@ POS_MAP = {
     "INTJ": "INT",
     "NUM": "NUM",
     "V": "VERB",
+    "VERB": "VERB",
     "V.PTCP": "VERB",
 }
 

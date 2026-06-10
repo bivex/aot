@@ -37,7 +37,7 @@ std::string TSynanHttpServer::ProcessMorphology(TDaemonParsedRequest &request) {
     bool withParadigms = evhttp_find_header(&request.headers, "withparadigms") != nullptr;
     const CMorphanHolder &h  = GetMHolder(request.Langua);
     std::string wordForm = request.Query;
-    if (request.Langua == morphEnglish || request.Langua == morphSpanish) {
+    if (request.Langua == morphEnglish || request.Langua == morphSpanish || request.Langua == morphLatin) {
         MakeUpperUtf8(wordForm);
     }
     return h.LemmatizeJson(wordForm, withParadigms);
