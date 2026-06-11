@@ -12,7 +12,8 @@ TSynanHttpServer::TSynanHttpServer() :
     EnglishSyntaxHolder(morphEnglish),
     SpanishSyntaxHolder(morphSpanish),
     LatinSyntaxHolder(morphLatin),
-    FrenchSyntaxHolder(morphFrench)
+    FrenchSyntaxHolder(morphFrench),
+    PortugueseSyntaxHolder(morphPortuguese)
 {
 
 }
@@ -41,7 +42,7 @@ std::string TSynanHttpServer::ProcessMorphology(TDaemonParsedRequest &request) {
     if (request.Langua == morphFrench) {
         StripFrenchAccents(wordForm);
     }
-    if (request.Langua == morphEnglish || request.Langua == morphSpanish || request.Langua == morphLatin || request.Langua == morphFrench) {
+    if (request.Langua == morphEnglish || request.Langua == morphSpanish || request.Langua == morphLatin || request.Langua == morphFrench || request.Langua == morphPortuguese) {
         MakeUpperUtf8(wordForm);
     }
     return h.LemmatizeJson(wordForm, withParadigms);
@@ -64,6 +65,8 @@ std::string TSynanHttpServer::ProcessSyntax(TDaemonParsedRequest &request) {
         P = &LatinSyntaxHolder;
     } else if (request.Langua == morphFrench) {
         P = &FrenchSyntaxHolder;
+    } else if (request.Langua == morphPortuguese) {
+        P = &PortugueseSyntaxHolder;
     }
 
     if (P == nullptr) {
@@ -72,10 +75,13 @@ std::string TSynanHttpServer::ProcessSyntax(TDaemonParsedRequest &request) {
 
     std::string query = request.Query;
     std::string originalQuery;
-    if (request.Langua == morphEnglish || request.Langua == morphSpanish || request.Langua == morphLatin || request.Langua == morphFrench) {
+    if (request.Langua == morphEnglish || request.Langua == morphSpanish || request.Langua == morphLatin || request.Langua == morphFrench || request.Langua == morphPortuguese) {
         originalQuery = query;
         if (request.Langua == morphFrench) {
             StripFrenchAccents(query);
+        }
+        if (request.Langua == morphPortuguese) {
+            StripPortugueseAccents(query);
         }
         MakeUpperUtf8(query);
     }
@@ -87,6 +93,10 @@ std::string TSynanHttpServer::ProcessSyntax(TDaemonParsedRequest &request) {
         }
         if (request.Langua == morphLatin) {
             LOGW << "Latin Syntax analysis failed (possibly due to missing dictionaries)";
+            return "[]";
+        }
+        if (request.Langua == morphPortuguese) {
+            LOGW << "Portuguese Syntax analysis failed (possibly due to missing dictionaries)";
             return "[]";
         }
         throw CExpc("Synan has crushed\n");
@@ -167,6 +177,18 @@ void TSynanHttpServer::LoadSynan(bool loadBigrams) {
         FrenchSyntaxHolder.LoadSyntax();
     } catch (CExpc& e) {
         LOGE << "Failed to load French Syntax: " << e.what();
+    }
+    try {
+        LOGI <<"Loading Portuguese Morphology";
+        PortugueseMorphHolder.LoadMorphology(morphPortuguese);
+    } catch (CExpc& e) {
+        LOGE << "Failed to load Portuguese Morphology: " << e.what();
+    }
+    try {
+        LOGI <<"Loading Portuguese Syntax";
+        PortugueseSyntaxHolder.LoadSyntax();
+    } catch (CExpc& e) {
+        LOGE << "Failed to load Portuguese Syntax: " << e.what();
     }
 
     if (loadBigrams) {

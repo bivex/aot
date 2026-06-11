@@ -36,9 +36,9 @@ if [ "$SKIP_BUILD" = false ]; then
 
     echo "Generating binary dictionaries..."
     mkdir -p "${DICT_DIR}"
-    "${BUILD_DIR}/Source/morph_dict/morph_wizard/morph_gen" \
-        "${ROOT}/Source/morph_dict/data/Portuguese/project.mwz" \
-        "${DICT_DIR}"
+    "${BUILD_DIR}/Source/morph_dict/morph_gen/morph_gen" \
+        --input "${ROOT}/Source/morph_dict/data/Portuguese/project.mwz" \
+        --output-folder "${DICT_DIR}"
 fi
 
 echo "Portuguese dictionaries rebuilt in ${DICT_DIR}"
