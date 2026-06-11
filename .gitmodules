@@ -26,3 +26,6 @@
 [submodule "Dicts/Morph/Portuguese/unimorph"]
 	path = Dicts/Morph/Portuguese/unimorph
 	url = https://github.com/unimorph/por.git
+[submodule "Dicts/Morph/Finnish/unimorph"]
+	path = Dicts/Morph/Finnish/unimorph
+	url = https://github.com/unimorph/fin.git

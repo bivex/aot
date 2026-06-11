@@ -11,11 +11,13 @@ class TSynanHttpServer : public TRMLHttpServer {
     CSyntaxHolder LatinSyntaxHolder;
     CSyntaxHolder FrenchSyntaxHolder;
     CSyntaxHolder PortugueseSyntaxHolder;
+    CSyntaxHolder FinnishSyntaxHolder;
     CMorphanHolder EnglishMorphHolder;
     CMorphanHolder UkrainianMorphHolder;
     CMorphanHolder SpanishMorphHolder;
     CMorphanHolder FrenchMorphHolder;
     CMorphanHolder PortugueseMorphHolder;
+    CMorphanHolder FinnishMorphHolder;
 
     std::string ProcessMorphology(TDaemonParsedRequest& request);
     std::string ProcessBigrams(TDaemonParsedRequest& request);

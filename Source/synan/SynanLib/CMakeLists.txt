@@ -17,6 +17,9 @@ add_library(SynanLib
         PorSyntaxOpt.cpp
         PorSentence.cpp
         PorFormatCaller.cpp
+        FinSyntaxOpt.cpp
+        FinSentence.cpp
+        FinFormatCaller.cpp
         SentencesCollection.h
         SyntaxHolder.h
         SpaSyntaxOpt.h
@@ -31,6 +34,9 @@ add_library(SynanLib
         PorSyntaxOpt.h
         PorSentence.h
         PorFormatCaller.h
+        FinSyntaxOpt.h
+        FinSentence.h
+        FinFormatCaller.h
 )
 
 target_link_libraries(SynanLib

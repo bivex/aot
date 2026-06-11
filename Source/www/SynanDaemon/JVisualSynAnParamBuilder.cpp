@@ -102,6 +102,12 @@ void JVisualSynAnParamBuilder::TokenizeOriginal(const string& text) {
 		if (m_pSyntaxHolder->GetLanguage() == morphFrench) {
 			StripFrenchAccents(upper);
 		}
+		if (m_pSyntaxHolder->GetLanguage() == morphPortuguese) {
+			StripPortugueseAccents(upper);
+		}
+		if (m_pSyntaxHolder->GetLanguage() == morphFinnish) {
+			StripFinnishAccents(upper);
+		}
 		MakeUpperUtf8(upper);
 		m_OriginalWords.push_back(std::move(word));
 		m_UpperWords.push_back(std::move(upper));

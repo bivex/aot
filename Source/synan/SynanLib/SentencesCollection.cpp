@@ -11,6 +11,7 @@
 #include "SpaSyntaxOpt.h"
 #include "FreSyntaxOpt.h"
 #include "PorSyntaxOpt.h"
+#include "FinSyntaxOpt.h"
 
 
 CSyntaxOpt *NewOptions(MorphLanguageEnum langua) {
@@ -34,6 +35,9 @@ CSyntaxOpt *NewOptions(MorphLanguageEnum langua) {
 
     if (langua == morphPortuguese)
         return new CPorSyntaxOpt(langua);
+
+    if (langua == morphFinnish)
+        return new CFinSyntaxOpt(langua);
 
     return new CRusSyntaxOpt(morphRussian);
 }
