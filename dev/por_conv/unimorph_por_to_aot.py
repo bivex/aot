@@ -398,7 +398,9 @@ def convert():
     }
 
     for word, (pos, tags) in CLOSED_CLASS.items():
-        data[word][pos].append((word, [pos] + tags))
+        word_clean = clean_text(word)
+        if word_clean:
+            data[word_clean][pos].append((word_clean, [pos] + tags))
 
     flexia_models = []
     paradigm_to_id = {}
