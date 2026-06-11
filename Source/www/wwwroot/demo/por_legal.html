@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="pt">
 <head>
-	<title>AOT :: Demo en línea :: Análisis Legal (ES)</title>
+	<title>AOT :: Demo online :: Analise Legal (PT)</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta name="description" content="Demostración del análisis sintáctico de documentos legales en español en el sistema AOT">
+	<meta name="description" content="Demonstracao de analise sintatica de documentos legais em portugues no sistema AOT">
 	<meta name="theme-color" content="#1a252f">
 
 	<link rel="stylesheet" href="../aot.css">
@@ -15,20 +15,20 @@
 
 <body>
 
-<!-- Navegación -->
-<nav class="aot-nav" role="navigation" aria-label="Navegación principal">
+<!-- Navegacao -->
+<nav class="aot-nav" role="navigation" aria-label="Navegacao principal">
 	<div class="nav-inner">
 		<a href="/index.html" class="nav-brand">
 			<span class="brand-accent">AOT</span><span class="brand-dot">.ru</span>
 		</a>
-		<button class="nav-toggle" aria-label="Menú" aria-expanded="false"
+		<button class="nav-toggle" aria-label="Menu" aria-expanded="false"
 			onclick="this.setAttribute('aria-expanded', this.getAttribute('aria-expanded')==='true'?'false':'true'); document.querySelector('.nav-links').classList.toggle('open')">
 			<span></span><span></span><span></span>
 		</button>
 		<div class="nav-links">
 			<a href="/index.html">Inicio</a>
 			<a href="/onlinedemo.html" class="active">Demo</a>
-			<a href="/technology.html">Tecnología</a>
+			<a href="/technology.html">Tecnologia</a>
 		</div>
 	</div>
 </nav>
@@ -37,60 +37,60 @@
 <header class="aot-hero" id="top">
 	<div class="hero-glow"></div>
 	<div class="hero-inner">
-		<div class="hero-badge">Español</div>
-		<h1>Análisis de Documentos Legales</h1>
-		<p>Análisis automático de la estructura de documentos legales y oficiales en español.</p>
+		<div class="hero-badge">Portugues</div>
+		<h1>Analise de Documentos Legais</h1>
+		<p>Analise automatica da estrutura de documentos legais e oficiais em portugues.</p>
 	</div>
 </header>
 
-<!-- Contenido principal -->
+<!-- Conteudo principal -->
 <main id="main-content" class="ui main container" style="padding-top: 3rem;">
 
 	<div class="ui stackable grid">
 		<div class="sixteen wide column">
-			<!-- Tarjeta de Demo -->
+			<!-- Cartao de Demo -->
 			<section class="ui card aot-card" style="width: 100%;">
 				<div class="content">
-					<h2 class="header">Análisis de Texto Legal</h2>
+					<h2 class="header">Analise de Texto Legal</h2>
 
 					<form class="ui form" id="syntax-form">
 						<div class="field">
-							<label for="InputText">Texto del documento:</label>
+							<label for="InputText">Texto do documento:</label>
 							<textarea
 								id="InputText"
 								rows="8"
-								placeholder="Pegue un fragmento de texto legal (contrato, estatuto, reglamento)..."
-							>El presente Contrato entrará en vigor en el momento de su firma por las Partes y permanecerá vigente hasta el total cumplimiento de sus obligaciones.</textarea>
+								placeholder="Cole um fragmento de texto legal (contrato, estatuto, regulamento)..."
+							>O presente Contrato entrara em vigor no momento de sua assinatura pelas Partes e permanecera vigente ate o total cumprimento de suas obrigacoes.</textarea>
 						</div>
 
 						<div class="field">
-							<label>Ejemplos de textos legales:</label>
+							<label>Exemplos de textos legais:</label>
 							<div class="ui buttons small">
 								<button type="button" class="ui button" onclick="setExample(0)">Contrato</button>
-								<button type="button" class="ui button" onclick="setExample(1)">Estatuto</button>
-								<button type="button" class="ui button" onclick="setExample(2)">Responsabilidad</button>
+								<button type="button" class="ui button" onclick="setExample(1)">Constituicao</button>
+								<button type="button" class="ui button" onclick="setExample(2)">Responsabilidade</button>
 							</div>
 						</div>
 
 						<div class="field" style="display: none;">
 							<select id="Language">
-								<option value="Spanish" selected>Spanish</option>
+								<option value="Portuguese" selected>Portuguese</option>
 							</select>
 						</div>
 
 						<div class="field">
 							<button type="button" class="ui primary button aot-primary" onclick="window.syntax_request()">
-								Analizar Estructura
+								Analisar Estrutura
 							</button>
-							<button type="button" class="ui button" onclick="clearForm()">Limpiar</button>
+							<button type="button" class="ui button" onclick="clearForm()">Limpar</button>
 							<button type="button" class="ui button" onclick="window.saveSvg()" id="btnSaveSvg" style="display:none">
-								Guardar SVG
+								Salvar SVG
 							</button>
 						</div>
 					</form>
 				</div>
 
-				<!-- Salida del Canvas -->
+				<!-- Saida do Canvas -->
 				<div class="ui canvas segment" id="canvasWrapper" style="border: none; border-top: 1px solid var(--border-color); border-radius: 0; min-height: 400px; background: #fff; overflow: hidden;">
 					<div id="svgContainer" style="width:100%;min-height:400px;"></div>
 				</div>
@@ -99,12 +99,12 @@
 
 		<div class="sixteen wide column">
 			<section class="ui info segment">
-				<h3 class="ui header">Características del Análisis Legal</h3>
-				<p>Este módulo utiliza una gramática especializada para detectar construcciones complejas típicas del estilo legal:</p>
+				<h3 class="ui header">Caracteristicas da Analise Legal</h3>
+				<p>Este modulo utiliza uma gramatica especializada para detetar construcoes complexas tipicas do estilo legal:</p>
 				<div class="ui bulleted list">
-					<div class="item">Análisis de frases participiales y gerundios complejos.</div>
-					<div class="item">Detección de sujetos y objetos en oraciones con múltiples cláusulas.</div>
-					<div class="item">Análisis de conexiones lógicas entre partes de normas legales.</div>
+					<div class="item">Analise de frases participiais e gerundiais complexas.</div>
+					<div class="item">Deteccao de sujeitos e objetos em oracoes com multiplas clausulas.</div>
+					<div class="item">Analise de conexoes logicas entre partes de normas legais.</div>
 				</div>
 			</section>
 		</div>
@@ -112,7 +112,7 @@
 
 </main>
 
-<!-- Pie de página -->
+<!-- Rodape -->
 <footer class="aot-footer" role="contentinfo">
 	<div class="footer-inner">
 		<div class="footer-grid">
@@ -120,14 +120,14 @@
 				<div class="footer-brand">
 					<span class="brand-accent">AOT</span><span class="brand-dot">.ru</span>
 				</div>
-				<p class="footer-desc">Sistema de análisis automático de texto. Análisis sintáctico de documentos en ruso, ucraniano, inglés, alemán, español, francés y latín.</p>
+				<p class="footer-desc">Sistema de analise automatica de texto. Analise sintatica de documentos em russo, ucraino, ingles, alemao, espanhol, frances, portugues e latim.</p>
 			</div>
 			<div class="footer-col">
-				<h4>Proyecto</h4>
+				<h4>Projeto</h4>
 				<a href="/index.html">Inicio</a>
 				<a href="/history.html">Historia</a>
 				<a href="/onlinedemo.html">Demos</a>
-				<a href="/technology.html">Tecnología</a>
+				<a href="/technology.html">Tecnologia</a>
 			</div>
 			<div class="footer-col">
 				<h4>Demo</h4>
@@ -138,12 +138,12 @@
 				<a href="fre_legal.html">Legal FR</a>
 				<a href="por_legal.html">Legal PT</a>
 				<a href="ger_legal.html">Legal DE</a>
-			<a href="lat_legal.html">Legal LA</a>
+				<a href="lat_legal.html">Legal LA</a>
 				<a href="game_design_eng.html">Game Design</a>
-				</div>
 			</div>
-			<div class="footer-bottom">
-				<p>&copy; 2003&ndash;2026 Proyecto AOT. Todos los derechos reservados.</p>
+		</div>
+		<div class="footer-bottom">
+			<p>&copy; 2003&ndash;2026 Projeto AOT. Todos os direitos reservados.</p>
 		</div>
 	</div>
 </footer>
@@ -151,13 +151,13 @@
 <script src="libs/d3.min.js"></script>
 <script src="libs/jquery-3.3.1.min.js"></script>
 <script src="libs/semantic.min.js"></script>
-<script src="synan_spa_legal.js?v=2"></script>
+<script src="synan_por_legal.js?v=2"></script>
 
 <script>
 	const examples = [
-		"El presente Contrato entrará en vigor en el momento de su firma por las Partes y permanecerá vigente hasta el total cumplimiento de sus obligaciones.",
-		"Las autoridades públicas y los órganos de la administración local actuarán únicamente de acuerdo con lo establecido en la Constitución y las leyes.",
-		"Las Partes serán responsables del incumplimiento o del cumplimiento defectuoso de las obligaciones derivadas del presente Contrato de conformidad con la legislación aplicable."
+		"O presente Contrato entrara em vigor no momento de sua assinatura pelas Partes e permanecera vigente ate o total cumprimento de suas obrigacoes.",
+		"Os orgaos publicos da administracao local atuarao somente de acordo com o estabelecido na Constituicao e nas leis.",
+		"As Partes serao responsaveis pelo descumprimento ou pelo cumprimento defeituoso das obrigacoes decorrentes do presente Contrato de conformidade com a legislacao aplicavel."
 	];
 
 	function setExample(i) {
@@ -182,7 +182,7 @@
 		var url = URL.createObjectURL(blob);
 		var a = document.createElement('a');
 		a.href = url;
-		a.download = 'synan_spa_legal.svg';
+		a.download = 'synan_por_legal.svg';
 		document.body.appendChild(a);
 		a.click();
 		document.body.removeChild(a);
