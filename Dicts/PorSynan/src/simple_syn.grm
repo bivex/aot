@@ -120,4 +120,4 @@
 [SP] -> [SP] [CONJ] [SP];
 
 %% ========== Root ==========
-[SYN_GROUP] -> [NP] | [VP] | [PP] | [SP] | [AP];
+[SYN_GROUP] -> [NP] | [VP] | [PP] | [SP] | [AP] | [PART];
