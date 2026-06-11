@@ -14,6 +14,9 @@ add_library(SynanLib
         FreSyntaxOpt.cpp
         FreSentence.cpp
         FreFormatCaller.cpp
+        PorSyntaxOpt.cpp
+        PorSentence.cpp
+        PorFormatCaller.cpp
         SentencesCollection.h
         SyntaxHolder.h
         SpaSyntaxOpt.h
@@ -25,6 +28,9 @@ add_library(SynanLib
         FreSyntaxOpt.h
         FreSentence.h
         FreFormatCaller.h
+        PorSyntaxOpt.h
+        PorSentence.h
+        PorFormatCaller.h
 )
 
 target_link_libraries(SynanLib

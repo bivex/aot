@@ -166,7 +166,7 @@ void CSyntaxOpt::InitializeOptions() {
     }
 
     if (!m_pOborDic->ReadOborots(m_piOborDictionaryWeak)) {
-        if (m_Language != morphUkrainian && m_Language != morphEnglish && m_Language != morphSpanish && m_Language != morphFrench) {
+        if (m_Language != morphUkrainian && m_Language != morphEnglish && m_Language != morphSpanish && m_Language != morphFrench && m_Language != morphPortuguese) {
             throw CExpc("Failed read oborots");
         }
     }

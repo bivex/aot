@@ -10,6 +10,7 @@
 #include "synan/SynanLib/LatSyntaxOpt.h"
 #include "SpaSyntaxOpt.h"
 #include "FreSyntaxOpt.h"
+#include "PorSyntaxOpt.h"
 
 
 CSyntaxOpt *NewOptions(MorphLanguageEnum langua) {
@@ -30,6 +31,9 @@ CSyntaxOpt *NewOptions(MorphLanguageEnum langua) {
 
     if (langua == morphFrench)
         return new CFreSyntaxOpt(langua);
+
+    if (langua == morphPortuguese)
+        return new CPorSyntaxOpt(langua);
 
     return new CRusSyntaxOpt(morphRussian);
 }
