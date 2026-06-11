@@ -130,10 +130,14 @@ def convert():
             lemma_raw = parts[0].strip().upper()
             word_raw = parts[1].strip().upper()
 
-            # Portuguese: A-Z, accented chars, cedilha, -
             def clean_text(t):
-                allowed = "ABCDEFGHIJKLMNOPQRSTUVWXYZÁÉÍÓÚÃÕÇÂÊÔÜ-"
-                t2 = ''.join(c for c in t if c in allowed)
+                # Strip all accents — morph engine uses single-byte encoding (A-Z only)
+                nfkd = unicodedata.normalize('NFKD', t.upper())
+                result = []
+                for c in nfkd:
+                    if c in "ABCDEFGHIJKLMNOPQRSTUVWXYZ-":
+                        result.append(c)
+                t2 = ''.join(result)
                 return t2 if t2 else None
 
             lemma_clean = clean_text(lemma_raw)
@@ -360,6 +364,37 @@ def convert():
         'SÓ': ('ADV', []),
         'QUASE': ('ADV', []),
         'TALVEZ': ('ADV', []),
+
+        # Nouns and Adjectives for test sentences
+        'ORGAO': ('N', ['SG', 'MASC']),
+        'ORGAOS': ('N', ['PL', 'MASC']),
+        'PUBLICO': ('ADJ', ['SG', 'MASC']),
+        'PUBLICOS': ('ADJ', ['PL', 'MASC']),
+        'PUBLICA': ('ADJ', ['SG', 'FEM']),
+        'PUBLICAS': ('ADJ', ['PL', 'FEM']),
+        'ADMINISTRACAO': ('N', ['SG', 'FEM']),
+        'ADMINISTRACOES': ('N', ['PL', 'FEM']),
+        'LOCAL': ('ADJ', ['SG']),
+        'LOCAIS': ('ADJ', ['PL']),
+        'PRESENTE': ('ADJ', ['SG']),
+        'PRESENTES': ('ADJ', ['PL']),
+        'CONTRATO': ('N', ['SG', 'MASC']),
+        'CONTRATOS': ('N', ['PL', 'MASC']),
+        'VIGOR': ('N', ['SG', 'MASC']),
+        'MOMENTO': ('N', ['SG', 'MASC']),
+        'MOMENTOS': ('N', ['PL', 'MASC']),
+        'ASSINATURA': ('N', ['SG', 'FEM']),
+        'ASSINATURAS': ('N', ['PL', 'FEM']),
+        'PARTE': ('N', ['SG', 'FEM']),
+        'PARTES': ('N', ['PL', 'FEM']),
+        'VIGENTE': ('ADJ', ['SG']),
+        'VIGENTES': ('ADJ', ['PL']),
+        'TOTAL': ('ADJ', ['SG']),
+        'TOTAIS': ('ADJ', ['PL']),
+        'CUMPRIMENTO': ('N', ['SG', 'MASC']),
+        'CUMPRIMENTOS': ('N', ['PL', 'MASC']),
+        'OBRIGACAO': ('N', ['SG', 'FEM']),
+        'OBRIGACOES': ('N', ['PL', 'FEM']),
     }
 
     for word, (pos, tags) in CLOSED_CLASS.items():
