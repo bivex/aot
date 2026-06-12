@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="it">
 <head>
-	<title>AOT :: Demo online :: Analise Legal (PT)</title>
+	<title>AOT :: Demo online :: Analisi sintattica (IT)</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta name="description" content="Demonstracao de analise sintatica de documentos legais em portugues no sistema AOT">
+	<meta name="description" content="Demo di analisi sintattica automatica per testi giuridici italiani - Sistema AOT">
 	<meta name="theme-color" content="#1a252f">
 
 	<link rel="stylesheet" href="../aot.css">
@@ -15,8 +15,8 @@
 
 <body>
 
-<!-- Navegacao -->
-<nav class="aot-nav" role="navigation" aria-label="Navegacao principal">
+<!-- Navigazione -->
+<nav class="aot-nav" role="navigation" aria-label="Navigazione principale">
 	<div class="nav-inner">
 		<a href="/index.html" class="nav-brand">
 			<span class="brand-accent">AOT</span><span class="brand-dot">.ru</span>
@@ -26,7 +26,7 @@
 			<span></span><span></span><span></span>
 		</button>
 		<div class="nav-links">
-			<a href="/index.html">Inicio</a>
+			<a href="/index.html">Home</a>
 			<a href="/onlinedemo.html" class="active">Demo</a>
 			<a href="/technology.html">Tecnologia</a>
 		</div>
@@ -37,60 +37,60 @@
 <header class="aot-hero" id="top">
 	<div class="hero-glow"></div>
 	<div class="hero-inner">
-		<div class="hero-badge">Portugues</div>
-		<h1>Analise de Documentos Legais</h1>
-		<p>Analise automatica da estrutura de documentos legais e oficiais em portugues.</p>
+		<div class="hero-badge">Italiano</div>
+		<h1>Analisi sintattica di testi giuridici</h1>
+		<p>Analisi automatica della struttura sintattica di documenti giuridici e amministrativi in lingua italiana.</p>
 	</div>
 </header>
 
-<!-- Conteudo principal -->
+<!-- Contenuto principale -->
 <main id="main-content" class="ui main container" style="padding-top: 3rem;">
 
 	<div class="ui stackable grid">
 		<div class="sixteen wide column">
-			<!-- Cartao de Demo -->
+			<!-- Scheda demo -->
 			<section class="ui card aot-card" style="width: 100%;">
 				<div class="content">
-					<h2 class="header">Analise de Texto Legal</h2>
+					<h2 class="header">Analisi sintattica del testo</h2>
 
 					<form class="ui form" id="syntax-form">
 						<div class="field">
-							<label for="InputText">Texto do documento:</label>
+							<label for="InputText">Testo del documento:</label>
 							<textarea
 								id="InputText"
 								rows="8"
-								placeholder="Cole um fragmento de texto legal (contrato, estatuto, regulamento)..."
-							>O presente Contrato entrara em vigor no momento de sua assinatura pelas Partes e permanecera vigente ate o total cumprimento de suas obrigacoes.</textarea>
+								placeholder="Inserire un brano di testo giuridico (contratto, legge, decreto)..."
+							>Il presente contratto entra in vigore nel momento in cui entrambe le parti lo hanno firmato e rimane valido fino a quando tutti gli obblighi derivanti da esso sono stati completamente adempiuti.</textarea>
 						</div>
 
 						<div class="field">
-							<label>Exemplos de textos legais:</label>
+							<label>Testi di esempio:</label>
 							<div class="ui buttons small">
-								<button type="button" class="ui button" onclick="setExample(0)">Contrato</button>
-								<button type="button" class="ui button" onclick="setExample(1)">Constituicao</button>
-								<button type="button" class="ui button" onclick="setExample(2)">Responsabilidade</button>
+								<button type="button" class="ui button" onclick="setExample(0)">Contratto</button>
+								<button type="button" class="ui button" onclick="setExample(1)">Costituzione</button>
+								<button type="button" class="ui button" onclick="setExample(2)">Responsabilita</button>
 							</div>
 						</div>
 
 						<div class="field" style="display: none;">
 							<select id="Language">
-								<option value="Portuguese" selected>Portuguese</option>
+								<option value="Italian" selected>Italian</option>
 							</select>
 						</div>
 
 						<div class="field">
 							<button type="button" class="ui primary button aot-primary" onclick="window.syntax_request()">
-								Analisar Estrutura
+								Analizza struttura
 							</button>
-							<button type="button" class="ui button" onclick="clearForm()">Limpar</button>
+							<button type="button" class="ui button" onclick="clearForm()">Cancella</button>
 							<button type="button" class="ui button" onclick="window.saveSvg()" id="btnSaveSvg" style="display:none">
-								Salvar SVG
+								Salva SVG
 							</button>
 						</div>
 					</form>
 				</div>
 
-				<!-- Saida do Canvas -->
+				<!-- Area di output -->
 				<div class="ui canvas segment" id="canvasWrapper" style="border: none; border-top: 1px solid var(--border-color); border-radius: 0; min-height: 400px; background: #fff; overflow: hidden;">
 					<div id="svgContainer" style="width:100%;min-height:400px;"></div>
 				</div>
@@ -99,12 +99,13 @@
 
 		<div class="sixteen wide column">
 			<section class="ui info segment">
-				<h3 class="ui header">Caracteristicas da Analise Legal</h3>
-				<p>Este modulo utiliza uma gramatica especializada para detetar construcoes complexas tipicas do estilo legal:</p>
+				<h3 class="ui header">Caratteristiche dell'analisi giuridica</h3>
+				<p>Questo modulo utilizza una grammatica specializzata per rilevare strutture complesse tipiche dello stile giuridico:</p>
 				<div class="ui bulleted list">
-					<div class="item">Analise de frases participiais e gerundiais complexas.</div>
-					<div class="item">Deteccao de sujeitos e objetos em oracoes com multiplas clausulas.</div>
-					<div class="item">Analise de conexoes logicas entre partes de normas legais.</div>
+					<div class="item">Analisi di strutture complesse con participi e gerundi.</div>
+					<div class="item">Identificazione di soggetti e oggetti in frasi con sintagmi nominali articolati.</div>
+					<div class="item">Analisi delle preposizioni articolate e dei costrutti preposizionali.</div>
+					<div class="item">Riconoscimento dei verbi ausiliari (essere, avere) e delle costruzioni composte.</div>
 				</div>
 			</section>
 		</div>
@@ -112,7 +113,7 @@
 
 </main>
 
-<!-- Rodape -->
+<!-- Piè di pagina -->
 <footer class="aot-footer" role="contentinfo">
 	<div class="footer-inner">
 		<div class="footer-grid">
@@ -120,13 +121,13 @@
 				<div class="footer-brand">
 					<span class="brand-accent">AOT</span><span class="brand-dot">.ru</span>
 				</div>
-				<p class="footer-desc">Sistema de analise automatica de texto. Analise sintatica de documentos em russo, ucraino, ingles, alemao, espanhol, frances, portugues, italiano e latim.</p>
+				<p class="footer-desc">Sistema di analisi automatica dei testi. Analisi sintattica per le lingue russa, ucraina, inglese, tedesca, spagnola, francese, portoghese, finlandese, italiana e latina.</p>
 			</div>
 			<div class="footer-col">
-				<h4>Projeto</h4>
-				<a href="/index.html">Inicio</a>
-				<a href="/history.html">Historia</a>
-				<a href="/onlinedemo.html">Demos</a>
+				<h4>Progetto</h4>
+				<a href="/index.html">Home</a>
+				<a href="/history.html">Storia</a>
+				<a href="/onlinedemo.html">Demo</a>
 				<a href="/technology.html">Tecnologia</a>
 			</div>
 			<div class="footer-col">
@@ -145,7 +146,7 @@
 			</div>
 		</div>
 		<div class="footer-bottom">
-			<p>&copy; 2003&ndash;2026 Projeto AOT. Todos os direitos reservados.</p>
+			<p>&copy; 2003&ndash;2026 Progetto AOT. Tutti i diritti riservati.</p>
 		</div>
 	</div>
 </footer>
@@ -153,13 +154,13 @@
 <script src="libs/d3.min.js"></script>
 <script src="libs/jquery-3.3.1.min.js"></script>
 <script src="libs/semantic.min.js"></script>
-<script src="synan_por_legal.js?v=2"></script>
+<script src="synan_ita_legal.js?v=2"></script>
 
 <script>
 	const examples = [
-		"O presente Contrato entrara em vigor no momento de sua assinatura pelas Partes e permanecera vigente ate o total cumprimento de suas obrigacoes.",
-		"Os orgaos publicos da administracao local atuarao somente de acordo com o estabelecido na Constituicao e nas leis.",
-		"As Partes serao responsaveis pelo descumprimento ou pelo cumprimento defeituoso das obrigacoes decorrentes do presente Contrato de conformidade com a legislacao aplicavel."
+		"Il presente contratto entra in vigore nel momento in cui entrambe le parti lo hanno firmato e rimane valido fino a quando tutti gli obblighi derivanti da esso sono stati completamente adempiuti.",
+		"La Repubblica italiana riconosce e garantisce i diritti inviolabili dell uomo sia come singolo sia nelle formazioni sociali ove si svolge la sua personalita.",
+		"Le parti sono responsabili dell inadempimento o dell esecuzione inesatta degli obblighi derivanti dal presente contratto secondo le disposizioni della legislazione applicabile."
 	];
 
 	function setExample(i) {
@@ -184,7 +185,7 @@
 		var url = URL.createObjectURL(blob);
 		var a = document.createElement('a');
 		a.href = url;
-		a.download = 'synan_por_legal.svg';
+		a.download = 'synan_ita_legal.svg';
 		document.body.appendChild(a);
 		a.click();
 		document.body.removeChild(a);
