@@ -29,3 +29,6 @@
 [submodule "Dicts/Morph/Finnish/unimorph"]
 	path = Dicts/Morph/Finnish/unimorph
 	url = https://github.com/unimorph/fin.git
+[submodule "Dicts/Morph/Italian/unimorph"]
+	path = Dicts/Morph/Italian/unimorph
+	url = https://github.com/unimorph/ita.git

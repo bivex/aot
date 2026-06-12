@@ -20,6 +20,9 @@ add_library(SynanLib
         FinSyntaxOpt.cpp
         FinSentence.cpp
         FinFormatCaller.cpp
+        ItSyntaxOpt.cpp
+        ItSentence.cpp
+        ItFormatCaller.cpp
         SentencesCollection.h
         SyntaxHolder.h
         SpaSyntaxOpt.h
@@ -37,6 +40,9 @@ add_library(SynanLib
         FinSyntaxOpt.h
         FinSentence.h
         FinFormatCaller.h
+        ItSyntaxOpt.h
+        ItSentence.h
+        ItFormatCaller.h
 )
 
 target_link_libraries(SynanLib

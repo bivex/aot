@@ -1,0 +1,70 @@
+%% ========== Italian Syntax Rules ==========
+
+[NOUN] -> [TOKEN grm="NOUN"];
+[ADJ] -> [TOKEN grm="ADJ"];
+[VERB] -> [TOKEN grm="VERB"];
+[ADV] -> [TOKEN grm="ADV"];
+[PRON] -> [TOKEN grm="PRON"];
+[CONJ] -> [TOKEN grm="CONJ"];
+[NUM] -> [TOKEN grm="NUM"];
+[PART] -> [TOKEN grm="PART"];
+[PREP] -> [TOKEN grm="PREP"];
+[DET] -> [TOKEN grm="DET"];
+[PROPN] -> [TOKEN grm="PROPN"];
+
+%% Noun Phrase: Italian uses articles (DET) before nouns
+[NP] -> [NOUN];
+[NP] -> [PRON];
+[NP] -> [DET] [NOUN];
+[NP] -> [ADJ] [NOUN];
+[NP] -> [DET] [ADJ] [NOUN];
+[NP] -> [DET] [NOUN] [ADJ];
+[NP] -> [NUM] [NOUN];
+[NP] -> [DET] [NUM] [NOUN];
+[NP] -> [PROPN];
+[NP] -> [NP] [CONJ] [NP];
+
+%% Adjective Phrase
+[AP] -> [ADJ];
+[AP] -> [ADV] [ADJ];
+
+%% Prepositional Phrase: Italian prepositions
+[PP] -> [PREP] [NP];
+[PP] -> 'DI' [NP];
+[PP] -> 'A' [NP];
+[PP] -> 'DA' [NP];
+[PP] -> 'IN' [NP];
+[PP] -> 'CON' [NP];
+[PP] -> 'SU' [NP];
+[PP] -> 'PER' [NP];
+[PP] -> 'TRA' [NP];
+[PP] -> 'FRA' [NP];
+
+%% NP with PP attachment
+[NP] -> [NP] [PP];
+[NP] -> [NP] [AP];
+
+%% Verb Phrase
+[VP] -> [VERB root];
+[VP] -> [VERB root] [NP];
+[VP] -> [VERB root] [ADV];
+[VP] -> [ADV] [VERB root];
+[VP] -> [NP] [VERB root];
+[VP] -> [VERB root] [NP] [PP];
+[VP] -> [VERB root] [PP];
+[VP] -> [PART] [VERB root];
+[VP] -> [VERB root] [PART] [VERB];
+[VP] -> [VERB root] [ADJ];
+[VP] -> [VERB root] [AP];
+[VP] -> [VP] [PP];
+
+%% Subject-Predicate
+[SP] -> [NP] [VP];
+[SP] -> [NP] [VP] [NP];
+[SP] -> [NP] [VP] [PP];
+[SP] -> [NP] [VP] [ADV];
+[SP] -> [VP] [NP];
+[SP] -> [SP] [CONJ] [SP];
+
+%% Root
+[SYN_GROUP] -> [NP] | [VP] | [SP] | [PP] | [AP] | [PART] | [ADV];
