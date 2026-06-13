@@ -1,6 +1,6 @@
 # RML — Russian Morphological Dictionary
 
-> **RML** (Russian Morphological Library) — a linguistic environment for processing Russian, English, German, Ukrainian, Spanish, French, and Latin texts. Includes morphological analyzers, syntactic parsers, and semantic analysis tools.
+> **RML** (Russian Morphological Library) — a linguistic environment for processing Russian, Ukrainian, English, German, Spanish, French, Latin, Portuguese, Finnish, Italian, and Hungarian texts. Includes morphological analyzers, syntactic parsers, and semantic analysis tools.
 
 ## 📖 Table of Contents
 
@@ -27,7 +27,7 @@
 
 ## About
 
-RML is a comprehensive linguistic processing framework developed for natural language processing (NLP) tasks in Russian, English, German, Ukrainian, Spanish, French, and Latin. The project started in Moscow at Dialing Company, was later extended with German support at the Berlin-Brandenburg Academy of Sciences and Humanities (DWDS project), and has recently been updated to support Spanish, Latin, and French syntax/morphology.
+RML is a comprehensive linguistic processing framework developed for natural language processing (NLP) tasks in 11 languages: Russian, Ukrainian, English, German, Spanish, French, Latin, Portuguese, Finnish, Italian, and Hungarian. The project started in Moscow at Dialing Company, was later extended with German support at the Berlin-Brandenburg Academy of Sciences and Humanities (DWDS project), and has recently been expanded with UniMorph-based morphology for Romance, Finno-Ugric, and other languages.
 
 **Official website:** [www.aot.ru](http://www.aot.ru) (Russian)
 
@@ -37,8 +37,8 @@ RML is a comprehensive linguistic processing framework developed for natural lan
 
 ## Features
 
-- **Morphological analysis** — lemmatization, part-of-speech tagging, inflection patterns
-- **Syntactic parsing** — dependency and constituency parsing (Russian, German, English, Spanish, French, Latin)
+- **Morphological analysis** — lemmatization, part-of-speech tagging, inflection patterns (11 languages)
+- **Syntactic parsing** — dependency and constituency parsing (all 11 languages)
 - **Semantic analysis** — semantic graph construction, Russian→English translation
 - **N-gram statistics** — collocation detection with bigram frequencies
 - **HTTP daemons** — REST-like API for integration into other applications
@@ -52,9 +52,7 @@ RML is a comprehensive linguistic processing framework developed for natural lan
 The project includes a web-based interface for visualizing linguistic analysis:
 
 - **Unified Interface**: `modern/index.html` — A modern SPA for general morphology and syntax.
-- **Russian Legal Demo**: `demo/rus_legal.html` — Specialized for Russian legal documents.
-- **English Legal Demo**: `demo/eng_legal.html` — Optimized for complex contract analysis with original casing preservation.
-- **Ukrainian Legal Demo**: `demo/ukr_legal.html` — Specialized for Ukrainian legal documents.
+- **Legal Demos** (one per language): `demo/rus_legal.html`, `demo/ukr_legal.html`, `demo/eng_legal.html`, `demo/ger_legal.html`, `demo/spa_legal.html`, `demo/fre_legal.html`, `demo/lat_legal.html`, `demo/por_legal.html`, `demo/fin_legal.html`, `demo/ita_legal.html`, `demo/hun_legal.html` — Specialized syntactic parsing of legal and official documents.
 - **Game Narrative Extractor**: `demo/game_design_eng.html` — Extract characters, actions and scene structure from English text for game design.
 
 ![Russian Legal Demo](Docs/images/rus_legal_demo.png)
@@ -399,8 +397,8 @@ RML=$RML ./Bin/SynanDaemon --host 127.0.0.1 --port 8082
 
 | Action | Parameters | Description |
 |--------|-----------|-------------|
-| `morph` | `langua=<Russian\|German\|English\|Ukrainian\|Spanish\|French\|Latin>`, `query=<word>` | Morphological analysis of a word |
-| `syntax` | `langua=<Russian\|German\|English\|Ukrainian\|Spanish\|French\|Latin>`, `query=<sentence>` | Syntactic parsing of a sentence |
+| `morph` | `langua=<Russian\|Ukrainian\|English\|German\|Spanish\|French\|Latin\|Portuguese\|Finnish\|Italian\|Hungarian>`, `query=<word>` | Morphological analysis of a word |
+| `syntax` | `langua=<Russian\|Ukrainian\|English\|German\|Spanish\|French\|Latin\|Portuguese\|Finnish\|Italian\|Hungarian>`, `query=<sentence>` | Syntactic parsing of a sentence |
 | `bigrams` | `langua=Russian`, `query=<word>`, `minBigramsFreq=<N>`, `sortMode=<freq\|mi>` | Find collocations |
 
 **Example:**
@@ -469,13 +467,17 @@ RML/
 ├── build/                  # CMake build directory ( created during build )
 ├── Dicts/                  # Dictionary data ( generated during build )
 │   ├── Morph/              # Morphological dictionaries
-│   │   ├── Russian/        # 25 MB  | 298k lemmas | 4.2M word forms
-│   │   ├── Ukrainian/      # 25 MB  | 419k lemmas | 4.0M word forms
+│   │   ├── Russian/        # 23 MB  | 299k lemmas | 4.2M word forms
+│   │   ├── Ukrainian/      # 23 MB  | 419k lemmas | 4.0M word forms
 │   │   ├── English/        # 94 MB  | 445k lemmas | ~2.5M word forms
-│   │   ├── German/         # 12 MB  | 219k lemmas | 1.5M word forms (no frequency corpus)
-│   │   ├── Spanish/        # 48 MB  | 72k lemmas  | 1.2M word forms (no frequency corpus)
-│   │   ├── French/         # 3.3 MB | 56k lemmas  | 520k word forms (no frequency corpus)
-│   │   └── Latin/          # 2.8 MB | 47k lemmas  | 968k word forms (no frequency corpus)
+│   │   ├── German/         # 60 MB  |  46k lemmas | 1.5M word forms
+│   │   ├── Spanish/        # 166 MB |  72k lemmas | 1.2M word forms
+│   │   ├── French/         # 69 MB  |  56k lemmas | 520k word forms
+│   │   ├── Latin/          # 122 MB |  48k lemmas | 968k word forms
+│   │   ├── Portuguese/     # 28 MB  |   4k lemmas | UniMorph-based
+│   │   ├── Finnish/        # 329 MB |  65k lemmas | UniMorph-based
+│   │   ├── Italian/        # 76 MB  |  32k lemmas | UniMorph-based
+│   │   └── Hungarian/      # 134 MB |  22k lemmas | UniMorph-based, 919k word forms
 │   ├── Bigrams/            # Bigram statistics
 │   ├── Ross/               # Thesaurus
 │   ├── Aoss/               # Semantic dictionary
@@ -484,13 +486,17 @@ RML/
 ├── Source/                 # Source code
 │   ├── morph_dict/         # Morphological dictionary library ( git submodule )
 │   │   └── data/
-│   │       ├── Russian/    # Source: morphs.json (33 MB, 2,767 models)
-│   │       ├── Ukrainian/  # Source: morphs.json (39 MB, 5,855 models)
-│   │       ├── English/    # Source: morphs.json (28 MB, 2,639 models)
-│   │       ├── German/     # Source: morphs.json (21 MB, 1,319 models)
-│   │       ├── Spanish/    # Source: morphs.json (72.7 MB, 7,051 models)
-│   │       ├── French/     # Source: morphs.json (5.7 MB, 932 models)
-│   │       └── Latin/      # Source: morphs.json (4.0 MB, 1,015 models)
+│   │       ├── Russian/    # Source: morphs.json (33 MB)
+│   │       ├── Ukrainian/  # Source: morphs.json (38 MB)
+│   │       ├── English/    # Source: morphs.json (27 MB)
+│   │       ├── German/     # Source: morphs.json (4.1 MB)
+│   │       ├── Spanish/    # Source: morphs.json (69 MB)
+│   │       ├── French/     # Source: morphs.json (5.4 MB)
+│   │       ├── Latin/      # Source: morphs.json (3.8 MB)
+│   │       ├── Portuguese/ # Source: morphs.json (568 KB, UniMorph)
+│   │       ├── Finnish/    # Source: morphs.json (6.7 MB, UniMorph)
+│   │       ├── Italian/    # Source: morphs.json (2.2 MB, UniMorph)
+│   │       └── Hungarian/  # Source: morphs.json (4.4 MB, UniMorph)
 │   ├── dicts/              # Dictionary processing tools
 │   ├── graphan/            # Graphematical analysis
 │   ├── morphen/            # Morphological analysis
@@ -511,42 +517,37 @@ RML/
 
 ### Quick Stats (Binary Output)
 
-| Language | Total Size | Lemmas | Word Forms | WordData Entries | Status |
-|----------|-----------|--------|------------|------------------|--------|
-| Russian  | 25 MB     | 298,510 | 4.2M      | 51,084           | ✅ rebuilt (May 14) |
-| Ukrainian| 25 MB     | 418,983 | 4.0M      | 418,983          | ✅ rebuilt (May 14) |
-| English  | 94 MB     | 444,755 | ~2.5M     | 13,933           | ✅ up-to-date |
-| German   | 12 MB     | 218,950 | 1.5M      | 0 (empty)        | ✅ rebuilt (May 14) |
-| Spanish  | 48 MB     | 72,093  | 1.2M      | 0 (empty)        | ✅ up-to-date |
-| French   | 3.3 MB    | 56,199  | 520k      | 0 (empty)        | ✅ up-to-date |
-| Latin    | 2.8 MB    | 47,786  | 968k      | 0 (empty)        | ✅ up-to-date |
+| Language | Total Size | Lemmas | Word Forms | Source | Status |
+|----------|-----------|--------|------------|--------|--------|
+| Russian  | 23 MB     | 298,510 | 4.2M      | AOT    | ✅ up-to-date |
+| Ukrainian| 23 MB     | 418,983 | 4.0M      | AOT    | ✅ up-to-date |
+| English  | 94 MB     | 444,755 | ~2.5M     | AOT    | ✅ up-to-date |
+| German   | 60 MB     | 45,736  | 1.5M      | AOT    | ✅ up-to-date |
+| Spanish  | 166 MB    | 72,093  | 1.2M      | AOT    | ✅ up-to-date |
+| French   | 69 MB     | 56,199  | 520k      | AOT    | ✅ up-to-date |
+| Latin    | 122 MB    | 47,786  | 968k      | AOT    | ✅ up-to-date |
+| Portuguese | 28 MB   | 4,158   | —         | UniMorph | ✅ up-to-date |
+| Finnish  | 329 MB    | 64,999  | —         | UniMorph | ✅ up-to-date |
+| Italian  | 76 MB     | 31,855  | —         | UniMorph | ✅ up-to-date |
+| Hungarian| 134 MB    | 21,584  | 919k      | UniMorph | ✅ up-to-date |
 
 **Source data** (in `Source/morph_dict/data/<Language>/`):
-- `morphs.json` — morphological models + lemmas (4–80 MB per language)
-  - Russian: 2,767 models → 298,510 lemmas → 4.2M word forms (33 MB file)
-  - Ukrainian: 5,855 models → 418,983 lemmas → 4.0M word forms (38 MB)
-  - English: 2,639 models → 444,755 lemmas → ~2.5M word forms (27 MB)
-  - German: 1,319 models → 218,950 lemmas → 1.5M word forms (21 MB)
-  - Spanish: 7,051 models → 72,093 lemmas → 1.2M word forms (72.7 MB)
-  - French: 932 models → 56,199 lemmas → 520k word forms (5.7 MB)
-  - Latin: 1,015 models → 47,786 lemmas → 968k word forms (4.0 MB)
+- `morphs.json` — morphological models + lemmas
+- `gramtab.json` — grammatical codes (4–152 KB)
+- `WordData.txt` — words with frequency corpus (Ukrainian richest: 419k; others empty)
 - `gramtab.json` — grammatical codes (20–174 KB)
 - `WordData.txt` — words with frequency corpus (Ukrainian richest: 418k; German empty)
 
 **Binary output** (in `Dicts/Morph/<Language>/`):
-- `morph.bases` — lemmas base (2–5 MB): RU 2.6M, UA 4.0M, EN 4.8M, DE 2.8M
-- `morph.annot` — annotations (3–6 MB): RU 4.7M, UA 5.6M, EN 4.9M, DE 3.6M
-- `morph.forms_autom` — morphological automaton (4–9 MB): RU 6.4M, UA 7.0M, EN 4.0M, DE 4.9M
-- `npredict.bin` — unknown word predictor (0.8–3.4 MB)
-- `*wordweight.bin` & `*homoweight.bin` — frequency tables (German files are minimal/empty — expected due to empty WordData.txt)
+- `morph.bases` — lemmas base
+- `morph.annot` — annotations
+- `morph.forms_autom` — morphological automaton (FSA)
+- `*wordweight.bin` & `*homoweight.bin` — frequency tables (only for languages with a frequency corpus: Russian, Ukrainian, English)
 
-**German-specific notes:**
-- Has **no frequency corpus** — `WordData.txt` is empty (0 bytes, rebuilt May 14, 2026)
-- Frequency binary files (`*wordweight.bin`) are therefore minimal (60–200 bytes each) — **this is expected and normal**
-- Syntactic support provided separately via `Dicts/GerSynan/` (German grammar tables for Synan parser)
-- Morphological coverage: ~219k lemmas, ~1.5M word forms — adequate for general text but less comprehensive than Russian/Ukrainian
-- Best for: morphological analysis, lemmatization, basic syntactic parsing
-- Not suitable for: frequency-based ranking, collocation extraction, corpus linguistics requiring frequency data
+**Notes on coverage:**
+- **Russian, Ukrainian, English** — hand-curated AOT dictionaries with frequency corpora; most comprehensive
+- **German, Spanish, French, Latin** — AOT dictionaries without frequency corpora
+- **Portuguese, Finnish, Italian, Hungarian** — built from [UniMorph](https://unimorph.github.io/) data via converters in `dev/<lang>_conv/`
 
 ### Rebuild Scripts
 
@@ -563,6 +564,9 @@ cd Scripts/dict_rebuild
 ./rebuild_spanish_dicts.sh      # Spanish
 ./rebuild_french_dicts.sh       # French
 ./rebuild_latin_dicts.sh        # Latin
+./rebuild_portuguese_dicts.sh   # Portuguese (UniMorph)
+./rebuild_finnish_dicts.sh      # Finnish (UniMorph)
+./rebuild_hungarian_dicts.sh    # Hungarian (UniMorph)
 
 # Verify integrity
 ./verify_russian_dicts.sh
