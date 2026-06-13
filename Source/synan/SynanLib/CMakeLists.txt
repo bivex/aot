@@ -23,6 +23,9 @@ add_library(SynanLib
         ItSyntaxOpt.cpp
         ItSentence.cpp
         ItFormatCaller.cpp
+        HunSyntaxOpt.cpp
+        HunSentence.cpp
+        HunFormatCaller.cpp
         SentencesCollection.h
         SyntaxHolder.h
         SpaSyntaxOpt.h
@@ -43,6 +46,9 @@ add_library(SynanLib
         ItSyntaxOpt.h
         ItSentence.h
         ItFormatCaller.h
+        HunSyntaxOpt.h
+        HunSentence.h
+        HunFormatCaller.h
 )
 
 target_link_libraries(SynanLib
