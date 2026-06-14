@@ -367,7 +367,96 @@ def convert():
         'NAUKA': ['sg'], 'NAUKI': ['pl'],
         'TECHNIKA': ['sg'],
         'KULTURA': ['sg'], 'KULTURY': ['pl'],
+        # legal nouns missing from UniMorph
+        'NARUSZENIE': ['sg'], 'NARUSZENIA': ['pl'],
+        'OBOWIAZEK': ['sg'], 'OBOWIAZKI': ['pl'],
+        'PRZEDMIOT': ['sg'], 'PRZEDMIOTY': ['pl'],
+        'CZESC': ['sg'], 'CZESCI': ['pl'],
+        'PRZYZNANIE': ['sg'], 'PRZYZNANIA': ['pl'],
+        'OŚWIADCZENIE'.replace('Ś','S'): ['sg'],
+        'WARUNEK': ['sg'], 'WARUNKI': ['pl'],
+        'SKUTEK': ['sg'], 'SKUTKI': ['pl'],
+        'CECHA': ['sg'], 'CECHY': ['pl'],
+        'TRESC': ['sg'],
+        'WYKONANIE': ['sg'], 'WYKONANIA': ['pl'],
+        'WYMAGANIE': ['sg'], 'WYMAGANIA': ['pl'],
+        'POSTANOWIENIE': ['sg'], 'POSTANOWIENIA': ['pl'],
+        'SRODEK': ['sg'], 'SRODKI': ['pl'],
+        'CZAS': ['sg'], 'CZASY': ['pl'],
+        'MIEJSCE': ['sg'], 'MIEJSCA': ['pl'],
+        'SPOSÓB'.replace('Ó','O'): ['sg'], 'SPOSOBY': ['pl'],
+        'SZCZEGOL': ['sg'], 'SZCZEGOLY': ['pl'],
+        'PRZEDSIONEK': ['sg'],
+        'ZAPLATA': ['sg'], 'ZAPLATY': ['pl'],
+        'WYNIAGRODZENIE': ['sg'],
+        'WYNAGRODZENIE': ['sg'], 'WYNAGRODZENIA': ['pl'],
+        'PRACODAWCA': ['sg'], 'PRACODAWCY': ['pl'],
+        'PRACOWNIK': ['sg'], 'PRACOWNICY': ['pl'],
+        'WIERZYCIEL': ['sg'], 'WIERZYCIELE': ['pl'],
+        'DLUZNIK': ['sg'], 'DLUZNICY': ['pl'],
+        'PODMIOT': ['sg'], 'PODMIOTY': ['pl'],
     }
+
+    # ── common + legal adjectives (full declension generated from stem) ──
+    # Each entry: (STEM, SOFT?) where SOFT stems take -i masc.nom.sg, hard take -y.
+    # Stems do NOT include the final masc.nom.sg vowel.
+    ADJ_ENDINGS = {
+        ('masc', 'nom', 'sg'): '{m}', ('masc', 'gen', 'sg'): 'EGO', ('masc', 'dat', 'sg'): 'EMU',
+        ('masc', 'acc', 'sg'): '{m}', ('masc', 'ins', 'sg'): 'YM', ('masc', 'loc', 'sg'): 'YM',
+        ('fem', 'nom', 'sg'): 'A', ('fem', 'gen', 'sg'): 'EJ', ('fem', 'dat', 'sg'): 'EJ',
+        ('fem', 'acc', 'sg'): 'A', ('fem', 'ins', 'sg'): 'A', ('fem', 'loc', 'sg'): 'EJ',
+        ('neut', 'nom', 'sg'): 'E', ('neut', 'gen', 'sg'): 'EGO', ('neut', 'dat', 'sg'): 'EMU',
+        ('neut', 'acc', 'sg'): 'E', ('neut', 'ins', 'sg'): 'YM', ('neut', 'loc', 'sg'): 'YM',
+        ('vir', 'nom', 'pl'): 'I', ('vir', 'gen', 'pl'): 'YCH', ('vir', 'dat', 'pl'): 'YM',
+        ('vir', 'acc', 'pl'): 'YCH', ('vir', 'ins', 'pl'): 'YMI', ('vir', 'loc', 'pl'): 'YCH',
+        ('nvir', 'nom', 'pl'): 'E', ('nvir', 'gen', 'pl'): 'YCH', ('nvir', 'dat', 'pl'): 'YM',
+        ('nvir', 'acc', 'pl'): 'E', ('nvir', 'ins', 'pl'): 'YMI', ('nvir', 'loc', 'pl'): 'YCH',
+    }
+    GENDER_TAG = {'masc': 'MASC', 'fem': 'FEM', 'neut': 'NEUT', 'vir': 'MASC', 'nvir': 'NEUT'}
+    # (stem, masc_nom_sg_final_vowel, full_lemma_for_display)
+    COMMON_ADJS = [
+        ('NINIEJSZ', 'Y', 'NINIEJSZY'),    # present/this (legal)
+        ('ZGODN', 'Y', 'ZGODNY'),          # consistent
+        ('PRAWN', 'Y', 'PRAWNY'),          # legal
+        ('PRAWIDL', 'Y', 'PRAWIDLOWY'),    # correct (stem PRAWIDL-, note O→nothing)
+        ('WAZN', 'Y', 'WAZNY'),            # valid/important
+        ('OKRESL', 'Y', 'OKRESLONY'),      # specified (simplified hard declension)
+        ('PODSTAW', 'Y', 'PODSTAWOWY'),    # basic (simplified)
+        ('GLOWN', 'Y', 'GLOWNY'),          # main
+        ('NOW', 'Y', 'NOWY'),              # new
+        ('STAR', 'Y', 'STARY'),            # old
+        ('WYSOK', 'I', 'WYSOKI'),          # high
+        ('NISK', 'I', 'NISKI'),            # low
+        ('DOBR', 'Y', 'DOBRY'),            # good
+        ('ZL', 'Y', 'ZLY'),                # bad
+        ('DUZ', 'Y', 'DUZY'),              # big
+        ('MAL', 'Y', 'MALY'),              # small
+        ('PIERWSZ', 'Y', 'PIERWSZY'),      # first
+        ('DRUG', 'I', 'DRUGI'),            # second
+        ('KAZD', 'Y', 'KAZDY'),            # each/every
+        ('INN', 'Y', 'INNY'),              # other
+        ('CAL', 'Y', 'CALY'),              # whole
+        ('WLASN', 'Y', 'WLASNY'),          # own
+        ('JAWN', 'Y', 'JAWNY'),            # public/overt
+        ('KONIECZN', 'Y', 'KONIECZNY'),    # necessary
+        ('MOZLIW', 'Y', 'MOZLIWY'),        # possible
+        ('ODPOWIEDN', 'I', 'ODPOWIEDNI'),  # appropriate
+        ('OBOWIAZUJ', 'ACY', 'OBOWIAZUJACY'),  # binding (participial -ący)
+    ]
+
+    for stem, mnom, lemma_display in COMMON_ADJS:
+        for (gender, case, number), suffix in ADJ_ENDINGS.items():
+            tags = ['ADJ', case.upper(), number.upper()]
+            if gender == 'vir':
+                tags += ['MASC', 'HUM']
+            elif gender == 'nvir':
+                tags += ['PL']
+            else:
+                tags += [GENDER_TAG[gender]]
+            final = suffix.replace('{m}', mnom)
+            form = stem + final
+            data[lemma_display]['ADJ'].append((form, tags))
+
 
     for word, tags in NOUNS.items():
         word_clean = clean_polish(word)
@@ -459,7 +548,191 @@ def convert():
             ('IDA', ['V', 'PRS', 'IND', '3', 'PL']),
             ('ISC', ['V', 'NFIN']),
         ],
+        # ── additional common + legal verbs (present tense + infinitive) ──
+        'PONOSIC': [
+            ('PONOSZE', ['V', 'PRS', 'IND', '1', 'SG']),
+            ('PONOSISZ', ['V', 'PRS', 'IND', '2', 'SG']),
+            ('PONOSI', ['V', 'PRS', 'IND', '3', 'SG']),
+            ('PONOSIMY', ['V', 'PRS', 'IND', '1', 'PL']),
+            ('PONOSICIE', ['V', 'PRS', 'IND', '2', 'PL']),
+            ('PONOSZA', ['V', 'PRS', 'IND', '3', 'PL']),
+            ('PONOSIC', ['V', 'NFIN']),
+        ],
+        'WYNIKAC': [
+            ('WYNIKAM', ['V', 'PRS', 'IND', '1', 'SG']),
+            ('WYNIKASZ', ['V', 'PRS', 'IND', '2', 'SG']),
+            ('WYNIKA', ['V', 'PRS', 'IND', '3', 'SG']),
+            ('WYNIKAMY', ['V', 'PRS', 'IND', '1', 'PL']),
+            ('WYNIKACIE', ['V', 'PRS', 'IND', '2', 'PL']),
+            ('WYNIKAJA', ['V', 'PRS', 'IND', '3', 'PL']),
+            ('WYNIKAC', ['V', 'NFIN']),
+        ],
+        'ZAWIERAC': [
+            ('ZAWIERAM', ['V', 'PRS', 'IND', '1', 'SG']),
+            ('ZAWIERASZ', ['V', 'PRS', 'IND', '2', 'SG']),
+            ('ZAWIERA', ['V', 'PRS', 'IND', '3', 'SG']),
+            ('ZAWIERAMY', ['V', 'PRS', 'IND', '1', 'PL']),
+            ('ZAWIERACIE', ['V', 'PRS', 'IND', '2', 'PL']),
+            ('ZAWIERAJA', ['V', 'PRS', 'IND', '3', 'PL']),
+            ('ZAWIERAC', ['V', 'NFIN']),
+        ],
+        'ZOBOWIAZYWAC': [
+            ('ZOBOWIAZUJE', ['V', 'PRS', 'IND', '1', 'SG']),
+            ('ZOBOWIAZUJESZ', ['V', 'PRS', 'IND', '2', 'SG']),
+            ('ZOBOWIAZUJE', ['V', 'PRS', 'IND', '3', 'SG']),
+            ('ZOBOWIAZUJEMY', ['V', 'PRS', 'IND', '1', 'PL']),
+            ('ZOBOWIAZUJECIE', ['V', 'PRS', 'IND', '2', 'PL']),
+            ('ZOBOWIAZUJA', ['V', 'PRS', 'IND', '3', 'PL']),
+            ('ZOBOWIAZYWAC', ['V', 'NFIN']),
+        ],
+        'STANOWIC': [
+            ('STANOWIE', ['V', 'PRS', 'IND', '1', 'SG']),
+            ('STANOWISZ', ['V', 'PRS', 'IND', '2', 'SG']),
+            ('STANOWI', ['V', 'PRS', 'IND', '3', 'SG']),
+            ('STANOWIMY', ['V', 'PRS', 'IND', '1', 'PL']),
+            ('STANOWICIE', ['V', 'PRS', 'IND', '2', 'PL']),
+            ('STANOWIA', ['V', 'PRS', 'IND', '3', 'PL']),
+            ('STANOWIC', ['V', 'NFIN']),
+        ],
+        'OKRESLAC': [
+            ('OKRESLAM', ['V', 'PRS', 'IND', '1', 'SG']),
+            ('OKRESLASZ', ['V', 'PRS', 'IND', '2', 'SG']),
+            ('OKRESLA', ['V', 'PRS', 'IND', '3', 'SG']),
+            ('OKRESLAMY', ['V', 'PRS', 'IND', '1', 'PL']),
+            ('OKRESLACIE', ['V', 'PRS', 'IND', '2', 'PL']),
+            ('OKRESLAJA', ['V', 'PRS', 'IND', '3', 'PL']),
+            ('OKRESLAC', ['V', 'NFIN']),
+        ],
+        'PODLEGAC': [
+            ('PODLEGAM', ['V', 'PRS', 'IND', '1', 'SG']),
+            ('PODLEGASZ', ['V', 'PRS', 'IND', '2', 'SG']),
+            ('PODLEGA', ['V', 'PRS', 'IND', '3', 'SG']),
+            ('PODLEGAMY', ['V', 'PRS', 'IND', '1', 'PL']),
+            ('PODLEGACIE', ['V', 'PRS', 'IND', '2', 'PL']),
+            ('PODLEGAJA', ['V', 'PRS', 'IND', '3', 'PL']),
+            ('PODLEGAC', ['V', 'NFIN']),
+        ],
+        'WYKONYWAC': [
+            ('WYKONUJE', ['V', 'PRS', 'IND', '1', 'SG']),
+            ('WYKONUJESZ', ['V', 'PRS', 'IND', '2', 'SG']),
+            ('WYKONUJE', ['V', 'PRS', 'IND', '3', 'SG']),
+            ('WYKONUJEMY', ['V', 'PRS', 'IND', '1', 'PL']),
+            ('WYKONUJECIE', ['V', 'PRS', 'IND', '2', 'PL']),
+            ('WYKONUJA', ['V', 'PRS', 'IND', '3', 'PL']),
+            ('WYKONYWAC', ['V', 'NFIN']),
+        ],
+        'PLACIC': [
+            ('PLACE', ['V', 'PRS', 'IND', '1', 'SG']),
+            ('PLCISZ', ['V', 'PRS', 'IND', '2', 'SG']),
+            ('PLACI', ['V', 'PRS', 'IND', '3', 'SG']),
+            ('PLACIMY', ['V', 'PRS', 'IND', '1', 'PL']),
+            ('PLACICIE', ['V', 'PRS', 'IND', '2', 'PL']),
+            ('PLACA', ['V', 'PRS', 'IND', '3', 'PL']),
+            ('PLACIC', ['V', 'NFIN']),
+        ],
+        'ZAPLACIC': [
+            ('ZAPLACE', ['V', 'PRS', 'IND', '1', 'SG']),
+            ('ZAPLCISZ', ['V', 'PRS', 'IND', '2', 'SG']),
+            ('ZAPLACI', ['V', 'PRS', 'IND', '3', 'SG']),
+            ('ZAPLACIMY', ['V', 'PRS', 'IND', '1', 'PL']),
+            ('ZAPLACICIE', ['V', 'PRS', 'IND', '2', 'PL']),
+            ('ZAPLACA', ['V', 'PRS', 'IND', '3', 'PL']),
+            ('ZAPLACIC', ['V', 'NFIN']),
+        ],
+        'PRZYZNAWAC': [
+            ('PRZYZNAJE', ['V', 'PRS', 'IND', '1', 'SG']),
+            ('PRZYZNAJESZ', ['V', 'PRS', 'IND', '2', 'SG']),
+            ('PRZYZNAJE', ['V', 'PRS', 'IND', '3', 'SG']),
+            ('PRZYZNAJEMY', ['V', 'PRS', 'IND', '1', 'PL']),
+            ('PRZYZNAJECIE', ['V', 'PRS', 'IND', '2', 'PL']),
+            ('PRZYZNAJA', ['V', 'PRS', 'IND', '3', 'PL']),
+            ('PRZYZNAWAC', ['V', 'NFIN']),
+        ],
+        'WYMAGAC': [
+            ('WYMAGAM', ['V', 'PRS', 'IND', '1', 'SG']),
+            ('WYMAGASZ', ['V', 'PRS', 'IND', '2', 'SG']),
+            ('WYMAGA', ['V', 'PRS', 'IND', '3', 'SG']),
+            ('WYMAGAMY', ['V', 'PRS', 'IND', '1', 'PL']),
+            ('WYMAGACIE', ['V', 'PRS', 'IND', '2', 'PL']),
+            ('WYMAGAJA', ['V', 'PRS', 'IND', '3', 'PL']),
+            ('WYMAGAC', ['V', 'NFIN']),
+        ],
+        'PRZEDSTAWIAC': [
+            ('PRZEDSTAWIAM', ['V', 'PRS', 'IND', '1', 'SG']),
+            ('PRZEDSTAWIASZ', ['V', 'PRS', 'IND', '2', 'SG']),
+            ('PRZEDSTAWIA', ['V', 'PRS', 'IND', '3', 'SG']),
+            ('PRZEDSTAWIAMY', ['V', 'PRS', 'IND', '1', 'PL']),
+            ('PRZEDSTAWIACIE', ['V', 'PRS', 'IND', '2', 'PL']),
+            ('PRZEDSTAWIAJA', ['V', 'PRS', 'IND', '3', 'PL']),
+            ('PRZEDSTAWIAC', ['V', 'NFIN']),
+        ],
+        'DOTYCZYC': [
+            ('DOTYCZE', ['V', 'PRS', 'IND', '1', 'SG']),
+            ('DOTYCZYSZ', ['V', 'PRS', 'IND', '2', 'SG']),
+            ('DOTYCZY', ['V', 'PRS', 'IND', '3', 'SG']),
+            ('DOTYCZYMY', ['V', 'PRS', 'IND', '1', 'PL']),
+            ('DOTYCZYCIE', ['V', 'PRS', 'IND', '2', 'PL']),
+            ('DOTYCZA', ['V', 'PRS', 'IND', '3', 'PL']),
+            ('DOTYCZYC', ['V', 'NFIN']),
+        ],
+        'OBOWIAZYWAC': [
+            ('OBOWIAZUJE', ['V', 'PRS', 'IND', '1', 'SG']),
+            ('OBOWIAZUJESZ', ['V', 'PRS', 'IND', '2', 'SG']),
+            ('OBOWIAZUJE', ['V', 'PRS', 'IND', '3', 'SG']),
+            ('OBOWIAZUJEMY', ['V', 'PRS', 'IND', '1', 'PL']),
+            ('OBOWIAZUJECIE', ['V', 'PRS', 'IND', '2', 'PL']),
+            ('OBOWIAZUJA', ['V', 'PRS', 'IND', '3', 'PL']),
+            ('OBOWIAZYWAC', ['V', 'NFIN']),
+        ],
+        'SKLADAC': [
+            ('SKLADAM', ['V', 'PRS', 'IND', '1', 'SG']),
+            ('SKLADASZ', ['V', 'PRS', 'IND', '2', 'SG']),
+            ('SKLADA', ['V', 'PRS', 'IND', '3', 'SG']),
+            ('SKLADAMY', ['V', 'PRS', 'IND', '1', 'PL']),
+            ('SKLADACIE', ['V', 'PRS', 'IND', '2', 'PL']),
+            ('SKLADAJA', ['V', 'PRS', 'IND', '3', 'PL']),
+            ('SKLADAC', ['V', 'NFIN']),
+        ],
+        'UZYSKIWAC': [
+            ('UZYSKUJE', ['V', 'PRS', 'IND', '1', 'SG']),
+            ('UZYSKUJESZ', ['V', 'PRS', 'IND', '2', 'SG']),
+            ('UZYSKUJE', ['V', 'PRS', 'IND', '3', 'SG']),
+            ('UZYSKUJEMY', ['V', 'PRS', 'IND', '1', 'PL']),
+            ('UZYSKUJECIE', ['V', 'PRS', 'IND', '2', 'PL']),
+            ('UZYSKUJA', ['V', 'PRS', 'IND', '3', 'PL']),
+            ('UZYSKIWAC', ['V', 'NFIN']),
+        ],
+        'PRZYSTAPIAC': [
+            ('PRZYSTAPIAM', ['V', 'PRS', 'IND', '1', 'SG']),
+            ('PRZYSTAPIASZ', ['V', 'PRS', 'IND', '2', 'SG']),
+            ('PRZYSTAPIA', ['V', 'PRS', 'IND', '3', 'SG']),
+            ('PRZYSTAPIAMY', ['V', 'PRS', 'IND', '1', 'PL']),
+            ('PRZYSTAPIACIE', ['V', 'PRS', 'IND', '2', 'PL']),
+            ('PRZYSTAPIAJA', ['V', 'PRS', 'IND', '3', 'PL']),
+            ('PRZYSTAPIAC', ['V', 'NFIN']),
+        ],
+        'OTRZYMYWAC': [
+            ('OTRZYMUJE', ['V', 'PRS', 'IND', '1', 'SG']),
+            ('OTRZYMUJESZ', ['V', 'PRS', 'IND', '2', 'SG']),
+            ('OTRZYMUJE', ['V', 'PRS', 'IND', '3', 'SG']),
+            ('OTRZYMUJEMY', ['V', 'PRS', 'IND', '1', 'PL']),
+            ('OTRZYMUJECIE', ['V', 'PRS', 'IND', '2', 'PL']),
+            ('OTRZYMUJA', ['V', 'PRS', 'IND', '3', 'PL']),
+            ('OTRZYMYWAC', ['V', 'NFIN']),
+        ],
+        'PRZEWIDZIEC': [
+            ('PRZEWIDUJE', ['V', 'PRS', 'IND', '1', 'SG']),
+            ('PRZEWIDUJESZ', ['V', 'PRS', 'IND', '2', 'SG']),
+            ('PRZEWIDUJE', ['V', 'PRS', 'IND', '3', 'SG']),
+            ('PRZEWIDUJEMY', ['V', 'PRS', 'IND', '1', 'PL']),
+            ('PRZEWIDUJECIE', ['V', 'PRS', 'IND', '2', 'PL']),
+            ('PRZEWIDUJA', ['V', 'PRS', 'IND', '3', 'PL']),
+            ('PRZEWIDZIEC', ['V', 'NFIN']),
+        ],
+        'STANOWIC_SIE': [],  # placeholder removed below
     }
+    # clean up the placeholder
+    COMMON_VERBS.pop('STANOWIC_SIE', None)
 
     for lemma, forms in COMMON_VERBS.items():
         lemma_clean = clean_polish(lemma)
@@ -469,6 +742,50 @@ def convert():
             form_clean = clean_polish(form_raw)
             if form_clean:
                 data[lemma_clean][tags[0]].append((form_clean, tags))
+
+    # ── active present participles for key verbs (legal text uses them heavily) ──
+    # participle stem = 3pl present minus final -A + J  →  stem-J + adjective endings
+    # e.g. WYNIKAJA → stem WYNIKAJ → wynikający/-ąca/-ące/-ących...
+    PARTICIPLE_VERBS = {
+        'WYNIKAC': 'WYNIKAJ',       # wynikający (arising)
+        'OBOWIAZYWAC': 'OBOWIAZUJ', # obowiązujący (binding)
+        'ZAWIERAC': 'ZAWIERAJ',     # zawierający (concluding)
+        'OKRESLAC': 'OKRESLAJ',     # określający (specifying)
+        'WYKONYWAC': 'WYKONUJ',     # wykonujący (performing)
+        'WYMAGAC': 'WYMAGAJ',       # wymagający (requiring)
+        'PRZEDSTAWIAC': 'PRZEDSTAWIAJ',
+        'UZYSKIWAC': 'UZYSKUJ',
+        'OTRZYMYWAC': 'OTRZYMUJ',
+        'STANOWIC': 'STANOWI',
+        'DOTYCZYC': 'DOTYCZ',
+        'PONOSIC': 'PONOSZ',
+    }
+    # participle declension (stripped of diacritics: ą→A, ę→E)
+    PTCP_ENDINGS = {
+        ('masc', 'nom', 'sg'): 'ACY', ('masc', 'gen', 'sg'): 'ACEGO', ('masc', 'dat', 'sg'): 'ACEMU',
+        ('masc', 'acc', 'sg'): 'ACY', ('masc', 'ins', 'sg'): 'ACYM', ('masc', 'loc', 'sg'): 'ACYM',
+        ('fem', 'nom', 'sg'): 'ACA', ('fem', 'gen', 'sg'): 'ACEJ', ('fem', 'dat', 'sg'): 'ACEJ',
+        ('fem', 'acc', 'sg'): 'ACA', ('fem', 'ins', 'sg'): 'ACA', ('fem', 'loc', 'sg'): 'ACEJ',
+        ('neut', 'nom', 'sg'): 'ACE', ('neut', 'gen', 'sg'): 'ACEGO', ('neut', 'dat', 'sg'): 'ACEMU',
+        ('neut', 'acc', 'sg'): 'ACE', ('neut', 'ins', 'sg'): 'ACYM', ('neut', 'loc', 'sg'): 'ACYM',
+        ('vir', 'nom', 'pl'): 'ACY', ('vir', 'gen', 'pl'): 'ACYCH', ('vir', 'dat', 'pl'): 'ACYM',
+        ('vir', 'acc', 'pl'): 'ACYCH', ('vir', 'ins', 'pl'): 'ACYMI', ('vir', 'loc', 'pl'): 'ACYCH',
+        ('nvir', 'nom', 'pl'): 'ACE', ('nvir', 'gen', 'pl'): 'ACYCH', ('nvir', 'dat', 'pl'): 'ACYM',
+        ('nvir', 'acc', 'pl'): 'ACE', ('nvir', 'ins', 'pl'): 'ACYMI', ('nvir', 'loc', 'pl'): 'ACYCH',
+    }
+    for verb_lemma, ptcp_stem in PARTICIPLE_VERBS.items():
+        for (gender, case, number), suffix in PTCP_ENDINGS.items():
+            tags = ['V', 'PTCP', 'PRS', 'ACT', case.upper(), number.upper()]
+            if gender == 'vir':
+                tags += ['MASC', 'HUM']
+            elif gender == 'nvir':
+                tags += ['PL']
+            else:
+                tags += [GENDER_TAG[gender]]
+            form = ptcp_stem + suffix
+            # store under 'V' (not 'V.PTCP') so participles merge into the
+            # finite-verb paradigm and share its stem+lemma reconstruction
+            data[verb_lemma]['V'].append((form, tags))
 
     # Build morphology
     flexia_models = []

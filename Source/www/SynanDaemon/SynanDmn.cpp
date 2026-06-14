@@ -46,6 +46,18 @@ std::string TSynanHttpServer::ProcessMorphology(TDaemonParsedRequest &request) {
     if (request.Langua == morphFrench) {
         StripFrenchAccents(wordForm);
     }
+    if (request.Langua == morphPortuguese) {
+        StripPortugueseAccents(wordForm);
+    }
+    if (request.Langua == morphFinnish) {
+        StripFinnishAccents(wordForm);
+    }
+    if (request.Langua == morphHungarian) {
+        StripHungarianAccents(wordForm);
+    }
+    if (request.Langua == morphPolish) {
+        StripPolishAccents(wordForm);
+    }
     if (request.Langua == morphEnglish || request.Langua == morphSpanish || request.Langua == morphLatin || request.Langua == morphFrench || request.Langua == morphPortuguese || request.Langua == morphFinnish || request.Langua == morphItalian || request.Langua == morphHungarian || request.Langua == morphPolish) {
         MakeUpperUtf8(wordForm);
     }
