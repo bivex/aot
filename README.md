@@ -1,6 +1,6 @@
 # RML — Russian Morphological Dictionary
 
-> **RML** (Russian Morphological Library) — a linguistic environment for processing Russian, Ukrainian, English, German, Spanish, French, Latin, Portuguese, Finnish, Italian, and Hungarian texts. Includes morphological analyzers, syntactic parsers, and semantic analysis tools.
+> **RML** (Russian Morphological Library) — a linguistic environment for processing Russian, Ukrainian, English, German, Spanish, French, Latin, Portuguese, Finnish, Italian, Hungarian, and Polish texts. Includes morphological analyzers, syntactic parsers, and semantic analysis tools.
 
 ## 📖 Table of Contents
 
@@ -27,7 +27,7 @@
 
 ## About
 
-RML is a comprehensive linguistic processing framework developed for natural language processing (NLP) tasks in 11 languages: Russian, Ukrainian, English, German, Spanish, French, Latin, Portuguese, Finnish, Italian, and Hungarian. The project started in Moscow at Dialing Company, was later extended with German support at the Berlin-Brandenburg Academy of Sciences and Humanities (DWDS project), and has recently been expanded with UniMorph-based morphology for Romance, Finno-Ugric, and other languages.
+RML is a comprehensive linguistic processing framework developed for natural language processing (NLP) tasks in 12 languages: Russian, Ukrainian, English, German, Spanish, French, Latin, Portuguese, Finnish, Italian, Hungarian, and Polish. The project started in Moscow at Dialing Company, was later extended with German support at the Berlin-Brandenburg Academy of Sciences and Humanities (DWDS project), and has recently been expanded with UniMorph-based morphology for Romance, Finno-Ugric, and other languages.
 
 **Official website:** [www.aot.ru](http://www.aot.ru) (Russian)
 
@@ -37,8 +37,8 @@ RML is a comprehensive linguistic processing framework developed for natural lan
 
 ## Features
 
-- **Morphological analysis** — lemmatization, part-of-speech tagging, inflection patterns (11 languages)
-- **Syntactic parsing** — dependency and constituency parsing (all 11 languages)
+- **Morphological analysis** — lemmatization, part-of-speech tagging, inflection patterns (12 languages)
+- **Syntactic parsing** — dependency and constituency parsing (all 12 languages)
 - **Semantic analysis** — semantic graph construction, Russian→English translation
 - **N-gram statistics** — collocation detection with bigram frequencies
 - **HTTP daemons** — REST-like API for integration into other applications
@@ -52,7 +52,7 @@ RML is a comprehensive linguistic processing framework developed for natural lan
 The project includes a web-based interface for visualizing linguistic analysis:
 
 - **Unified Interface**: `modern/index.html` — A modern SPA for general morphology and syntax.
-- **Legal Demos** (one per language): `demo/rus_legal.html`, `demo/ukr_legal.html`, `demo/eng_legal.html`, `demo/ger_legal.html`, `demo/spa_legal.html`, `demo/fre_legal.html`, `demo/lat_legal.html`, `demo/por_legal.html`, `demo/fin_legal.html`, `demo/ita_legal.html`, `demo/hun_legal.html` — Specialized syntactic parsing of legal and official documents.
+- **Legal Demos** (one per language): `demo/rus_legal.html`, `demo/ukr_legal.html`, `demo/eng_legal.html`, `demo/ger_legal.html`, `demo/spa_legal.html`, `demo/fre_legal.html`, `demo/lat_legal.html`, `demo/por_legal.html`, `demo/fin_legal.html`, `demo/ita_legal.html`, `demo/hun_legal.html`, `demo/pol_legal.html` — Specialized syntactic parsing of legal and official documents.
 - **Game Narrative Extractor**: `demo/game_design_eng.html` — Extract characters, actions and scene structure from English text for game design.
 
 ![Russian Legal Demo](Docs/images/rus_legal_demo.png)
@@ -397,8 +397,8 @@ RML=$RML ./Bin/SynanDaemon --host 127.0.0.1 --port 8082
 
 | Action | Parameters | Description |
 |--------|-----------|-------------|
-| `morph` | `langua=<Russian\|Ukrainian\|English\|German\|Spanish\|French\|Latin\|Portuguese\|Finnish\|Italian\|Hungarian>`, `query=<word>` | Morphological analysis of a word |
-| `syntax` | `langua=<Russian\|Ukrainian\|English\|German\|Spanish\|French\|Latin\|Portuguese\|Finnish\|Italian\|Hungarian>`, `query=<sentence>` | Syntactic parsing of a sentence |
+| `morph` | `langua=<Russian\|Ukrainian\|English\|German\|Spanish\|French\|Latin\|Portuguese\|Finnish\|Italian\|Hungarian\|Polish>`, `query=<word>` | Morphological analysis of a word |
+| `syntax` | `langua=<Russian\|Ukrainian\|English\|German\|Spanish\|French\|Latin\|Portuguese\|Finnish\|Italian\|Hungarian\|Polish>`, `query=<sentence>` | Syntactic parsing of a sentence |
 | `bigrams` | `langua=Russian`, `query=<word>`, `minBigramsFreq=<N>`, `sortMode=<freq\|mi>` | Find collocations |
 
 **Example:**
@@ -477,7 +477,8 @@ RML/
 │   │   ├── Portuguese/     # 28 MB  |   4k lemmas | UniMorph-based
 │   │   ├── Finnish/        # 329 MB |  65k lemmas | UniMorph-based
 │   │   ├── Italian/        # 76 MB  |  32k lemmas | UniMorph-based
-│   │   └── Hungarian/      # 134 MB |  22k lemmas | UniMorph-based, 919k word forms
+│   │   ├── Hungarian/      # 134 MB |  22k lemmas | UniMorph-based, 919k word forms
+│   │   └── Polish/         # 1.7 MB |  13k lemmas | UniMorph-based
 │   ├── Bigrams/            # Bigram statistics
 │   ├── Ross/               # Thesaurus
 │   ├── Aoss/               # Semantic dictionary
@@ -496,7 +497,8 @@ RML/
 │   │       ├── Portuguese/ # Source: morphs.json (568 KB, UniMorph)
 │   │       ├── Finnish/    # Source: morphs.json (6.7 MB, UniMorph)
 │   │       ├── Italian/    # Source: morphs.json (2.2 MB, UniMorph)
-│   │       └── Hungarian/  # Source: morphs.json (4.4 MB, UniMorph)
+│   │       ├── Hungarian/  # Source: morphs.json (4.4 MB, UniMorph)
+│   │       └── Polish/     # Source: morphs.json (4.4 MB, UniMorph)
 │   ├── dicts/              # Dictionary processing tools
 │   ├── graphan/            # Graphematical analysis
 │   ├── morphen/            # Morphological analysis
@@ -530,6 +532,7 @@ RML/
 | Finnish  | 329 MB    | 64,999  | —         | UniMorph | ✅ up-to-date |
 | Italian  | 76 MB     | 31,855  | —         | UniMorph | ✅ up-to-date |
 | Hungarian| 134 MB    | 21,584  | 919k      | UniMorph | ✅ up-to-date |
+| Polish   | 1.7 MB    | 13,301  | 187k      | UniMorph | ✅ up-to-date |
 
 **Source data** (in `Source/morph_dict/data/<Language>/`):
 - `morphs.json` — morphological models + lemmas
@@ -547,7 +550,7 @@ RML/
 **Notes on coverage:**
 - **Russian, Ukrainian, English** — hand-curated AOT dictionaries with frequency corpora; most comprehensive
 - **German, Spanish, French, Latin** — AOT dictionaries without frequency corpora
-- **Portuguese, Finnish, Italian, Hungarian** — built from [UniMorph](https://unimorph.github.io/) data via converters in `dev/<lang>_conv/`
+- **Portuguese, Finnish, Italian, Hungarian, Polish** — built from [UniMorph](https://unimorph.github.io/) data via converters in `dev/<lang>_conv/`
 
 ### Rebuild Scripts
 
@@ -567,6 +570,7 @@ cd Scripts/dict_rebuild
 ./rebuild_portuguese_dicts.sh   # Portuguese (UniMorph)
 ./rebuild_finnish_dicts.sh      # Finnish (UniMorph)
 ./rebuild_hungarian_dicts.sh    # Hungarian (UniMorph)
+./rebuild_polish_dicts.sh       # Polish (UniMorph)
 
 # Verify integrity
 ./verify_russian_dicts.sh
