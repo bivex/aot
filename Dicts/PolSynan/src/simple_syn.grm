@@ -1,0 +1,41 @@
+%% ========== Polish Syntax Rules ==========
+
+[NOUN] -> [TOKEN grm="NOUN"];
+[ADJ] -> [TOKEN grm="ADJ"];
+[VERB] -> [TOKEN grm="VERB"];
+[ADV] -> [TOKEN grm="ADV"];
+[PRON] -> [TOKEN grm="PRON"];
+[CONJ] -> [TOKEN grm="CONJ"];
+[NUM] -> [TOKEN grm="NUM"];
+[PART] -> [TOKEN grm="PART"];
+[PREP] -> [TOKEN grm="PREP"];
+[DET] -> [TOKEN grm="DET"];
+
+[NP] -> [NOUN];
+[NP] -> [PRON];
+[NP] -> [ADJ] [NOUN];
+[NP] -> [NUM] [NOUN];
+[NP] -> [DET] [NOUN];
+[NP] -> [ADJ] [NOUN root];
+[NP] -> [DET] [ADJ] [NOUN];
+[NP] -> [DET] [NOUN root];
+
+[VP] -> [VERB root];
+[VP] -> [VERB root] [NP];
+[VP] -> [VERB root] [ADV];
+[VP] -> [ADV] [VERB root];
+[VP] -> [NP] [VERB root];
+[VP] -> [NP] [VERB root] [NP];
+[VP] -> [VERB root] [PART] [VERB];
+
+[PP] -> [PREP] [NP];
+
+[SP] -> [NP] [VP];
+[SP] -> [NP] [VP] [NP];
+[SP] -> [NP] [VP] [PP];
+[SP] -> [NP] [VP] [ADV];
+[SP] -> [VP] [NP];
+[SP] -> [NP] [VP] [PART] [VP];
+[SP] -> [SP] [CONJ] [SP];
+
+[SYN_GROUP] -> [NP] | [VP] | [SP] | [PP] | [PART] | [ADV];

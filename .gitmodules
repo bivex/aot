@@ -35,3 +35,6 @@
 [submodule "Dicts/Morph/Hungarian/unimorph"]
 	path = Dicts/Morph/Hungarian/unimorph
 	url = https://github.com/unimorph/hun.git
+[submodule "Dicts/Morph/Polish/unimorph"]
+	path = Dicts/Morph/Polish/unimorph
+	url = https://github.com/unimorph/pol.git

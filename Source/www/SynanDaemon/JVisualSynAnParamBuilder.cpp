@@ -111,6 +111,9 @@ void JVisualSynAnParamBuilder::TokenizeOriginal(const string& text) {
 		if (m_pSyntaxHolder->GetLanguage() == morphHungarian) {
 			StripHungarianAccents(upper);
 		}
+		if (m_pSyntaxHolder->GetLanguage() == morphPolish) {
+			StripPolishAccents(upper);
+		}
 		MakeUpperUtf8(upper);
 		m_OriginalWords.push_back(std::move(word));
 		m_UpperWords.push_back(std::move(upper));

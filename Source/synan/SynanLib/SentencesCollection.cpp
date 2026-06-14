@@ -14,6 +14,7 @@
 #include "FinSyntaxOpt.h"
 #include "ItSyntaxOpt.h"
 #include "HunSyntaxOpt.h"
+#include "PolSyntaxOpt.h"
 
 
 CSyntaxOpt *NewOptions(MorphLanguageEnum langua) {
@@ -46,6 +47,9 @@ CSyntaxOpt *NewOptions(MorphLanguageEnum langua) {
 
     if (langua == morphHungarian)
         return new CHunSyntaxOpt(langua);
+
+    if (langua == morphPolish)
+        return new CPolSyntaxOpt(langua);
 
     return new CRusSyntaxOpt(morphRussian);
 }
